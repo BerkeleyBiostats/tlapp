@@ -25,28 +25,155 @@
             </div>
         </nav>
         </div>
+
+
+        <div class="row wrapper border-bottom white-bg page-heading">
+            <div class="col-lg-12">
+                <a class="btn btn-primary btn-rounded" href="#">Model</a>
+                <a class="btn btn-default btn-rounded" href="#">Jobs</a>
+                <a class="btn btn-default btn-rounded" href="#">Results</a>
+            </div>
+        </div>
+
         <div class="wrapper wrapper-content">
             <div class="container">
+
+
+
                 <div class="row">
 
                     <div class="col-lg-12">
-                        <div class="ibox float-e-margins">
-                            <div class="ibox-title">
-                                <h5>Data</h5>
+
+
+                        <div class="tabs-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#tab-1">Guided</a></li>
+                            <li class=""><a data-toggle="tab" href="#tab-2">Custom</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab-1" class="tab-pane active">
+                                <div class="panel-body">
+                                    <h1>Data</h1>
+
+                                    <h2>Dataset</h2>
+
+                                    <p>Using <strong>AllGHAPStudies.Rdata</strong></p>
+
+                                    <p><strong>Total Records:</strong> 12,345</p>
+
+                                    <h3>Columns</h3>
+
+                                    <p>studyid, subjid, siteid, sex, agedays, WHZ, region, risk factor</p>
+
+                                    <h1>Model</h1>
+
+                                    <pre>
+
+#Subset to studyid, subjid, siteid, sex, agedays, WHZ, region,  and risk factor
+dim(d)
+d<- d %>% subset(select=c(WHZ, STUDYID,  SUBJID, SEX, AGEDAYS, region, HHwealth_quart)) %>%
+  subset(!is.na(HHwealth_quart)) %>% filter(WHZ>-5 & WHZ <5)
+dim(d)
+table(d$STUDYID,d$HHwealth_quart)
+table(d$STUDYID)
+summary(d$WHZ)
+
+
+
+#Clean covariates
+d$STUDYID<-as.factor(d$STUDYID)
+table(d$SEX)
+d$SEX[d$SEX=="male"]<-"Male"
+d$SEX[d$SEX=="female"]<-"Female"
+d$SEX<-as.factor(d$SEX)
+d$HHwealth_quart<-factor(d$HHwealth_quart)
+d$HHwealth_quart<-as.numeric(unclass(d$HHwealth_quart))
+
+summary(d$HHwealth_quart)
+
+
+d$wast<-ifelse(d$WHZ< (-2), 1,0)
+d$wast[is.na(d$WHZ)]<-NA
+
+
+#Drop empty factor levels
+d<-droplevels(d)
+d<-as.data.frame(d)
+
+lib=list(c("SL.glm","screen.corP"),c("SL.bayesglm","screen.corP"),
+         c("SL.gam","screen.corP"),
+         c("SL.glmnet","All"), c("SL.mean","All"))
+lib=c("SL.glm", "SL.gam", "SL.mean","SL.bayesglm")
+Wvars<-c("STUDYID", "SEX", "AGEDAYS", "region")
+
+Acuts= c(1.5, 2.5, 3.5)
+Alevels=c("Quartile 1", "Quartile 2","Quartile 3","Quartile 4")
+
+overallATE<-tmle_risk(dat=as.data.frame(d),
+                      W=Wvars,
+                      A="HHwealth_quart",
+                      n.cat=4,
+                      reflevel=1,
+                      Acuts=Acuts,
+                      Alevels=Alevels,
+                      outputdf=NULL,
+                      Y="wast",
+                      family="binomial",
+                      SLlibrary=lib)
+as.data.frame(overallATE)
+
+#NOTE: Need to figure out bug coming from study cross-validation,
+# and need to figure out how to create a reference group with enough
+# data support for every study
+
+time<-system.time(
+  study.ATEs <-
+    d %>%
+    group_by(STUDYID) %>% select_groups() %>%
+    do(try(as.data.frame(tmle_risk(dat=as.data.frame(.),
+                                   W=c("SEX", "AGEDAYS"),
+                                   A="HHwealth_quart",
+                                   n.cat=4,
+                                   reflevel=1,
+                                   Acuts=Acuts,
+                                   Alevels=Alevels,
+                                   outputdf=NULL,
+                                   Y="wast",
+                                   family="binomial",
+                                   SLlibrary=lib,
+                                   sparseN=0))))
+)
+as.data.frame(study.ATEs)
+time
+
+
+
+
+
+overallATE<-cbind("overall ATE", as.data.frame((overallATE)))
+colnames(overallATE)[1]<-"STUDYID"
+
+
+res<-rbind(as.data.frame(study.ATEs), as.data.frame(overallATE))
+res
+
+                                    </pre>
+
+
+                                </div>
+                            </div>
+                            <div id="tab-2" class="tab-pane">
+                                <div class="panel-body">
+                                    <h2>Donec quam felis</strong>
+
+                                </div>
                             </div>
                         </div>
+
+
                     </div>
 
-                </div>
-				
-				 <div class="row">
 
-                    <div class="col-lg-12">
-                        <div class="ibox float-e-margins">
-                            <div class="ibox-title">
-                                <h5>Model</h5>
-                            </div>
-                        </div>
                     </div>
 
                 </div>
