@@ -90,7 +90,7 @@
     <h3>Columns</h3>
   </div>
   <div class="col-md-10">
-
+<!-- 
 <button type="button" class="btn btn-default btn-sm">studyid</button>
 <button type="button" class="btn btn-default btn-sm">subjid</button>
 <button type="button" class="btn btn-default btn-sm">siteid</button>
@@ -99,28 +99,31 @@
 <button type="button" class="btn btn-default btn-sm">WHZ</button>
 <button type="button" class="btn btn-default btn-sm">region</button>
 <button type="button" class="btn btn-default btn-sm">risk factor</button>
-
+ -->
   </div>
 </div>
 
 <div class="row p-md">
+  <div class="col-md-12">
 
-  <div class="col-md-3">
-    <h3>W Vars</h3>
-    <p>Drag columns here</p>
+    <table>
+      {% for variable in variables %}
+      <tr>
+        <td class="p-md">{{ variable }}</td>
+        <td>
+          <div class="btn-group">
+              <button class="btn btn-primary" type="button">W</button>
+              <button class="btn btn-white" type="button">A</button>
+              <button class="btn btn-white" type="button">Y</button>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
   </div>
-  <div class="col-md-3">
-    <h3>A Vars</h3>
-    <p>Drag columns here</p>
-  </div>
-  <div class="col-md-3">
-    <h3>Y Vars</h3>
-    <p>Drag columns here</p>
-  </div>
-
-
-
 </div>
+
 
                                           
 

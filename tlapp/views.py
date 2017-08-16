@@ -7,4 +7,18 @@ from django.http import HttpResponse
 
 # @login_required
 def index(request):
-	return render(request, 'index.html')
+
+	context = {
+		"variables": [
+			"studyid",
+			"subjid",
+			"siteid",
+			"sex",
+			"agedays",
+			"WHZ",
+			"region",
+			"risk factor"
+		]
+	}
+
+	return render(request, 'index.html', context)
