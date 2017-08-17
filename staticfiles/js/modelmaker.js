@@ -21,10 +21,12 @@ var modelInputs = {
 		name: 'ABar',
 		help: 'A block of help text that explains the model input.',
 		type: 'float',
+		value: null,
 	}, {
 		name: 'Learners',
 		type: 'enum',
 		choices: ['GLM', 'Random Forest', 'Regression'],
+		value: [],
 	}],
 };
 
@@ -37,4 +39,18 @@ var app = new Vue({
 	variables: variables,
 	modelInputs: modelInputs,
   },
+  methods: {
+  	sendJob: function (event) {
+  		var parameters = this.modelInputs.fields.map(function (field) {
+  			return {
+  				name: field.name,
+  				value: field.value,
+  			};
+  		});
+  		console.log(parameters);
+  	},
+  },
 });
+
+
+
