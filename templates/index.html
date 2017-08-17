@@ -116,9 +116,15 @@
   <td class="p-md">${ variable.name }</td>
   <td>
     <div class="btn-group">
-      <button v-bind:class="{ 'btn-primary': variable.role === 'W', 'btn-white': variable.role !== 'W' }" class="btn" type="button">W</button>
-      <button v-bind:class="{ 'btn-primary': variable.role === 'A', 'btn-white': variable.role !== 'A' }" class="btn" type="button">A</button>
-      <button v-bind:class="{ 'btn-primary': variable.role === 'Y', 'btn-white': variable.role !== 'Y' }" class="btn" type="button">Y</button>
+        <button 
+          v-for="role in roles" 
+          v-bind:class="{ 'btn-primary': variable.role === role, 'btn-white': variable.role !== role }" 
+          v-on:click="variable.role = role"
+          class="btn" 
+          type="button"
+          >
+          ${ role }
+        </button>
     </div>
   </td>
 </tr>
