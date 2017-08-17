@@ -8,6 +8,23 @@ from django.http import HttpResponse
 # @login_required
 def index(request):
 
+	model_parameters = {
+		"parameters": [{
+			"name": "ABar",
+			"type": "float",
+			"help": "A block of help text that explains the model input.",
+		}, {
+			"name": "Learners",
+			"type": "enum",
+			"choices": [
+				"GLM",
+				"Random Forest",
+				"Regression"
+			],
+		},]
+
+	}
+
 	context = {
 		"variables": [
 			"studyid",
