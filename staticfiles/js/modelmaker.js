@@ -1,4 +1,4 @@
-var variable_names = [
+var variableNames = [
 	"studyid",
 	"subjid",
 	"siteid",
@@ -9,12 +9,24 @@ var variable_names = [
 	"risk factor"
 ];
 
-var variables = variable_names.map(function (variable_name) {
+var variables = variableNames.map(function (variableName) {
 	return {
-		name: variable_name,
+		name: variableName,
 		role: "W"
 	}
 });
+
+var modelInputs = {
+	fields: [{
+		name: 'ABar',
+		help: 'A block of help text that explains the model input.',
+		type: 'float',
+	}, {
+		name: 'Learners',
+		type: 'enum',
+		choices: ['GLM', 'Random Forest', 'Regression'],
+	}],
+};
 
 var app = new Vue({
   delimiters: ['${', '}'],
@@ -22,9 +34,7 @@ var app = new Vue({
   data: {
   	roles: ['W', 'A', 'Y'],
     message: 'Hello Vue!',
-	variables: variables
+	variables: variables,
+	modelInputs: modelInputs,
   },
-  computed: {
-
-  }
 });
