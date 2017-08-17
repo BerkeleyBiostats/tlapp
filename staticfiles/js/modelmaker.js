@@ -27,6 +27,11 @@ var modelInputs = {
 		type: 'enum',
 		choices: ['GLM', 'Random Forest', 'Regression'],
 		value: [],
+	}, {
+		name: 'Spacing',
+		type: 'enum',
+		choices: ['tight', 'loose'],
+		value: [],
 	}],
 };
 
