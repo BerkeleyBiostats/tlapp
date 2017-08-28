@@ -54,10 +54,14 @@ var app = new Vue({
   				value: field.value,
   			};
   		});
-  		console.log(parameters);
+
+  		var job = {
+  			parameters,
+  			model_template: this.selectedTemplate.id,
+  		};
 
   		// GET /someUrl
-		this.$http.post('/submit_job/', parameters).then(response => {
+		this.$http.post('/submit_job/', job).then(response => {
 			console.log(response.data);
 		}, response => {
 		});

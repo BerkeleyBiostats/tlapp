@@ -15,6 +15,7 @@ def index(request):
 	templates = models.ModelTemplate.objects.all()
 
 	templates_json = [{
+		"id": template.id,
 		"name": template.name,
 		"code": template.code,
 		"parameters": template.parameters
