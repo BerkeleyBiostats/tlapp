@@ -11,3 +11,18 @@ class ModelTemplate(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class ModelRun(models.Model):
+
+	status_choices = {
+		'submitted': 'submitted',
+		'running': 'running',
+		'success': 'success',
+		'error':' error',
+	}
+
+	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+	parameters = JSONField(null=True, blank=True)
+	status = models.CharField(max_length=32)
+	traceback = models.TextField(null=True, blank=True)
+	model_template = models.ForeignKey(ModelTemplate)

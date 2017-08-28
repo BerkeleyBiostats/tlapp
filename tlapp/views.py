@@ -24,3 +24,11 @@ def index(request):
 	}
 
 	return render(request, 'index.html', context)
+
+# @login_required
+def jobs(request):
+	jobs = models.ModelRun.objects.all()
+	context = {
+		"jobs": jobs,
+	}
+	return render(request, 'jobs.html', context)

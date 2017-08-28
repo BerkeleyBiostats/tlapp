@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block content %}
+
+<div>
+
+<div id="wrapper">
+<div id="page-wrapper" class="gray-bg">
+
+<div class="row border-bottom white-bg">
+<nav class="navbar navbar-static-top" role="navigation">
+  <div class="navbar-header">
+    <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" class="navbar-toggle collapsed" type="button">
+    <i class="fa fa-reorder"></i>
+    </button>
+    
+    <a href="#" class="navbar-brand">Targeted Learning</a>
+  </div>
+  <div class="navbar-collapse collapse" id="navbar">
+    <ul class="nav navbar-top-links navbar-right">
+        <li>
+            <a href="login.html">
+                <i class="fa fa-sign-out"></i> Log out
+            </a>
+        </li>
+    </ul>
+  </div>
+</nav>
+</div>
+
+<div class="row wrapper border-bottom white-bg page-heading p-sm">
+    <div class="col-md-6">
+        <a class="btn btn-default btn-rounded" href="#">Model</a>
+        <a class="btn btn-primary btn-rounded" href="#">Jobs</a>
+        <a class="btn btn-default btn-rounded disabled" href="#">Results</a>
+    </div>
+    <div class="col-md-4">
+        Statistician
+        <a class="btn btn-default btn-rounded disabled" href="#">Model Templates</a>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content">
+<div class="container">
+<div class="row">
+  <div class="col-lg-12">
+
+    {% for job in jobs %}
+    <h2>{{ job.created_at }}</h2>
+    <h2>{{ job.model_template.name }}</h2>
+    <hr>
+    {% endfor %}
+
+  </div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    <!-- Mainly scripts -->
+    <script src="{% static 'js/jquery-3.1.1.min.js' %} "></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
+    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+    <!-- Custom and plugin javascript -->
+    <script src="{% static 'js/inspinia.js' %}"></script>
+    <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
+{% endblock %}

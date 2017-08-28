@@ -56,9 +56,6 @@ var app = new Vue({
   		});
   		console.log(parameters);
   	},
-  	selectTemplate: function (event) {
-  		console.log(this.selectedTemplate);
-  	},
   },
 });
 

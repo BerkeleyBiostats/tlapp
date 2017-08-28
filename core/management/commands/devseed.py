@@ -65,3 +65,15 @@ class Command(BaseCommand):
             code=code
         )
         mt2.save()
+
+        job = models.ModelRun(
+            model_template=mt,
+            status=models.ModelRun.status_choices['submitted'],
+        )
+        job.save()
+
+        job = models.ModelRun(
+            model_template=mt2,
+            status=models.ModelRun.status_choices['submitted'],
+        )
+        job.save()
