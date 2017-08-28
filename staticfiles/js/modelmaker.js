@@ -63,6 +63,7 @@ var app = new Vue({
   		// GET /someUrl
 		this.$http.post('/submit_job/', job).then(response => {
 			console.log(response.data);
+			window.location.href = '/jobs/';
 		}, response => {
 		});
   	},
