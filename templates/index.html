@@ -1,196 +1,118 @@
-{% extends "base.html" %}
+{% extends "app.html" %}
 
 {% load staticfiles %}
 
-{% block content %}
+{% block body %}
 
-<div id="modelmaker">
+<div class="wrapper wrapper-content">
+<div class="container">
 
-<div id="wrapper">
+<div class="row">
 
-<div id="page-wrapper" class="gray-bg">
+<div class="col-lg-12">
 
-<div class="row border-bottom white-bg">
-
-<nav class="navbar navbar-static-top" role="navigation">
-  <div class="navbar-header">
-    <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" class="navbar-toggle collapsed" type="button">
-    <i class="fa fa-reorder"></i>
-    </button>
+<div class="tabs-container">
+  <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#tab-1">Guided</a></li>
+      <li class=""><a data-toggle="tab" href="#tab-2">Custom</a></li>
+  </ul>
     
-    <a href="#" class="navbar-brand">Targeted Learning</a>
-  </div>
-  <div class="navbar-collapse collapse" id="navbar">
-    <ul class="nav navbar-top-links navbar-right">
-        <li>
-            <a href="login.html">
-                <i class="fa fa-sign-out"></i> Log out
-            </a>
-        </li>
-    </ul>
-  </div>
-</nav>
+  <div class="tab-content">
+  <div id="tab-1" class="tab-pane active">
 
-</div>
+  <div class="panel-body">
+  <div class="row">
+  <div class="col-lg-12">
 
-        <div class="row wrapper border-bottom white-bg page-heading p-sm">
-            <div class="col-md-6">
-                <a class="btn btn-primary btn-rounded" href="#">Model</a>
-                <a class="btn btn-default btn-rounded disabled" href="#">Jobs</a>
-                <a class="btn btn-default btn-rounded disabled" href="#">Results</a>
-            </div>
-            <div class="col-md-4">
-                Statistician
-                <a class="btn btn-default btn-rounded disabled" href="#">Model Templates</a>
-            </div>
-        </div>
+    <div class="ibox-title">
+    <h5>Dataset</h5>
 
-        <div class="wrapper wrapper-content">
-            <div class="container">
-                <div class="row">
+    <div class="ibox-tools">
+    <button type="button" class="btn btn-xs btn-primary disabled">Choose</button>
+    </div>
+    
+    </div>
 
-                    <div class="col-lg-12">
+    <div class="ibox-content">
+    
+    <h3 class="p-md">AllGHAPStudies.RData</h3>
 
+    <div class="p-md">
+    <h1 class="no-margins">12,345</h1>
+    <small>Total Records</small>
+    </div>
 
-                        <div class="tabs-container">
-                        <ul class="nav nav-tabs">
-                            <li class="active"><a data-toggle="tab" href="#tab-1">Guided</a></li>
-                            <li class=""><a data-toggle="tab" href="#tab-2">Custom</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div id="tab-1" class="tab-pane active">
-                                <div class="panel-body">
-                                    <div class="row">
-                                      <div class="col-lg-12">
-                                        <div class="ibox-title">
-                                          <h5>Dataset</h5>
-
-
-                                          <div class="ibox-tools">
-
-
-<button type="button" class="btn btn-xs btn-primary disabled">Choose</button>
-
-           
-                                           </div>
-
-                                        </div>
-                                        <div class="ibox-content">
-
-                                          <h3 class="p-md">AllGHAPStudies.RData</h3>
-
-                                          <div class="p-md">
-                                          <h1 class="no-margins">
-                                            12,345
-                                          </h1>
-                                          <small>Total Records</small>
-
-                                          </div>
-
-
-
-<div class="row p-md">
-  <div class="col-md-2">
+    <div class="row p-md">
+    <div class="col-md-2">
     <h3>Columns</h3>
-  </div>
-  <div class="col-md-10">
-<!-- 
-<button type="button" class="btn btn-default btn-sm">studyid</button>
-<button type="button" class="btn btn-default btn-sm">subjid</button>
-<button type="button" class="btn btn-default btn-sm">siteid</button>
-<button type="button" class="btn btn-default btn-sm">sex</button>
-<button type="button" class="btn btn-default btn-sm">agedays</button>
-<button type="button" class="btn btn-default btn-sm">WHZ</button>
-<button type="button" class="btn btn-default btn-sm">region</button>
-<button type="button" class="btn btn-default btn-sm">risk factor</button>
- -->
-  </div>
-</div>
+    </div>
+    <div class="col-md-10">
+    </div>
+    </div>
 
-<div class="row p-md">
-  <div class="col-md-12">
-
-<table>
-<tr v-for="variable in variables">
-  <td class="p-md">${ variable.name }</td>
-  <td>
+    <div class="row p-md">
+    <div class="col-md-12">
+    <table>
+    <tr v-for="variable in variables">
+    <td class="p-md">${ variable.name }</td>
+    <td>
     <div class="btn-group">
-        <button 
-          v-for="role in roles" 
-          v-bind:class="{ 'btn-primary': variable.role === role, 'btn-white': variable.role !== role }" 
-          v-on:click="variable.role = role"
-          class="btn" 
-          type="button"
-          >
-          ${ role }
-        </button>
+    <button 
+      v-for="role in roles" 
+      v-bind:class="{ 'btn-primary': variable.role === role, 'btn-white': variable.role !== role }" 
+      v-on:click="variable.role = role"
+      class="btn" 
+      type="button"
+      >
+      ${ role }
+    </button>
     </div>
-  </td>
-</tr>
-</table>
+    </td>
+    </tr>
+    </table>
+    </div>
+    </div>
 
-  </div>
-</div>
+    </div> <!-- .ibox-content -->
+    </div> <!-- .col-lg-12 -->
+    </div> <!-- .row -->
 
+    <div class="row">
+    <div class="col-lg-12">
+      <div class="ibox-title">
+        <h5>Model</h5>
+      </div>
 
-                                          
+      <div class="ibox-content">
 
-
-
-
-                                        </div>
-                                    </div>
-
-                                    
-                                    </div>
-
-                                    <div class="row">
-                                    <div class="col-lg-12">
-                                      <div class="ibox-title">
-                                        <h5>Model</h5>
-                                      </div>
-                                      <div class="ibox-content">
-
-
-
-<form method="get" class="form-horizontal">
-
-
-    <div class="form-group"><label class="col-sm-2 control-label">Template</label>
-
+      <form method="get" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Template</label>
         <div class="col-sm-10">
-
-          <select 
-            class="form-control m-b" 
-            name="account"
-            v-model="selectedTemplate"
-          >
-
-          <option 
-            v-for="template in modelTemplates"
-            :value="template"
-          >
-            ${ template.name }
-          </option>
-            
-
+        <select 
+          class="form-control m-b" 
+          name="account"
+          v-model="selectedTemplate"
+        >
+        <option 
+          v-for="template in modelTemplates"
+          :value="template"
+        >
+          ${ template.name }
+        </option>
         </select>
-
         </div>
-    </div>
-    <div class="hr-line-dashed"></div>
+      </div>
+      
+      <div class="hr-line-dashed"></div>
 
+      <div v-for="field in selectedTemplate.parameters.fields">
 
-<div>
-
-  <div v-for="field in selectedTemplate.parameters.fields">
-
-    <div class="form-group">
+      <div class="form-group">
 
       <label class="col-sm-2 control-label">${ field.name }</label>
 
       <div class="col-sm-10">
-
         <div v-if="field.type === 'float'">
           <input type="number" v-model="field.value" class="form-control"> 
           <span v-if="field.help" class="help-block m-b-none">${ field.help }</span>
@@ -204,66 +126,51 @@
                 ${ choice }
             </label>
         </div>
+      </div> <!-- .col-sm-10 -->
 
+      </div> <!-- .form-group -->
+
+      <div class="hr-line-dashed"></div>
+
+      </div> <!-- .v-for selectedTemplate.parameters.field -->
+
+      <div class="form-group">
+      <div class="col-sm-4">
+          <button 
+            class="btn btn-primary"
+            type="button"
+            v-on:click="sendJob"
+            >
+            Submit Job
+          </button>
       </div>
+      </div>
+      </form>
+
+      <pre>
+      ${ selectedTemplate.code }
+      </pre>
 
     </div>
-
-    <div class="hr-line-dashed"></div>
 
   </div>
-
 </div>
+</div>
+</div> <!-- #tab1 -->
 
-    <div class="form-group">
-        <div class="col-sm-4">
-            <button 
-              class="btn btn-primary"
-              type="button"
-              v-on:click="sendJob"
-              >
-              Submit Job
-            </button>
-        </div>
+<div id="tab-2" class="tab-pane">
+    <div class="panel-body">
+        <h2>Donec quam felis</h2>
     </div>
-</form>
-
-<pre>
-${ selectedTemplate.code }
-</pre>
-
-</div>
-
-                            <div id="tab-2" class="tab-pane">
-                                <div class="panel-body">
-                                    <h2>Donec quam felis</strong>
-
-                                </div>
-                            </div>
-                        </div>
+</div> <!-- #tab2 -->
 
 
-                    </div>
-
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-        <div class="footer">
-        </div>
-
-        </div>
-        </div>
-
-</div>
-</div>
-</div>
-</div>      
-</div>
+</div> <!-- .tab-content -->
+</div> <!-- .tabs-container -->
+</div> <!-- .col-lg-12 -->
+</div> <!-- .row -->
+</div> <!-- .container -->
+</div> <!-- .wrapper -->
 
 {% endblock %}
 
