@@ -26,3 +26,13 @@ class ModelRun(models.Model):
 	status = models.CharField(max_length=32)
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(ModelTemplate)
+
+	def __str__(self):
+		return "%s %s" % (self.model_template.name, self.created_at)
+
+	def as_dict(self):
+		return {
+			'status': self.status,
+			'created_at': self.created_at,
+			'model_template': self.model_template.name,
+		}

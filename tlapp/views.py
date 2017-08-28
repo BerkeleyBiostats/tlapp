@@ -30,7 +30,7 @@ def index(request):
 
 # @login_required
 def jobs(request):
-	jobs = models.ModelRun.objects.all()
+	jobs = models.ModelRun.objects.all().order_by('-created_at')
 	context = {
 		"jobs": jobs,
 	}
@@ -39,6 +39,17 @@ def jobs(request):
 # @login_required
 @csrf_exempt
 def submit_job(request):
-	print(json.loads(request.body))
-	return JsonResponse({'foo':'bar'})
+	job_data = json.loads(request.body)
+
+	job = models.ModelRun(
+		model_template_id = job_data['model_template'],
+		status = models.ModelRun.status_choices['submitted'],
+		parameters = job_data['parameters'],
+	)
+	job.save()
+
+	return JsonResponse(job.as_dict())
+
+
+
 
