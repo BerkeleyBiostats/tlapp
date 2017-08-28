@@ -26,8 +26,7 @@ def handle_jobs():
         code_filename],
         cwd=code_folder)
 
-    print("Ran the job:")
-    print(script_resp)
+    job.output = script_resp
 
     job.status = models.ModelRun.status_choices['success']
     job.save()

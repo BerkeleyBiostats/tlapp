@@ -9,6 +9,7 @@
     {% for job in jobs %}
     <h2>{{ job.created_at }}</h2>
     <h2>{{ job.model_template.name }}</h2>
+    <p>{{ job.output }}</p>
     <hr>
     {% endfor %}
   </div>

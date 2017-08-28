@@ -24,6 +24,7 @@ class ModelRun(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	parameters = JSONField(null=True, blank=True)
 	status = models.CharField(max_length=32)
+	output = models.TextField(null=True, blank=True)
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(ModelTemplate)
 
