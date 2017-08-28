@@ -16,7 +16,7 @@ def handle_jobs():
     job.status = models.ModelRun.status_choices['running']
     job.save()
 
-    code_folder = tempfile.mkdtemp('/tmp')
+    code_folder = tempfile.mkdtemp('./tmp')
     print(code_folder)
     code_filename = os.path.join(code_folder, 'script.R')
     with open(code_filename, 'w') as code_file:
