@@ -172,25 +172,6 @@
 </div> <!-- .container -->
 </div> <!-- .wrapper -->
 
-{% endblock %}
-
-{% block js %}
-
-    <!-- Mainly scripts -->
-    <script src="{% static 'js/jquery-3.1.1.min.js' %} "></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
-    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
-
-    <!-- Custom and plugin javascript -->
-    <script src="{% static 'js/inspinia.js' %}"></script>
-    <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
-
-    <script type="text/javascript">
-    var G = {};
-    G.models = {{ templates_json | safe }}
-    </script>
-
-    <script type="text/javascript" src="{% static 'js/modelmaker.js' %}"></script>
+</div> <!-- there's an open div orphaned somewhere... -->
 
 {% endblock %}

@@ -2,9 +2,11 @@
 from __future__ import unicode_literals
 import json
 
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+
 from core import models
 
 # @login_required
@@ -32,3 +34,10 @@ def jobs(request):
 		"jobs": jobs,
 	}
 	return render(request, 'jobs.html', context)
+
+# @login_required
+@csrf_exempt
+def submit_job(request):
+	print(json.loads(request.body))
+	return JsonResponse({'foo':'bar'})
+

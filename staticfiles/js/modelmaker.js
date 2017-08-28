@@ -55,6 +55,12 @@ var app = new Vue({
   			};
   		});
   		console.log(parameters);
+
+  		// GET /someUrl
+		this.$http.post('/submit_job/', parameters).then(response => {
+			console.log(response.data);
+		}, response => {
+		});
   	},
   },
 });
