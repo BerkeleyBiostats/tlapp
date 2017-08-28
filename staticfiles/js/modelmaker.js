@@ -43,6 +43,8 @@ var app = new Vue({
     message: 'Hello Vue!',
 	variables: variables,
 	modelInputs: modelInputs,
+	modelTemplates: G.models,
+	selectedTemplate: G.models[0],
   },
   methods: {
   	sendJob: function (event) {
@@ -53,6 +55,9 @@ var app = new Vue({
   			};
   		});
   		console.log(parameters);
+  	},
+  	selectTemplate: function (event) {
+  		console.log(this.selectedTemplate);
   	},
   },
 });

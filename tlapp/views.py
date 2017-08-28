@@ -1,41 +1,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponse
+from core import models
 
 # @login_required
 def index(request):
 
-	model_parameters = {
-		"parameters": [{
-			"name": "ABar",
-			"type": "float",
-			"help": "A block of help text that explains the model input.",
-		}, {
-			"name": "Learners",
-			"type": "enum",
-			"choices": [
-				"GLM",
-				"Random Forest",
-				"Regression"
-			],
-		},]
+	templates = models.ModelTemplate.objects.all()
 
-	}
+	templates_json = [{
+		"name": template.name,
+		"code": template.code,
+		"parameters": template.parameters
+	} for template in templates]
 
 	context = {
-		"variables": [
-			"studyid",
-			"subjid",
-			"siteid",
-			"sex",
-			"agedays",
-			"WHZ",
-			"region",
-			"risk factor"
-		]
+		"templates": templates,
+		"templates_json": json.dumps(templates_json),
 	}
 
 	return render(request, 'index.html', context)

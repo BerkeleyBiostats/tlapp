@@ -158,11 +158,23 @@
 
     <div class="form-group"><label class="col-sm-2 control-label">Template</label>
 
-        <div class="col-sm-10"><select class="form-control m-b" name="account">
-            <option>HBGDki.R</option>
-            <option>option 2</option>
-            <option>option 3</option>
-            <option>option 4</option>
+        <div class="col-sm-10">
+
+          <select 
+            class="form-control m-b" 
+            name="account"
+            v-model="selectedTemplate"
+            v-on:change="selectTemplate()"
+          >
+
+          <option 
+            v-for="template in modelTemplates"
+            :value="template"
+          >
+            ${ template.name }
+          </option>
+            
+
         </select>
 
         </div>
@@ -172,7 +184,7 @@
 
 <div>
 
-  <div v-for="field in modelInputs.fields">
+  <div v-for="field in selectedTemplate.parameters.fields">
 
     <div class="form-group">
 
@@ -359,6 +371,11 @@ res
     <!-- Custom and plugin javascript -->
     <script src="{% static 'js/inspinia.js' %}"></script>
     <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
+
+    <script type="text/javascript">
+    var G = {};
+    G.models = {{ templates_json | safe }}
+    </script>
 
     <script type="text/javascript" src="{% static 'js/modelmaker.js' %}"></script>
 

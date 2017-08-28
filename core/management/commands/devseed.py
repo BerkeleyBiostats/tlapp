@@ -11,7 +11,7 @@ class Command(BaseCommand):
         user.save()
 
         parameters = {
-            "parameters": [{
+            "fields": [{
                 "name": "ABar",
                 "type": "float",
                 "help": "A block of help text that explains the model input.",
@@ -22,6 +22,13 @@ class Command(BaseCommand):
                     "GLM",
                     "Random Forest",
                     "Regression"
+                ],
+            }, {
+                "name": "Spacing",
+                "type": "enum",
+                "choices": [
+                    "tight",
+                    "loose",
                 ],
             },]
         }
@@ -37,3 +44,24 @@ class Command(BaseCommand):
         )   
         mt.save()
 
+        parameters = {
+            "fields": [{
+                "name": "Spacing",
+                "type": "enum",
+                "choices": [
+                    "tight",
+                    "loose",
+                ],
+            },]
+        }
+
+        code = """
+            print('foo')
+        """
+
+        mt2 = models.ModelTemplate(
+            name='Another sample.R',
+            parameters=parameters,
+            code=code
+        )
+        mt2.save()
