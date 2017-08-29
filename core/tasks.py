@@ -2,6 +2,7 @@ import logging
 import tempfile
 import os
 import subprocess
+import traceback
 from core import models
 
 def handle_jobs():
@@ -25,7 +26,7 @@ def handle_jobs():
             code_folder = tempfile.mkdtemp()
 
         print(code_folder)
-        
+
         code_filename = os.path.join(code_folder, 'script.R')
         with open(code_filename, 'w') as code_file:
             code_file.write(job.model_template.code)
