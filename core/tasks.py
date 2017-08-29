@@ -16,20 +16,32 @@ def handle_jobs():
     job.status = models.ModelRun.status_choices['running']
     job.save()
 
-    code_folder = tempfile.mkdtemp(prefix='./tmp')
-    print(code_folder)
-    code_filename = os.path.join(code_folder, 'script.R')
-    with open(code_filename, 'w') as code_file:
-        code_file.write(job.model_template.code)
-    
-    script_resp = subprocess.check_output([
-        "Rscript",
-        code_filename],
-        cwd=code_folder)
+    try:
 
-    job.output = script_resp
+        if os.environ.get('DYNO') is not None:
+            app_dir = os.environ.get('HOME')
+            code_folder = tempfile.mkdtemp(dir=app_dir)
+        else:
+            code_folder = tempfile.mkdtemp()
 
-    job.status = models.ModelRun.status_choices['success']
+        print(code_folder)
+        
+        code_filename = os.path.join(code_folder, 'script.R')
+        with open(code_filename, 'w') as code_file:
+            code_file.write(job.model_template.code)
+        
+        script_resp = subprocess.check_output([
+            "Rscript",
+            code_filename],
+            cwd=code_folder)
+
+        job.output = script_resp
+        job.status = models.ModelRun.status_choices['success']
+    except:
+        print(traceback.format_exc())
+        job.traceback = traceback.format_exc()
+        job.status = model.ModelRun.status_choices['error']
+
     job.save()
 
     return 1
