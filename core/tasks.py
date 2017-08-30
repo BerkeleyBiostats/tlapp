@@ -23,7 +23,11 @@ def handle_jobs():
 
 
     try:
-        code_folder = tempfile.mkdtemp()
+
+        if on_heroku:
+            code_folder = tempfile.mkdtemp(dir=app_dir)
+        else:
+            code_folder = tempfile.mkdtemp()
 
         print(code_folder)
 
