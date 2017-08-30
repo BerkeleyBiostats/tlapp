@@ -17,24 +17,26 @@ def handle_jobs():
     job.status = models.ModelRun.status_choices['running']
     job.save()
 
-    try:
+    on_heroku = (os.environ.get('DYNO') is not None)
+    if on_heroku:
+        app_dir = os.environ.get('HOME')
 
-        if os.environ.get('DYNO') is not None:
-            app_dir = os.environ.get('HOME')
-            code_folder = tempfile.mkdtemp(dir=app_dir)
-        else:
-            code_folder = tempfile.mkdtemp()
+
+    try:
+        code_folder = tempfile.mkdtemp()
 
         print(code_folder)
 
-        code_filename = os.path.join(code_folder, 'script.R')
+        script_name = 'script.R'
+        code_filename = os.path.join(code_folder, script_name)
+        print(code_filename)
         with open(code_filename, 'w') as code_file:
             code_file.write(job.model_template.code)
         
-        script_resp = subprocess.check_output([
-            "Rscript",
-            code_filename],
-            cwd=code_folder)
+        if on_heroku:
+            script_resp = subprocess.check_output(["Rscript", code_filename], cwd=app_dir)
+        else:
+            script_resp = subprocess.check_output(["Rscript", code_filename])
 
         job.output = script_resp
         job.status = models.ModelRun.status_choices['success']
