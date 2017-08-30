@@ -41,7 +41,7 @@ def handle_jobs():
     except:
         print(traceback.format_exc())
         job.traceback = traceback.format_exc()
-        job.status = model.ModelRun.status_choices['error']
+        job.status = models.ModelRun.status_choices['error']
 
     job.save()
 
