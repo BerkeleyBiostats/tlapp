@@ -40,7 +40,7 @@ def handle_jobs():
         if on_heroku:
             script_resp = subprocess.check_output(["Rscript", code_filename], cwd=app_dir)
         else:
-            script_resp = subprocess.check_output(["Rscript", "--default-packages", "methods,stats", code_filename])
+            script_resp = subprocess.check_output(["Rscript", "--default-packages=methods,stats", code_filename])
 
         job.output = script_resp
         job.status = models.ModelRun.status_choices['success']
