@@ -36,6 +36,13 @@ def jobs(request):
 	}
 	return render(request, 'jobs.html', context)
 
+def job_detail(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	context = {
+		"job": job,
+	}
+	return render(request, 'job_detail.html', context)
+
 # @login_required
 @csrf_exempt
 def submit_job(request):

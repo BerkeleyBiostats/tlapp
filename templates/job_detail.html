@@ -6,15 +6,12 @@
 
 <div class="row">
   <div class="col-lg-12">
-    {% for job in jobs %}
     <h2>{{ job.created_at }}</h2>
     <h2>{{ job.model_template.name }}</h2>
     <p>{{ job.status }}</p>
-    <div>
-        <a href="{% url 'job_detail' job.id %}">Results</a>
-    </div>
-    <hr>
-    {% endfor %}
+<div>
+{{ job.output | safe }}
+</div>
   </div>
 </div>
 
