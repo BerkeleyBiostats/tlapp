@@ -4,6 +4,7 @@ import os
 import subprocess
 import traceback
 import json
+import shutil
 from core import models
 
 def handle_jobs():
@@ -53,8 +54,14 @@ def handle_jobs():
         print(" ".join(cmd))
 
         script_resp = subprocess.check_output(cmd)
-
         job.output = script_resp
+
+        # TODO: upload to s3 instead
+        report_filename = os.path.join(output_folder, 'REPORT.html')
+        with open(report_filename, mode='r') as report_file:
+            report_content = report_file.read()
+        job.output = report_content
+
         job.status = models.ModelRun.status_choices['success']
     except:
         print(traceback.format_exc())

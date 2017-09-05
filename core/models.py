@@ -25,6 +25,7 @@ class ModelRun(models.Model):
 	parameters = JSONField(null=True, blank=True)
 	status = models.CharField(max_length=32)
 	output = models.TextField(null=True, blank=True)
+	output_zip = models.BinaryField(null=True, blank=True) # TODO: remove this, unused
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(ModelTemplate)
 
