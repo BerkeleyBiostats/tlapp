@@ -4,6 +4,11 @@ from __future__ import unicode_literals
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
+class Dataset(models.Model):
+	title = models.CharField(max_length=256)
+	url = models.URLField(null=True, blank=True)
+	variables = JSONField(null=True, blank=True)
+
 class ModelTemplate(models.Model):
 	name = models.CharField(max_length=256)
 	parameters = JSONField(null=True, blank=True)
