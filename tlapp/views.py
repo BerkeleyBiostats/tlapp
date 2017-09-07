@@ -21,10 +21,18 @@ def index(request):
 		"parameters": template.parameters
 	} for template in templates]
 
+	datasets = models.Dataset.objects.all()
+
+	datasets_json = [{
+		"id": dataset.id,
+		"title": dataset.title,
+		"variables": dataset.variables['names'],
+	} for dataset in datasets]
+
 	context = {
 		"templates": templates,
 		"templates_json": json.dumps(templates_json),
-		"datasets": models.Dataset.objects.all(),
+		"datasets_json": json.dumps(datasets_json),
 	}
 
 	return render(request, 'index.html', context)

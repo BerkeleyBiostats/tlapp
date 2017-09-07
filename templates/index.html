@@ -41,7 +41,7 @@
 
     <div class="ibox-content">
     
-    <h3 class="p-md">AllGHAPStudies.RData</h3>
+    <h3 class="p-md">${activeDataset.title}</h3>
 
 <div class="modal inmodal in" id="datasetsModal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
   <div class="modal-dialog">
@@ -53,10 +53,16 @@
 </div>
 <div class="modal-body">
 
-{% for dataset in datasets %}
-<h3>{{ dataset.title }}</h3>
+<div 
+  data-dismiss="modal"
+  v-for="dataset in datasets"
+  v-on:click="activeDataset = dataset"
+>
+<h3>
+  <a>${ dataset.title }</a>
+</h3>
 <hr>
-{% endfor %}
+</div>
 
 
 </div>
@@ -67,14 +73,6 @@
     </div>
 </div>
 
-
-
-
-
-    <div class="p-md">
-    <h1 class="no-margins">12,345</h1>
-    <small>Total Records</small>
-    </div>
 
     <div class="row p-md">
     <div class="col-md-2">
@@ -87,7 +85,7 @@
     <div class="row p-md">
     <div class="col-md-12">
     <table>
-    <tr v-for="variable in variables">
+    <tr v-for="variable in activeDataset.variables">
     <td class="p-md">${ variable.name }</td>
     <td>
     <div class="btn-group">

@@ -16,6 +16,16 @@ var variables = variableNames.map(function (variableName) {
 	}
 });
 
+G.datasets = G.datasets.map(function (dataset) {
+	dataset.variables = dataset.variables.map(function (variableName) {
+		return {
+			name: variableName,
+			role: "W",
+		};
+	});
+	return dataset;
+});
+
 var modelInputs = {
 	fields: [{
 		name: 'ABar',
@@ -45,6 +55,8 @@ var app = new Vue({
 	modelInputs: modelInputs,
 	modelTemplates: G.models,
 	selectedTemplate: G.models[0],
+	datasets: G.datasets,
+	activeDataset: G.datasets[0],
   },
   methods: {
   	sendJob: function (event) {

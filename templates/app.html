@@ -68,7 +68,8 @@
 
     <script type="text/javascript">
     var G = {};
-    G.models = {{ templates_json | safe }}
+    G.models = {{ templates_json | safe }};
+    G.datasets = {{ datasets_json | safe }};
     </script>
 
     <script type="text/javascript" src="{% static 'js/modelmaker.js' %}"></script>
