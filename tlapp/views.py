@@ -24,6 +24,7 @@ def index(request):
 	context = {
 		"templates": templates,
 		"templates_json": json.dumps(templates_json),
+		"datasets": models.Dataset.objects.all(),
 	}
 
 	return render(request, 'index.html', context)

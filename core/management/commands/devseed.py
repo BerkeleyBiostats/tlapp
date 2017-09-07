@@ -210,3 +210,34 @@ class Command(BaseCommand):
             status=models.ModelRun.status_choices['submitted'],
         )
         job.save()
+
+        dataset = models.Dataset(
+            title="Subset of growth data from the collaborative perinatal project (CPP)",
+            url="https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",
+            variables={
+                "names": [
+                    "haz",
+                    "parity",
+                    "apgar1", 
+                    "apgar5", 
+                    "gagebrth", 
+                    "mage", 
+                    "meducyrs", 
+                    "sexn"
+                ]
+            }            
+        )
+        dataset.save()
+
+        dataset = models.Dataset(
+            title="Another sample",
+            url="https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",
+            variables={
+                "names": [
+                    "foo",
+                    "bar",
+                ]
+            }            
+        )
+        dataset.save()
+
