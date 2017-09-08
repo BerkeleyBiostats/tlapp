@@ -67,6 +67,31 @@ var app = new Vue({
   			};
   		});
 
+  		var whereRole = (variables, role) => {
+  			return variables.filter(function (variable) {
+  				return variable.role === role;
+  			});
+  		};
+
+  		var whereRoleForActive = (role) => {
+  			var vars = whereRole(this.activeDataset.variables, role);
+  			return vars.map(function (variable) {
+  				return variable.name;
+  			});
+  		};
+
+  		parameters.data = {
+  			uri: this.activeDataset.url,
+  			type: 'csv',
+  			nodes: {
+  				Y: whereRoleForActive('Y'),
+  				A: whereRoleForActive('A'),
+  				W: whereRoleForActive('W'),
+  			}
+  		};
+
+  		console.log(parameters);
+
   		var job = {
   			parameters,
   			model_template: this.selectedTemplate.id,
@@ -75,7 +100,7 @@ var app = new Vue({
   		// GET /someUrl
 		this.$http.post('/submit_job/', job).then(response => {
 			console.log(response.data);
-			window.location.href = '/jobs/';
+			// window.location.href = '/jobs/';
 		}, response => {
 		});
   	},

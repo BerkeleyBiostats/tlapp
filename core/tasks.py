@@ -40,7 +40,7 @@ def handle_jobs():
         parameters['output_directory'] = output_folder
 
         with open(input_filename, 'w') as input_file:
-            input_file.write(json.dumps(job.model_template.parameters))
+            input_file.write(json.dumps(job.parameters))
         
         rpath = '/usr/local/lib/R/site-library/tltools/'
         cmd = [

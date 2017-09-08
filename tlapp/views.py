@@ -26,6 +26,7 @@ def index(request):
 	datasets_json = [{
 		"id": dataset.id,
 		"title": dataset.title,
+		"url": dataset.url,
 		"variables": dataset.variables['names'],
 	} for dataset in datasets]
 
