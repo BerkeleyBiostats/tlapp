@@ -6,3 +6,4 @@ from . import models
 
 # Register your models here.
 admin.site.register(models.ModelTemplate)
+admin.site.register(models.Dataset)
