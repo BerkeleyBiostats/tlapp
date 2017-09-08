@@ -18,7 +18,7 @@ def index(request):
 		"id": template.id,
 		"name": template.name,
 		"code": template.code,
-		"parameters": template.parameters
+		"fields": template.fields
 	} for template in templates]
 
 	datasets = models.Dataset.objects.all()
@@ -61,7 +61,7 @@ def submit_job(request):
 	job = models.ModelRun(
 		model_template_id = job_data['model_template'],
 		status = models.ModelRun.status_choices['submitted'],
-		parameters = job_data['parameters'],
+		inputs = job_data['inputs'],
 	)
 	job.save()
 

@@ -138,7 +138,7 @@ class Command(BaseCommand):
 
         mt = models.ModelTemplate(
             name='sl3_sample.R',
-            inputs=inputs,
+            fields=inputs,
             code=code
         )   
         mt.save()
@@ -158,7 +158,7 @@ class Command(BaseCommand):
 
         mt2 = models.ModelTemplate(
             name='Another sample.R',
-            inputs=inputs,
+            fields=inputs,
             code=code
         )
         mt2.save()

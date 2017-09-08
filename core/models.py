@@ -11,7 +11,7 @@ class Dataset(models.Model):
 
 class ModelTemplate(models.Model):
 	name = models.CharField(max_length=256)
-	inputs = JSONField(null=True, blank=True)
+	fields = JSONField(null=True, blank=True)
 	code = models.TextField(null=True, blank=True)
 
 	def __str__(self):
@@ -27,7 +27,7 @@ class ModelRun(models.Model):
 	}
 
 	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-	parameters = JSONField(null=True, blank=True)
+	inputs = JSONField(null=True, blank=True)
 	status = models.CharField(max_length=32)
 	output = models.TextField(null=True, blank=True)
 	output_zip = models.BinaryField(null=True, blank=True) # TODO: remove this, unused

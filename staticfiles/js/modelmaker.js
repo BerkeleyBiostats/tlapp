@@ -21,9 +21,8 @@ var app = new Vue({
   },
   methods: {
   	sendJob: function (event) {
-  		var parameters = {};
-  		console.log(this.selectedTemplate.parameters.fields);
-  		parameters.inputs = this.selectedTemplate.parameters.fields.map(function (field) {
+  		var inputs = {};
+  		inputs.fields = this.selectedTemplate.fields.map(function (field) {
   			return {
   				name: field.name,
   				value: field.value,
@@ -43,7 +42,7 @@ var app = new Vue({
   			});
   		};
 
-  		parameters.data = {
+  		inputs.data = {
   			uri: this.activeDataset.url,
   			type: 'csv',
   			nodes: {
@@ -53,10 +52,10 @@ var app = new Vue({
   			}
   		};
 
-  		console.log(parameters);
+  		console.log(inputs);
 
   		var job = {
-  			parameters,
+  			inputs,
   			model_template: this.selectedTemplate.id,
   		};
 
