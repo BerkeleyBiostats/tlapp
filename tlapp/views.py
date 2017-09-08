@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import os
 import json
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 
 from core import models
@@ -53,6 +54,15 @@ def job_detail(request, job_id):
 		"inputs_formatted": json.dumps(job.inputs, indent=2),
 	}
 	return render(request, 'job_detail.html', context)
+
+def job_output_download(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	outputs_dir = '/tmp/outputs'
+	if not os.path.exists(outputs_dir):
+		os.makedirs(outputs_dir)
+	with open(os.path.join(outputs_dir, 'bar.txt'), 'w') as f:
+		f.write('hello')
+	return redirect('/static/bar.txt')
 
 # @login_required
 @csrf_exempt

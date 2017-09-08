@@ -20,6 +20,7 @@ from tlapp import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
+    url(r'^jobs/(?P<job_id>[0-9]+)/download/$', views.job_output_download, name='job_output_download'),
     url(r'^jobs/(?P<job_id>[0-9]+)/$', views.job_detail, name='job_detail'),
     url(r'^jobs/', views.jobs, name='jobs'),
     url(r'^submit_job/', views.submit_job, name='submit_job'),
