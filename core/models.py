@@ -11,7 +11,7 @@ class Dataset(models.Model):
 
 class ModelTemplate(models.Model):
 	name = models.CharField(max_length=256)
-	parameters = JSONField(null=True, blank=True)
+	inputs = JSONField(null=True, blank=True)
 	code = models.TextField(null=True, blank=True)
 
 	def __str__(self):

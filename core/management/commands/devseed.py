@@ -3,48 +3,14 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from core import models
 
-sample_script_inputs = """
-
-{
-    "data": {
-        "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",
-        "type": "csv",
-        "nodes": {
-            "Y": "haz",
-            "A": "parity",
-            "W": ["apgar1", "apgar5", "gagebrth", "mage", "meducyrs", "sexn"]
-        }
-    },
-    "fields": [{
-        "name": "Learners",
-        "type": "enum",
-        "choices": [
-            "glmfast",
-            "SL.glmnet"
-        ]
-    }],
-    "params": {
-        "learners": {
-            "glm_learner": {
-                "learner": "Lrnr_glm_fast"
-            },
-            
-            "sl_glmnet_learner": {
-                "learner": "Lrnr_pkg_SuperLearner",
-                "params": {
-                    "SL_wrapper":"SL.glmnet"
-                }
-            }
-            
-        },
-        
-        "metalearner": {
-            "learner": "Lrnr_nnls"
-        }
-    }
-}
-
-"""
+sample_script_inputs = [{
+    "name": "Learners",
+    "type": "enum",
+    "choices": [
+        "glmfast",
+        "SL.glmnet"
+    ]
+}]
 
 sample_script = """
 
@@ -166,27 +132,25 @@ class Command(BaseCommand):
             'admin', 'admin@example.com', 'admin')
         user.save()
 
-        parameters = json.loads(sample_script_inputs)
+        inputs = sample_script_inputs
 
         code = sample_script
 
         mt = models.ModelTemplate(
             name='sl3_sample.R',
-            parameters=parameters,
+            inputs=inputs,
             code=code
         )   
         mt.save()
 
-        parameters = {
-            "fields": [{
-                "name": "Spacing",
-                "type": "enum",
-                "choices": [
-                    "tight",
-                    "loose",
-                ],
-            },]
-        }
+        inputs = [{
+            "name": "Spacing",
+            "type": "enum",
+            "choices": [
+                "tight",
+                "loose",
+            ],
+        },]
 
         code = """
             print('foo')
@@ -194,7 +158,7 @@ class Command(BaseCommand):
 
         mt2 = models.ModelTemplate(
             name='Another sample.R',
-            parameters=parameters,
+            inputs=inputs,
             code=code
         )
         mt2.save()
