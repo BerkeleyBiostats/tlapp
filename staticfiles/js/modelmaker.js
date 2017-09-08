@@ -8,6 +8,18 @@ G.datasets = G.datasets.map(function (dataset) {
 	return dataset;
 });
 
+G.models = G.models.map(function (model) {
+  model.fields = model.fields.map(function (field) {
+    // initialize enum types with empty array so that Vue model
+    // works properly
+    if (field.type === 'enum') {
+      field.value = [];
+    }
+    return field;
+  });
+  return model;
+})
+
 var app = new Vue({
   delimiters: ['${', '}'],
   el: '#modelmaker',
@@ -23,6 +35,7 @@ var app = new Vue({
   	sendJob: function (event) {
   		var inputs = {};
   		inputs.fields = this.selectedTemplate.fields.map(function (field) {
+        console.log(field);
   			return {
   				name: field.name,
   				value: field.value,
