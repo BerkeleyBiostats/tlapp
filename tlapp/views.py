@@ -50,6 +50,7 @@ def job_detail(request, job_id):
 	job = models.ModelRun.objects.get(pk=job_id)
 	context = {
 		"job": job,
+		"inputs_formatted": json.dumps(job.inputs, indent=2),
 	}
 	return render(request, 'job_detail.html', context)
 
