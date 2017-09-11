@@ -20,6 +20,12 @@ G.models = G.models.map(function (model) {
   return model;
 })
 
+function highlightCode () {
+ $('pre code').each(function(i, block) {
+      hljs.highlightBlock(block);
+    });
+};
+
 var app = new Vue({
   delimiters: ['${', '}'],
   el: '#modelmaker',
@@ -31,7 +37,13 @@ var app = new Vue({
 	datasets: G.datasets,
 	activeDataset: G.datasets[0],
   },
+  mounted: function () {
+    highlightCode();
+  },
   methods: {
+    templateSelected: function (event) {      
+      highlightCode();
+    },
   	sendJob: function (event) {
   		var inputs = {};
   		inputs.fields = this.selectedTemplate.fields.map(function (field) {

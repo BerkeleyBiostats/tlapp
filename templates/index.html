@@ -125,6 +125,7 @@
           class="form-control m-b" 
           name="account"
           v-model="selectedTemplate"
+          v-on:change="templateSelected"
         >
         <option 
           v-for="template in modelTemplates"
@@ -179,9 +180,11 @@
       </div>
       </form>
 
-      <pre>
-      ${ selectedTemplate.code }
-      </pre>
+<pre>
+<code class="R">
+${ selectedTemplate.code }
+</code>
+</pre>
 
     </div>
 
