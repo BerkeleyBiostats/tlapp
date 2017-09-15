@@ -31,6 +31,7 @@ class ModelRun(models.Model):
 	status = models.CharField(max_length=32)
 	output = models.TextField(null=True, blank=True)
 	output_zip = models.BinaryField(null=True, blank=True) # TODO: remove this, unused
+	output_url = models.URLField(null=True, blank=True)
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(ModelTemplate)
 
