@@ -10,9 +10,11 @@
     <h2>{{ job.created_at }}</h2>
     <h2>{{ job.model_template.name }}</h2>
     <p>{{ job.status }}</p>
+    {% if job.output_url %}
     <div>
-        <a href="{% url 'job_detail' job.id %}">Details</a>
+        <a href="{{ job.output_url }}">Download Outputs</a>
     </div>
+    {% endif %}
     <hr>
     {% endfor %}
   </div>

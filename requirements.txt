@@ -1,3 +1,4 @@
+boto3
 Django==1.11.4
 dj_database_url==0.4.2
 psycopg2

@@ -5,6 +5,7 @@ import subprocess
 import traceback
 import json
 import shutil
+import boto3
 from core import models
 
 def handle_jobs():
@@ -57,6 +58,22 @@ def handle_jobs():
         job.output = script_resp
 
         # TODO: upload to s3 instead
+
+        shutil.make_archive(output_folder, "zip", output_folder)
+        output_zip_filename = output_folder + ".zip"
+
+        s3 = boto3.client('s3')
+        key = os.path.basename(output_zip_filename)
+        bucket = 'tlapp'
+        s3.upload_file(output_zip_filename, bucket, key)
+
+        url = s3.generate_presigned_url(
+            'get_object', 
+            Params={'Bucket': bucket, 'Key': key}, ExpiresIn=3600)
+
+        job.output_url = url
+        print(url)
+
         report_filename = os.path.join(output_folder, 'REPORT.html')
         with open(report_filename, mode='r') as report_file:
             report_content = report_file.read()
