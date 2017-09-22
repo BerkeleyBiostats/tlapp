@@ -29,6 +29,9 @@ class ModelRun(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	inputs = JSONField(null=True, blank=True)
 	status = models.CharField(max_length=32)
+	backend = models.CharField(max_length=32, blank=True, null=True)
+	ghap_username = models.CharField(max_length=256, blank=True, null=True)
+	ghap_ip = models.CharField(max_length=256, blank=True, null=True)
 	output = models.TextField(null=True, blank=True)
 	output_zip = models.BinaryField(null=True, blank=True) # TODO: remove this, unused
 	output_url = models.URLField(null=True, blank=True)

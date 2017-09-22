@@ -49,7 +49,7 @@ var app = new Vue({
     templateSelected: function (event) {      
       highlightCode();
     },
-  	sendJob: function (event, backend) {
+  	sendJob: function (backend) {
   		var inputs = {};
   		inputs.fields = this.selectedTemplate.fields.map(function (field) {
         console.log(field);
@@ -84,8 +84,13 @@ var app = new Vue({
 
   		console.log(inputs);
 
+      console.log(event);
+      console.log(backend);
+
   		var job = {
   			inputs,
+        backend,
+        ghap_credentials: this.ghapCredentials,
   			model_template: this.selectedTemplate.id,
   		};
 

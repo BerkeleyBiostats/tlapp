@@ -69,11 +69,25 @@ def job_output_download(request, job_id):
 def submit_job(request):
 	job_data = json.loads(request.body)
 
+	ghap_username = None
+	ghap_password = None
+	ghap_ip = None
+	if 'ghap_credentials' in job_data:
+		ghap_credentials = job_data['ghap_credentials']
+		ghap_username = ghap_credentials['username']
+		ghap_password = ghap_credentials['password']
+		ghap_ip = ghap_credentials['ip']
+
 	job = models.ModelRun(
 		model_template_id = job_data['model_template'],
 		status = models.ModelRun.status_choices['submitted'],
 		inputs = job_data['inputs'],
+		backend = job_data['backend'],
+		ghap_username = ghap_username,
+		ghap_ip = ghap_ip,
 	)
+
+	# TODO: add the password to the cache with timeout
 
 	# Hardcode this for now
 	job.inputs['params'] = {
