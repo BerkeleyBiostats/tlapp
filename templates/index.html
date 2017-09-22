@@ -171,27 +171,86 @@
 
       </div> <!-- .v-for selectedTemplate.parameters.field -->
 
-      <div class="form-group">
-      <div class="col-sm-4">
-          <button 
-            class="btn btn-primary"
-            type="button"
-            v-on:click="sendJob"
-            >
-            Submit Job
-          </button>
-      </div>
-      </div>
       </form>
 
-<pre>
-<code class="R">
-${ selectedTemplate.code }
-</code>
-</pre>
+</div> <!-- .ibox-content -->
+
+
+<div class="ibox-title">
+  <h5>Backend</h5>
+</div>
+
+<div class="ibox-content">
+<div class="tabs-container">
+
+<div class="tabs-left">
+  <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#tab-6">GHAP</a></li>
+      <li class=""><a data-toggle="tab" href="#tab-7">VPS</a></li>
+  </ul>
+  <div class="tab-content ">
+    
+  <div id="tab-6" class="tab-pane active">
+  <div class="panel-body">
+      
+      <div class="form-group">
+      <label class="col-sm-2 control-label">Username</label>
+      <div class="col-sm-10">
+        <div>
+          <input type="text" v-model="ghapCredentials.username" class="form-control"> 
+        </div>
+      </div> <!-- .col-sm-10 -->
+      </div> <!-- .form-group -->
+
+      <div class="form-group">
+      <label class="col-sm-2 control-label">Password</label>
+      <div class="col-sm-10">
+        <div>
+          <input type="password" v-model="ghapCredentials.username" class="form-control"> 
+        </div>
+      </div> <!-- .col-sm-10 -->
+      </div> <!-- .form-group -->
+
+      <div class="form-group">
+      <label class="col-sm-2 control-label">IP Address</label>
+      <div class="col-sm-10">
+        <div>
+          <input type="text" v-model="ghapCredentials.username" class="form-control"> 
+        </div>
+      </div> <!-- .col-sm-10 -->
+      </div> <!-- .form-group -->
+
+      <button 
+        class="btn btn-primary"
+        type="button"
+        v-on:click="sendJob('ghap')"
+        >
+        Submit Job
+      </button>
+      
+  </div>
+  </div>
+  
+  <div id="tab-7" class="tab-pane">
+  <div class="panel-body">
+      <button 
+        class="btn btn-primary"
+        type="button"
+        v-on:click="sendJob('vps')"
+        >
+        Submit Job
+      </button>
+  </div>
+  </div>
+
+  </div> <!-- .tab-content -->
+</div>
+</div> <!-- .tabs-container -->
+</div> <!-- .ibox-content -->
+
+
 
     </div>
-
   </div>
 </div>
 </div>

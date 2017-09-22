@@ -36,6 +36,11 @@ var app = new Vue({
 	selectedTemplate: G.models[0],
 	datasets: G.datasets,
 	activeDataset: G.datasets[0],
+  ghapCredentials: {
+    username: '',
+    password: '',
+    ip: '',
+  },
   },
   mounted: function () {
     highlightCode();
@@ -44,7 +49,7 @@ var app = new Vue({
     templateSelected: function (event) {      
       highlightCode();
     },
-  	sendJob: function (event) {
+  	sendJob: function (event, backend) {
   		var inputs = {};
   		inputs.fields = this.selectedTemplate.fields.map(function (field) {
         console.log(field);
