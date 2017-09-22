@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import json
 
+from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -116,6 +117,10 @@ def submit_job(request):
 		job.inputs['data']['nodes']['A'] = job.inputs['data']['nodes']['A'][0]
 
 	job.save()
+
+	if ghap_password:
+		# expire saved password after a day
+		cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
 
 	return JsonResponse(job.as_dict())
 
