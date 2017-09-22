@@ -88,8 +88,6 @@ def submit_job(request):
 		ghap_ip = ghap_ip,
 	)
 
-	# TODO: add the password to the cache with timeout
-
 	# Hardcode this for now
 	job.inputs['params'] = {
 		"learners": {
@@ -119,7 +117,8 @@ def submit_job(request):
 	job.save()
 
 	if ghap_password:
-		# expire saved password after a day
+		# expire saved password after a day to reduce impact of the 
+		# application being compromised
 		cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
 
 	return JsonResponse(job.as_dict())
