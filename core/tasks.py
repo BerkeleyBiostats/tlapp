@@ -1,6 +1,7 @@
 import logging
 import tempfile
 import os
+import uuid
 import subprocess
 import traceback
 import json
@@ -15,7 +16,29 @@ def pwd():
     output = run('pwd')
     return output
 
+def upload_to_ghap(job):
+    temp_base_dir = '/tmp'
+    output_folder = make_temp_dir(temp_base_dir)
+
+    # Write script to a file...    
+    local_code_folder = tempfile.mkdtemp()
+    script_name = 'script.R'
+    local_code_filename = os.path.join(local_code_folder, script_name)
+    with open(local_code_filename, 'w') as code_file:
+        code_file.write(job.model_template.code)
+    # ...then upload to cluster
+    remote_code_folder = make_temp_dir(temp_base_dir)
+    remote_code_filename = os.path.join(remote_code_folder, script_name)
+    with cd('/torquefs'):
+        run('mkdir -p %s' % remote_code_folder)
+        put(local_code_filename, remote_code_filename)
+    print("Put code at %s" % remote_code_filename)
+
+def make_temp_dir(base_dir):
+    return os.path.join(base_dir, str(uuid.uuid4()))
+
 def run_ghap_job(job):
+    # Configure login parameters for fabric ssh connection
     username = job.ghap_username
     server = job.ghap_ip
     password = cache.get("ghap_password_%s" % job.id)
@@ -23,7 +46,11 @@ def run_ghap_job(job):
     env.passwords = {
         "%s@%s:22" % (username, server): password
     }
+
+    execute(upload_to_ghap, job)
+
     output = execute(pwd)
+
     job.output = output
     job.status = models.ModelRun.status_choices['success']
 
