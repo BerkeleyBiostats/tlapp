@@ -14,6 +14,10 @@
     <div>
         <a href="{{ job.output_url }}">Download Outputs</a>
     </div>
+    <div>
+        <a href="{% url 'job_detail' job.id %}">Details</a>
+    </div>
+
     {% endif %}
     <hr>
     {% endfor %}
