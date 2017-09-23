@@ -52,6 +52,8 @@ def upload_to_ghap(job):
     put(local_input_filename, remote_input_filename)
     print("Put inputs at %s" % remote_input_filename)
 
+    # TODO: upload a provision script and execute it first.
+
     # Now run the script
     run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.2/tltools/scripts/run_job.R'
     cmd = "Rscript --default-packages=methods,stats %s %s %s" % (
