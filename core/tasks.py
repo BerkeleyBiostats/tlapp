@@ -52,7 +52,19 @@ def upload_to_ghap(job):
     put(local_input_filename, remote_input_filename)
     print("Put inputs at %s" % remote_input_filename)
 
-    # TODO: upload a provision script and execute it first.
+    # Upload and run a provisioning script
+    if job.model_template.provision:
+        provision_name = 'provision.sh'
+        local_provision_filename = os.path.join(local_code_folder, provision_name)
+        with open(local_provision_filename, 'w') as provision_file:
+            provision_file.write(job.model_template.provision)
+        remote_provision_filename = os.path.join(remote_code_folder, provision_name)
+        put(local_provision_filename, remote_provision_filename, mode=0755)
+        print("Put provision script at %s" % remote_provision_filename)
+
+        with cd(remote_code_folder):
+            cmd = "./provision.sh"
+            provision_output = run(cmd)
 
     # Now run the script
     run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.2/tltools/scripts/run_job.R'

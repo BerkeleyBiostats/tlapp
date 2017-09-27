@@ -13,6 +13,7 @@ class ModelTemplate(models.Model):
 	name = models.CharField(max_length=256)
 	fields = JSONField(null=True, blank=True)
 	code = models.TextField(null=True, blank=True)
+	provision = models.TextField(null=True, blank=True)
 
 	def __str__(self):
 		return self.name

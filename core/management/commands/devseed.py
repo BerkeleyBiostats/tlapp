@@ -12,6 +12,24 @@ sample_script_inputs = [{
     ]
 }]
 
+# R -e "if (!require('')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+
+sample_provision = """
+R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('SuperLearner')) install.packages('SuperLearner', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('glmnet')) install.packages('glmnet', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('speedglm')) install.packages('speedglm', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('future')) install.packages('future', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('origami')) devtools::install_github('jeremyrcoyle/origami')"
+R -e "if (!require('igraph')) devtools::install_version('igraph', version='1.0.1', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('uuid')) install.packages('uuid', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('memoise')) install.packages('memoise', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('sl3')) devtools::install_github('jeremyrcoyle/sl3')"
+R -e "if (!require('testthat')) install.packages('testthat', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('jsonlite')) install.packages('jsonlite', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('tltools')) devtools::install_github('jeremyrcoyle/tltools')"
+"""
+
 sample_script = """
 
 
@@ -139,7 +157,8 @@ class Command(BaseCommand):
         mt = models.ModelTemplate(
             name='sl3_sample.R',
             fields=inputs,
-            code=code
+            code=code,
+            provision=sample_provision,
         )   
         mt.save()
 
@@ -159,7 +178,8 @@ class Command(BaseCommand):
         mt2 = models.ModelTemplate(
             name='Another sample.R',
             fields=inputs,
-            code=code
+            code=code,
+            provision=sample_provision,
         )
         mt2.save()
 
