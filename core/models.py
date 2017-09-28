@@ -9,6 +9,13 @@ class Dataset(models.Model):
 	url = models.URLField(null=True, blank=True)
 	variables = JSONField(null=True, blank=True)
 
+	# Path to file if it's in a GHAP git repo
+	repository_path = models.TextField(max_length=256, null=True, blank=True)
+
+	def __str__(self):
+		return self.title
+
+
 class ModelTemplate(models.Model):
 	name = models.CharField(max_length=256)
 	fields = JSONField(null=True, blank=True)

@@ -27,6 +27,16 @@ def upload_to_ghap(job):
     remote_output_folder = make_temp_dir_name()
     remote_output_folder_full_path = os.path.join(temp_base_dir, remote_output_folder)
 
+    # Check if we need to clone a dataset
+    # ...has a git url and
+    # ...repo hasn't already been cloned
+
+    # cd and clone
+    # build the git url, pipes.quote the password
+
+    # finally, generate the filepath to pass to script inputs
+
+
     # Write script to a file...    
     local_code_folder = tempfile.mkdtemp()
     script_name = 'script.R'
