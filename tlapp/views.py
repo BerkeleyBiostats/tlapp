@@ -81,6 +81,7 @@ def submit_job(request):
 
 	job = models.ModelRun(
 		model_template_id = job_data['model_template'],
+		dataset_id = job_data['dataset'],
 		status = models.ModelRun.status_choices['submitted'],
 		inputs = job_data['inputs'],
 		backend = job_data['backend'],

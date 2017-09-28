@@ -82,21 +82,16 @@ var app = new Vue({
   			}
   		};
 
-  		console.log(inputs);
-
-      console.log(event);
-      console.log(backend);
-
   		var job = {
   			inputs,
         backend,
         ghap_credentials: this.ghapCredentials,
   			model_template: this.selectedTemplate.id,
+        dataset: this.activeDataset.id,
   		};
 
   		// GET /someUrl
 		this.$http.post('/submit_job/', job).then(response => {
-			console.log(response.data);
 			window.location.href = '/jobs/';
 		}, response => {
 		});

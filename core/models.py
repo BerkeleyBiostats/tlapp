@@ -45,6 +45,7 @@ class ModelRun(models.Model):
 	output_url = models.URLField(null=True, blank=True)
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(ModelTemplate)
+	dataset = models.ForeignKey(Dataset, null=True, blank=True)
 
 	def __str__(self):
 		return "%s %s" % (self.model_template.name, self.created_at)

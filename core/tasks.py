@@ -1,3 +1,5 @@
+from urlparse import urlparse, urlunparse
+import pipes
 import logging
 import tempfile
 import os
@@ -9,6 +11,7 @@ import shutil
 import boto3
 from fabric.api import *
 from fabric.operations import *
+from fabric.contrib.files import exists
 from django.core.cache import cache
 from core import models
 
@@ -22,19 +25,36 @@ def make_temp_dir_name():
 def make_temp_dir(base_dir):
     return os.path.join(base_dir, make_temp_dir_name())
 
-def upload_to_ghap(job):
+def upload_to_ghap(job, username, password):
     temp_base_dir = '/tmp'
     remote_output_folder = make_temp_dir_name()
     remote_output_folder_full_path = os.path.join(temp_base_dir, remote_output_folder)
 
     # Check if we need to clone a dataset
-    # ...has a git url and
-    # ...repo hasn't already been cloned
+    if job.dataset.url.startswith('https://git.ghap.io'):
 
-    # cd and clone
-    # build the git url, pipes.quote the password
+        # Check if the dataset has already been cloned
+        o = urlparse(job.dataset.url)
+        repo_name = o.path.split('/')[-1][:-4]
+        repo_base_path = '~/datasets'
+        repo_path = os.path.join(repo_base_path, repo_name)
+        repo_exists = exists(repo_path)
 
-    # finally, generate the filepath to pass to script inputs
+        if repo_exists:
+            print("Not going to clone git repo since it already exists")
+        else:
+
+            # Add username and password to the git url
+            o = list(tuple(o))
+            o[1] = username + ":" + pipes.quote(password) + "@" + o[1]
+            git_url_with_password = urlunparse(tuple(o))
+
+            # Clone it
+            with cd(repo_base_path):
+                run('git clone %s' % git_url_with_password)
+
+            # Set the uri to the file's path on the local file system
+            job.inputs['data']['uri'] = os.path.join(repo_path, job.dataset.repository_path)
 
 
     # Write script to a file...    
@@ -120,7 +140,7 @@ def run_ghap_job(job):
         "%s@%s:22" % (username, server): password
     }
 
-    output = execute(upload_to_ghap, job)
+    output = execute(upload_to_ghap, job, username, password)
 
     job.output = output
     job.status = models.ModelRun.status_choices['success']

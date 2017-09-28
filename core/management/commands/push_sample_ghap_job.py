@@ -5,7 +5,18 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from core import models
 
-sample_inputs = {"fields": [{"name": "Learners", "value": []}, {"name": "Abar"}], "data": {"nodes": {"A": "parity", "Y": "haz", "W": ["apgar1", "apgar5", "gagebrth", "mage", "meducyrs", "sexn"]}, "type": "csv", "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv"}, "params": {"metalearner": {"learner": "Lrnr_nnls"}, "learners": {"glm_learner": {"learner": "Lrnr_glm_fast"}, "sl_glmnet_learner": {"learner": "Lrnr_pkg_SuperLearner", "params": {"SL_wrapper": "SL.glmnet"}}}}}
+sample_inputs = {
+    "fields": [
+        {"name": "Learners", "value": []}, 
+        {"name": "Abar"}
+    ], 
+    "data": {
+        "nodes": {"A": "parity", "Y": "haz", "W": ["apgar1", "apgar5", "gagebrth", "mage", "meducyrs", "sexn"]}, 
+        "type": "csv", 
+        "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv"
+    }, 
+    "params": {"metalearner": {"learner": "Lrnr_nnls"}, "learners": {"glm_learner": {"learner": "Lrnr_glm_fast"}, "sl_glmnet_learner": {"learner": "Lrnr_pkg_SuperLearner", "params": {"SL_wrapper": "SL.glmnet"}}}}
+}
 
 class Command(BaseCommand):
     help = "Push a sample job for testing GHAP integration"
@@ -19,6 +30,7 @@ class Command(BaseCommand):
             backend = 'ghap',
             ghap_username = os.environ.get('GHAP_USERNAME'),
             ghap_ip = os.environ.get('GHAP_IP'),
+            dataset = models.Dataset.objects.get(title="ki1000306-ZincSGA"),
         )
         job.save()
 
