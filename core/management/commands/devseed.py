@@ -78,6 +78,22 @@ covars <- c(unlist(tlparams$data_nodes$W), tlparams$data_nodes$A)
 outcome <- tlparams$data_nodes$Y
 task <- sl3_Task$new(cpp, covariates = covars, outcome = outcome)
 
+
+# Hardcode this for now.
+# Later: build the full learner configuration from the tlparams$params value
+tlparams$params = list(
+    learners = list(
+        glm_learner = list(learner = "Lrnr_glm_fast"),
+        sl_glmnet_learner = list(
+            learner = "Lrnr_pkg_SuperLearner",
+            params = list(
+                SL_wrapper = "SL.glmnet"
+            )
+        )
+    ),
+    metalearner = list(learner="Lrnr_nnls")
+)
+
 #define learners based on tlparams
 learner_from_params <- function(learner){
   Lrnr_factory <- get(learner$learner)

@@ -89,26 +89,6 @@ def submit_job(request):
 		ghap_ip = ghap_ip,
 	)
 
-	# Hardcode this for now
-	job.inputs['params'] = {
-		"learners": {
-			"glm_learner": {
-				"learner": "Lrnr_glm_fast"
-			},
-			
-			"sl_glmnet_learner": {
-				"learner": "Lrnr_pkg_SuperLearner",
-				"params": {
-					"SL_wrapper":"SL.glmnet"
-				}
-			}
-			
-		},
-		"metalearner": {
-			"learner": "Lrnr_nnls"
-		}
-	}
-
 	# nodes.Y and nodes.A expect a single element
 	if len(job.inputs['data']['nodes']['Y']) == 1:
 		job.inputs['data']['nodes']['Y'] = job.inputs['data']['nodes']['Y'][0]

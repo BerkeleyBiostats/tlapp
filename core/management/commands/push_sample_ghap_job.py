@@ -15,7 +15,13 @@ sample_inputs = {
         "type": "csv", 
         "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv"
     }, 
-    "params": {"metalearner": {"learner": "Lrnr_nnls"}, "learners": {"glm_learner": {"learner": "Lrnr_glm_fast"}, "sl_glmnet_learner": {"learner": "Lrnr_pkg_SuperLearner", "params": {"SL_wrapper": "SL.glmnet"}}}}
+    "params": {
+        "metalearner": {"learner": "Lrnr_nnls"}, 
+        "learners": {
+            "glm_learner": {"learner": "Lrnr_glm_fast"}, 
+            "sl_glmnet_learner": {"learner": "Lrnr_pkg_SuperLearner", "params": {"SL_wrapper": "SL.glmnet"}}
+        }
+    }
 }
 
 class Command(BaseCommand):

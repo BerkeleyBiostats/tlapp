@@ -51,13 +51,10 @@ var app = new Vue({
     },
   	sendJob: function (backend) {
   		var inputs = {};
-  		inputs.fields = this.selectedTemplate.fields.map(function (field) {
-        console.log(field);
-  			return {
-  				name: field.name,
-  				value: field.value,
-  			};
-  		});
+      inputs.params = {}
+      this.selectedTemplate.fields.forEach(function (field) {
+        inputs.params[field.name] = field.value;
+      });
 
   		var whereRole = (variables, role) => {
   			return variables.filter(function (variable) {
