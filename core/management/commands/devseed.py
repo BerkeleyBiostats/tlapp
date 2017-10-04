@@ -170,7 +170,7 @@ class Command(BaseCommand):
 
         code = sample_script
 
-        mt = models.ModelTemplate(
+        mt = models.AnalysisTemplate(
             name='sl3_sample.R',
             fields=inputs,
             code=code,
@@ -191,7 +191,7 @@ class Command(BaseCommand):
             print('foo')
         """
 
-        mt2 = models.ModelTemplate(
+        mt2 = models.AnalysisTemplate(
             name='Another sample.R',
             fields=inputs,
             code=code,

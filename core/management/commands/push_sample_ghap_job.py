@@ -28,7 +28,7 @@ class Command(BaseCommand):
     help = "Push a sample job for testing GHAP integration"
 
     def handle(self, *args, **options):
-        mt = models.ModelTemplate.objects.get(name='sl3_sample.R')
+        mt = models.AnalysisTemplate.objects.get(name='sl3_sample.R')
         job = models.ModelRun(
             model_template = mt,
             status = models.ModelRun.status_choices['submitted'],

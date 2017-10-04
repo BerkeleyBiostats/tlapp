@@ -16,7 +16,7 @@ class Dataset(models.Model):
 		return self.title
 
 
-class ModelTemplate(models.Model):
+class AnalysisTemplate(models.Model):
 	name = models.CharField(max_length=256)
 	fields = JSONField(null=True, blank=True)
 	code = models.TextField(null=True, blank=True)
@@ -44,7 +44,7 @@ class ModelRun(models.Model):
 	output_zip = models.BinaryField(null=True, blank=True) # TODO: remove this, unused
 	output_url = models.URLField(null=True, blank=True)
 	traceback = models.TextField(null=True, blank=True)
-	model_template = models.ForeignKey(ModelTemplate)
+	model_template = models.ForeignKey(AnalysisTemplate)
 	dataset = models.ForeignKey(Dataset, null=True, blank=True)
 
 	def __str__(self):

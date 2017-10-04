@@ -5,5 +5,5 @@ from django.contrib import admin
 from . import models
 
 # Register your models here.
-admin.site.register(models.ModelTemplate)
+admin.site.register(models.AnalysisTemplate)
 admin.site.register(models.Dataset)

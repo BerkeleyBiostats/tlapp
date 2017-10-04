@@ -14,7 +14,7 @@ from core import models
 # @login_required
 def index(request):
 
-	templates = models.ModelTemplate.objects.all()
+	templates = models.AnalysisTemplate.objects.all()
 
 	templates_json = [{
 		"id": template.id,
