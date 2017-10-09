@@ -101,7 +101,7 @@ def upload_to_ghap(job, username, password):
     # Now run the script
     run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.2/tltools/scripts/run_job.R'
 
-    cmd = "Rscript --default-packages=methods,stats %s %s %s" % (
+    cmd = "Rscript --default-packages=methods,stats,utils %s %s %s" % (
         run_job_path,
         remote_code_filename,
         remote_input_filename
