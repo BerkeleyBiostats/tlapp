@@ -67,7 +67,7 @@ def post_process_outputs(job):
             job.report_html = f.read()
     else:
         print("Didn't find a report")
-        
+
     # If there is a file "REPORT_utf8.html", 
         # replace all img srcs with signed url
         # save the report html in the job object
