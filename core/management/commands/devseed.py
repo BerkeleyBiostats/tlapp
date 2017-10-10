@@ -15,6 +15,7 @@ sample_script_inputs = [{
 # R -e "if (!require('')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
 
 sample_provision = """
+which R
 R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('SuperLearner')) install.packages('SuperLearner', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('glmnet')) install.packages('glmnet', repos = 'http://cran.rstudio.com/')"
@@ -28,131 +29,208 @@ R -e "if (!require('sl3')) devtools::install_github('jeremyrcoyle/sl3')"
 R -e "if (!require('testthat')) install.packages('testthat', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('jsonlite')) install.packages('jsonlite', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('tltools')) devtools::install_github('jeremyrcoyle/tltools')"
+R -e "if (!require('rstackdeque')) install.packages('rstackdeque', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('rlang')) install.packages('rlang', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('visNetwork')) install.packages('visNetwork', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('delayed')) devtools::install_github('jeremyrcoyle/delayed@reduce-r-version')"
+R -e "if (!require('randomForest')) install.packages('randomForest', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('assertthat')) install.packages('assertthat', repos = 'http://cran.rstudio.com/')"
 """
 
 sample_script = """
 
-
 ---
-title: "Sample TL App script"
+title: "SuperLearner Benchmarks"
 author: "Jeremy Coyle"
-date: "9/1/2017"
+date: "10/5/2017"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, results='hide'}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE)
+library(sl3)
+library(delayed)
+library(SuperLearner)
+library(future)
+library(ggplot2)
+library(data.table)
+```
+## Test Setup
+
+### Session Information
+
+```{r sessionInfo, echo=FALSE, results="asis"}
+sessionInfo()
 ```
 
-```{r tltools_setup, include=FALSE}
-library(tltools)
+### Test System
 
-if(!exists("tlparams")){
-  sample_input_file <- fpath <- system.file("extdata", "sample_input.json", package="tltools")
-  tlparams <- ScriptParams$new(sample_input_file)
+```{r systemInfo, echo=FALSE, results="asis"}
+uname <- system("uname -a", intern = TRUE)
+os <- sub(" .*", "", uname)
+if(os=="Darwin"){
+  cpu_model <- system("sysctl -n machdep.cpu.brand_string", intern = TRUE)
+  cpus_physical <- as.numeric(system("sysctl -n hw.physicalcpu", intern = TRUE))
+  cpus_logical <- as.numeric(system("sysctl -n hw.logicalcpu", intern = TRUE))
+  cpu_clock <- system("sysctl -n hw.cpufrequency_max", intern = TRUE)
+  memory <- system("sysctl -n hw.memsize", intern = TRUE)
+} else if(os=="Linux"){
+  cpu_model <- system("lscpu | grep 'Model name'", intern = TRUE)
+  cpu_model <- gsub("Model name:[[:blank:]]*","", cpu_model)
+  cpus_logical <- system("lscpu | grep '^CPU(s)'", intern = TRUE)
+  cpus_logical <- as.numeric(gsub("^.*:[[:blank:]]*","", cpus_logical))
+  tpc <- system("lscpu | grep '^Thread(s) per core'", intern = TRUE)
+  tpc <- as.numeric(gsub("^.*:[[:blank:]]*","", tpc))
+  cpus_physical <- cpus_logical/tpc
+  cpu_clock <- as.numeric(gsub("GHz","",gsub("^.*@","",cpu_model)))*10^9
+  memory <- system("cat /proc/meminfo | grep '^MemTotal'", intern = TRUE)
+  memory <- as.numeric(gsub("kB","",gsub("^.*:","",memory)))*2^10
+} else {
+  stop("unsupported OS")
 }
 ```
 
-## Analysis Parameters
-```{r comment='', echo=FALSE}
-cat(readLines(tlparams$input_file, warn=FALSE), sep = '\n')
-```
+* CPU model: `r cpu_model`
+* Physical cores: `r as.numeric(cpus_physical)`
+* Logical cores: `r as.numeric(cpus_logical)`
+* Clock speed: `r as.numeric(cpu_clock)/10^9`GHz
+* Memory: `r round(as.numeric(memory)/2^30, 1)`GB
 
-## Analysis 
+### Test Data
 
-```{r analysis, echo=TRUE, cache=T}
-# Note for Marc Pare:
-# in some sense we might want to separate the part of the script that runs an analysis 
-# (computantionally expensive, unlikely to change) from the part of the script that reports the results 
-# (runs fast, might change a lot)
-# the former would likely be an R script, the latter an Rmd document
-# this chunk is the analysis part, the rest is the report part
-# just something to think about
-library(sl3)
-library(SuperLearner)
-#define task from tlparams specification
-cpp <- tlparams$data
+```{r data_setup, echo=TRUE, results="hide"}
+
+data(cpp)
+cpp <- cpp[!is.na(cpp[, "haz"]), ]
+covars <- c("apgar1", "apgar5", "parity", "gagebrth", "mage", "meducyrs", "sexn")
 cpp[is.na(cpp)] <- 0
-covars <- c(unlist(tlparams$data_nodes$W), tlparams$data_nodes$A)
-outcome <- tlparams$data_nodes$Y
+# cpp <- cpp[sample(nrow(cpp),10000,replace=T),]
+cpp <- cpp[1:150, ]
+outcome <- "haz"
+
+
 task <- sl3_Task$new(cpp, covariates = covars, outcome = outcome)
 
-
-# Hardcode this for now.
-# Later: build the full learner configuration from the tlparams$params value
-tlparams$params = list(
-    learners = list(
-        glm_learner = list(learner = "Lrnr_glm_fast"),
-        sl_glmnet_learner = list(
-            learner = "Lrnr_pkg_SuperLearner",
-            params = list(
-                SL_wrapper = "SL.glmnet"
-            )
-        )
-    ),
-    metalearner = list(learner="Lrnr_nnls")
-)
-
-#define learners based on tlparams
-learner_from_params <- function(learner){
-  Lrnr_factory <- get(learner$learner)
-  params <- learner$params
-  
-  if(is.null(params)){
-    params <- list()
-  }
-  learner <- do.call(Lrnr_factory$new, params)
-  
-  return(learner)
-}
-
-learners <- lapply(tlparams$params$learners, learner_from_params)
-metalearner <- learner_from_params(tlparams$params$metalearner)
-sl_learner <- Lrnr_sl$new(learners = learners, metalearner = metalearner)
-sl_fit <- sl_learner$train(task)
-
-
 ```
 
+### Test Descriptions
+
+#### `sl3` with Legacy `SuperLearner` Wrappers
+```{r sl3_legacy_setup, echo=TRUE}
+sl_glmnet <- Lrnr_pkg_SuperLearner$new("SL.glmnet")
+sl_random_forest <- Lrnr_pkg_SuperLearner$new("SL.randomForest")
+sl_glm <- Lrnr_pkg_SuperLearner$new("SL.glm")
+nnls_lrnr <- Lrnr_nnls$new()
+
+sl3_legacy <- Lrnr_sl$new(list(sl_random_forest, sl_glmnet, sl_glm), nnls_lrnr)
+```
+
+
+#### `sl3` with Improved Wrappers
+```{r sl3_improved_setup, echo=TRUE}
+sl_glmnet <- Lrnr_pkg_SuperLearner$new("SL.glmnet")
+random_forest <- Lrnr_randomForest$new()
+glm_fast <- Lrnr_glm_fast$new()
+nnls_lrnr <- Lrnr_nnls$new()
+
+sl3_improved <- Lrnr_sl$new(list(random_forest, sl_glmnet, glm_fast), nnls_lrnr)
+```
+
+#### Legacy `SuperLearner`
+
+```{r legacy_SuperLearner, echo=TRUE, message=FALSE}
+time_SuperLearner_sequential <- system.time({
+  SuperLearner(task$Y, as.data.frame(task$X), newX = NULL, family = gaussian(), 
+               SL.library=c("SL.glmnet","SL.randomForest","SL.glm"),
+               method = "method.NNLS", id = NULL, verbose = FALSE,
+               control = list(), cvControl = list(), obsWeights = NULL, 
+               env = parent.frame())
+})
+
+options(mc.cores=cpus_physical)
+time_SuperLearner_multicore <- system.time({
+  mcSuperLearner(task$Y, as.data.frame(task$X), newX = NULL, family = gaussian(), 
+               SL.library=c("SL.glmnet","SL.randomForest","SL.glm"),
+               method = "method.NNLS", id = NULL, verbose = FALSE,
+               control = list(), cvControl = list(), obsWeights = NULL, 
+               env = parent.frame())
+})
+```
 ## Results
 
-Just a sample of some output types
+
+```{r eval, echo=FALSE, results="hide", message=FALSE}
+plan(sequential)
+test <- delayed_learner_train(sl3_legacy, task)
+time_sl3_legacy_sequential <- system.time({
+  sched <- Scheduler$new(test, SequentialJob)
+  cv_fit <- sched$compute()
+})
+
+test <- delayed_learner_train(sl3_improved, task)
+time_sl3_improved_sequential <- system.time({
+  sched <- Scheduler$new(test, SequentialJob)
+  cv_fit <- sched$compute()
+})
+
+plan(multicore, workers=cpus_logical)
+test <- delayed_learner_train(sl3_legacy, task)
+time_sl3_legacy_multicore_ht <- system.time({
+  sched <- Scheduler$new(test, FutureJob, nworkers=cpus_logical, verbose = FALSE)
+  cv_fit <- sched$compute()
+})
+
+test <- delayed_learner_train(sl3_improved, task)
+time_sl3_improved_multicore_ht <- system.time({
+  sched <- Scheduler$new(test, FutureJob, nworkers=cpus_logical, verbose = FALSE)
+  cv_fit <- sched$compute()
+})
+
+test <- delayed_learner_train(sl3_legacy, task)
+time_sl3_legacy_multicore <- system.time({
+  sched <- Scheduler$new(test, FutureJob, nworkers=cpus_physical, verbose = FALSE)
+  cv_fit <- sched$compute()
+})
+
+test <- delayed_learner_train(sl3_improved, task)
+time_sl3_improved_multicore <- system.time({
+  sched <- Scheduler$new(test, FutureJob, nworkers=cpus_physical, verbose = FALSE)
+  cv_fit <- sched$compute()
+})
+
+plan(multisession, workers=cpus_physical)
+test <- delayed_learner_train(sl3_legacy, task)
+time_sl3_legacy_multisession <- system.time({
+  sched <- Scheduler$new(test, FutureJob, nworkers=cpus_physical, verbose = FALSE)
+  cv_fit <- sched$compute()
+})
+
+test <- delayed_learner_train(sl3_improved, task)
+time_sl3_improved_multisession <- system.time({
+  sched <- Scheduler$new(test, FutureJob, nworkers=cpus_physical, verbose = FALSE)
+  cv_fit <- sched$compute()
+})
 
 
-### Coef table
-```{r coefs, echo=FALSE}
-ml_fit <- sl_fit$fit_object$full_fit$fit_object$learner_fits[[2]]$fit_object
-coeftab <- as.matrix(coef(ml_fit))
-learner_names <- sapply(learners,`[[`,'name')
-rownames(coeftab) <- learner_names
-colnames(coeftab) <- "Coef"
-kable(coeftab)
 ```
 
-### Coef plot
-```{r coef_plot, echo=FALSE, fig.height=2, fig.width=4}
-library(ggplot2)
-coefdf <- as.data.frame(coeftab)
-coefdf$Learner <- learner_names
-ggplot(coefdf,aes(y=Learner, x=Coef))+geom_point()+theme_bw()
-```
+```{r results, echo=FALSE}
+results <- rbind(time_sl3_legacy_sequential, time_sl3_legacy_multicore, 
+                 time_sl3_legacy_multicore_ht, time_sl3_legacy_multisession,
+                 time_sl3_improved_sequential, time_sl3_improved_multicore, 
+                 time_sl3_improved_multicore_ht, time_sl3_improved_multisession,
+                 time_SuperLearner_sequential, time_SuperLearner_multicore
+                )
+test <- rownames(results)
+results <- as.data.table(results)
 
-### Coef text
-```{r coef_text, echo=FALSE}
-print(coeftab)
-```
+invisible(results[, test := gsub("time_", "", test)])
+results <- results[order(results$elapsed)]
+invisible(results[, test := factor(test,levels=test)])
+ggplot(results, aes(y=test, x=elapsed))+geom_point()+
+  xlab("Time (s)")+ylab("Test")+theme_bw()
 
-### We can also write output to a file
-
-Nothing to see here
-
-```{r coef_file, echo=FALSE}
-csv_file <- file.path(tlparams$output_dir, "coef.csv")
-write.csv(coeftab,csv_file)
-
-rdata_file<- file.path(tlparams$output_dir, "coef.rdata")
-save(coeftab,file=rdata_file)
 ```
 
 

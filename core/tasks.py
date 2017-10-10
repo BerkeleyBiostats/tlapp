@@ -9,6 +9,7 @@ import traceback
 import json
 import shutil
 import boto3
+import tarfile
 from fabric.api import *
 from fabric.operations import *
 from fabric.contrib.files import exists
@@ -24,6 +25,53 @@ def make_temp_dir_name():
 
 def make_temp_dir(base_dir):
     return os.path.join(base_dir, make_temp_dir_name())
+
+def post_process_outputs(job):
+
+    s3 = boto3.resource('s3')
+
+    parts = urlparse(job.output_url)
+    output_zip_key = parts.path[1:] # Remove leading slash
+
+    output_path = '/tmp/%s' % output_zip_key
+    print("Downloading job outputs to %s" % output_path)
+
+    s3.Object('tlapp', output_zip_key).download_file(output_path)
+
+    tar = tarfile.open(output_path)
+    tar.extractall(path="/tmp")
+    tar.close()
+
+    # Upload all the files unzipped
+    output_dirname = output_zip_key[:-7]
+    f = []
+    k = []
+    output_path = os.path.join("/tmp", output_dirname)
+    for (dirpath, dirnames, filenames) in os.walk(output_path):
+        keypath = dirpath[len("/tmp/"):]
+        keys = [os.path.join(keypath, name) for name in filenames]
+        filenames = [os.path.join(dirpath, name) for name in filenames]
+        f.extend(filenames)
+        k.extend(keys)
+
+    print("Files to upload to s3:")
+    print(zip(f, k))
+
+    for filename, key in zip(f, k):
+        s3.Object('tlapp', key).upload_file(filename)
+
+    report_path = os.path.join(output_path, 'REPORT_utf8.html')
+    if os.path.exists(report_path):
+        print("Found a report")
+        with open(report_path) as f:
+            job.report_html = f.read()
+    else:
+        print("Didn't find a report")
+        
+    # If there is a file "REPORT_utf8.html", 
+        # replace all img srcs with signed url
+        # save the report html in the job object
+
 
 def upload_to_ghap(job, username, password):
     temp_base_dir = '/tmp'
@@ -227,6 +275,10 @@ def handle_jobs():
             # Maybe reimplement as ssh flow like ghap job?
             # run_vps_job(job)
             pass
+
+        job.save()
+        post_process_outputs(job)
+
     except: 
         print(traceback.format_exc())
         job.traceback = traceback.format_exc()
