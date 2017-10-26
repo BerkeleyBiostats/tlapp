@@ -6,3 +6,4 @@ fabric
 psycopg2
 gunicorn
 whitenoise
+bs4

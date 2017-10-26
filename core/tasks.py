@@ -14,6 +14,7 @@ from fabric.api import *
 from fabric.operations import *
 from fabric.contrib.files import exists
 from django.core.cache import cache
+from bs4 import BeautifulSoup
 from core import models
 
 def pwd():
@@ -25,6 +26,26 @@ def make_temp_dir_name():
 
 def make_temp_dir(base_dir):
     return os.path.join(base_dir, make_temp_dir_name())
+
+def change_image_links(html, job_id):
+    print("Replacing relative image links with S3 signed urls")
+    s3 = boto3.client('s3')
+    bucket = 'tlapp'
+
+    soup = BeautifulSoup(html, 'html.parser')
+    img_tags = soup.find_all("img")
+
+    for tag in img_tags:
+        key = job_id + "/" + tag.get("src")
+        url = s3.generate_presigned_url(
+            'get_object', 
+            Params={'Bucket': bucket, 'Key': key}, ExpiresIn=3600)
+
+        tag["src"] = url
+
+    return soup.prettify()
+
+
 
 def post_process_outputs(job):
 
@@ -65,13 +86,9 @@ def post_process_outputs(job):
         print("Found a report")
         with open(report_path) as f:
             job.report_html = f.read()
+            job.report_html = change_image_links(job.report_html, output_dirname)
     else:
         print("Didn't find a report")
-
-    # If there is a file "REPORT_utf8.html", 
-        # replace all img srcs with signed url
-        # save the report html in the job object
-
 
 def upload_to_ghap(job, username, password):
     temp_base_dir = '/tmp'
