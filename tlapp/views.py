@@ -11,7 +11,7 @@ from django.http import HttpResponse, JsonResponse
 
 from core import models
 
-# @login_required
+@login_required
 def index(request):
 
 	templates = models.AnalysisTemplate.objects.all()
@@ -40,7 +40,7 @@ def index(request):
 
 	return render(request, 'index.html', context)
 
-# @login_required
+@login_required
 def jobs(request):
 	jobs = models.ModelRun.objects.all().order_by('-created_at')
 	context = {
@@ -65,7 +65,7 @@ def job_output_download(request, job_id):
 		f.write('hello')
 	return redirect('/static/bar.txt')
 
-# @login_required
+@login_required
 @csrf_exempt
 def submit_job(request):
 	job_data = json.loads(request.body)

@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from tlapp import views
 
@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^jobs/(?P<job_id>[0-9]+)/$', views.job_detail, name='job_detail'),
     url(r'^jobs/', views.jobs, name='jobs'),
     url(r'^submit_job/', views.submit_job, name='submit_job'),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 ]
