@@ -39,7 +39,7 @@ def change_image_links(html, job_id):
         key = job_id + "/" + tag.get("src")
         url = s3.generate_presigned_url(
             'get_object', 
-            Params={'Bucket': bucket, 'Key': key}, ExpiresIn=3600)
+            Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
 
         tag["src"] = url
 
@@ -191,7 +191,7 @@ def upload_to_ghap(job, username, password):
 
     url = s3.generate_presigned_url(
         'get_object', 
-        Params={'Bucket': bucket, 'Key': key}, ExpiresIn=3600)
+        Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
 
     job.output_url = url
     print("Signed url for outputs %s" % url)
@@ -260,7 +260,7 @@ def run_vps_job(job):
 
     url = s3.generate_presigned_url(
         'get_object', 
-        Params={'Bucket': bucket, 'Key': key}, ExpiresIn=3600)
+        Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
 
     job.output_url = url
     print(url)
