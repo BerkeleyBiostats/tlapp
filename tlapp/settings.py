@@ -134,7 +134,7 @@ STATICFILES_DIRS = (
     # '/tmp/',
 )
 
-if os.environ.get("MAILGUN_API_KEY"):
+if os.environ.get("SENDGRID_API_KEY"):
     EMAIL_BACKEND = 'sgbackend.SendGridBackend'
     SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 else:
