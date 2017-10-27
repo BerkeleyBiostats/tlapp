@@ -42,7 +42,7 @@ def index(request):
 
 @login_required
 def jobs(request):
-	jobs = models.ModelRun.objects.all().order_by('-created_at')
+	jobs = models.ModelRun.objects.filter(created_by=request.user).order_by('-created_at')
 	context = {
 		"jobs": jobs,
 	}
@@ -80,6 +80,7 @@ def submit_job(request):
 		ghap_ip = ghap_credentials['ip']
 
 	job = models.ModelRun(
+		created_by = request.user,
 		model_template_id = job_data['model_template'],
 		dataset_id = job_data['dataset'],
 		status = models.ModelRun.status_choices['submitted'],

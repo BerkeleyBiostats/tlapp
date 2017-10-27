@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.contrib.auth.models import User
 
 class Dataset(models.Model):
 	title = models.CharField(max_length=256)
@@ -33,6 +34,8 @@ class ModelRun(models.Model):
 		'success': 'success',
 		'error':' error',
 	}
+
+	created_by = models.ForeignKey(User, blank=True, null=True)
 
 	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	inputs = JSONField(null=True, blank=True)
