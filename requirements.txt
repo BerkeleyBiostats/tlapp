@@ -7,3 +7,4 @@ psycopg2
 gunicorn
 whitenoise
 bs4
+sendgrid-django
