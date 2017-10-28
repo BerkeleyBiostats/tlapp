@@ -274,6 +274,17 @@ def run_vps_job(job):
 
     job.status = models.ModelRun.status_choices['success']
 
+
+class StreamingStringIO(io.StringIO):
+     def __init__(self, job):
+         self.job = job
+         io.StringIO.__init__(self)
+
+     def write(self,s):
+         io.StringIO.write(self, s)
+         self.job.output = self.getvalue()
+         self.job.save()
+
 def handle_jobs():
     # Pick off a random ModelRun job
     job = models.ModelRun.objects.filter(
@@ -286,7 +297,8 @@ def handle_jobs():
     job.status = models.ModelRun.status_choices['running']
     job.save()
 
-    f = io.StringIO()
+sssss    f = StreamingStringIO(job)
+
     with redirect_stdout(f), redirect_stderr(f):        
         try:
             if job.backend == 'ghap':
