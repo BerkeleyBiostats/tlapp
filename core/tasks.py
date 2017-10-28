@@ -1,8 +1,10 @@
-from urlparse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 import pipes
 import logging
 import tempfile
 import os
+import sys
+import io
 import uuid
 import subprocess
 import traceback
@@ -16,6 +18,11 @@ from fabric.contrib.files import exists
 from django.core.cache import cache
 from bs4 import BeautifulSoup
 from core import models
+
+
+from contextlib import redirect_stdout, redirect_stderr
+
+
 
 def pwd():
     output = run('pwd')
@@ -121,9 +128,6 @@ def upload_to_ghap(job, username, password):
             with cd(repo_base_path):
                 run('git clone %s' % git_url_with_password)
 
-        
-
-
     # Write script to a file...    
     local_code_folder = tempfile.mkdtemp()
     script_name = 'script.R'
@@ -156,7 +160,7 @@ def upload_to_ghap(job, username, password):
         with open(local_provision_filename, 'w') as provision_file:
             provision_file.write(job.model_template.provision)
         remote_provision_filename = os.path.join(remote_code_folder, provision_name)
-        put(local_provision_filename, remote_provision_filename, mode=0755)
+        put(local_provision_filename, remote_provision_filename, mode=0o755)
         print("Put provision script at %s" % remote_provision_filename)
 
         with cd(remote_code_folder):
@@ -209,8 +213,6 @@ def run_ghap_job(job):
     }
 
     output = execute(upload_to_ghap, job, username, password)
-
-    job.output = output
     job.status = models.ModelRun.status_choices['success']
 
 def run_vps_job(job):
@@ -284,23 +286,27 @@ def handle_jobs():
     job.status = models.ModelRun.status_choices['running']
     job.save()
 
-    try:
-        if job.backend == 'ghap':
-            run_ghap_job(job)
-        else:
-            # TODO: this won't work running it on Heroku. 
-            # Maybe reimplement as ssh flow like ghap job?
-            # run_vps_job(job)
-            pass
+    f = io.StringIO()
+    with redirect_stdout(f), redirect_stderr(f):        
+        try:
+            if job.backend == 'ghap':
+                run_ghap_job(job)
+            else:
+                # TODO: this won't work running it on Heroku. 
+                # Maybe reimplement as ssh flow like ghap job?
+                # run_vps_job(job)
+                pass
 
-        job.save()
-        post_process_outputs(job)
+            job.save()
+            if job.status == models.ModelRun.status_choices['success']:
+                post_process_outputs(job)
 
-    except: 
-        print(traceback.format_exc())
-        job.traceback = traceback.format_exc()
-        job.status = models.ModelRun.status_choices['error']
+        except: 
+            print(traceback.format_exc())
+            job.status = models.ModelRun.status_choices['error']
 
+    job.output = f.getvalue()
+    print(job.output)
     job.save()
 
     return 1

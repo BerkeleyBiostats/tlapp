@@ -24,6 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         mt = models.AnalysisTemplate.objects.get(name='sl3_sample.R')
         job = models.ModelRun(
+            created_by = models.User.objects.get(username='admin'),
             model_template = mt,
             status = models.ModelRun.status_choices['submitted'],
             inputs = sample_inputs,
