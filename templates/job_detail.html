@@ -28,7 +28,13 @@
     <div class="ibox">
         <div class="ibox-title">Output</div>
         <div class="ibox-content">
+
+{% if job.status == 'success' %}
     {{ job.report_html | safe }}
+{% else %}
+<pre>{{ job.output }}</pre>
+{% endif %}
+
     </div>
     </div>
 </div>
