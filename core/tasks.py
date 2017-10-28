@@ -297,7 +297,7 @@ def handle_jobs():
     job.status = models.ModelRun.status_choices['running']
     job.save()
 
-sssss    f = StreamingStringIO(job)
+    f = StreamingStringIO(job)
 
     with redirect_stdout(f), redirect_stderr(f):        
         try:
