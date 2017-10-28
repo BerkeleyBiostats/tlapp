@@ -29,10 +29,10 @@
         <div class="ibox-title">Output</div>
         <div class="ibox-content">
 
-{% if job.output %}
-<pre>{{ job.output }}</pre>
-{% else %}
+{% if job.status == 'success' %}
     {{ job.report_html | safe }}
+{% else %}
+<pre>{{ job.output }}</pre>
 {% endif %}
 
     </div>
