@@ -82,7 +82,7 @@ def post_process_outputs(job):
     for filename, key in zip(f, k):
         s3.Object('tlapp', key).upload_file(filename)
 
-    report_path = os.path.join(output_path, 'REPORT_utf8.html')
+    report_path = os.path.join(output_path, 'REPORT.html')
     if os.path.exists(report_path):
         print("Found a report")
         with open(report_path) as f:

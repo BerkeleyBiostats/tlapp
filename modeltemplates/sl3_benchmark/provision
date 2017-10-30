@@ -1,8 +1,7 @@
 which R
-mkdir -p /data/R/x86_64-redhat-linux-gnu-library/3.2
-mkdir -p /data/R/x86_64-redhat-linux-gnu-library/3.4
+mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.2/"
+mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.4/"
 
-R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('SuperLearner')) install.packages('SuperLearner', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('glmnet')) install.packages('glmnet', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('speedglm')) install.packages('speedglm', repos = 'http://cran.rstudio.com/')"
