@@ -162,7 +162,7 @@ def upload_to_ghap(job, username, password):
             provision_output = run(cmd)
 
     # Now run the script
-    run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.2/tltools/scripts/run_job.R'
+    run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.4/tltools/scripts/run_job.R'
 
     cmd = "Rscript --default-packages=methods,stats,utils %s %s %s" % (
         run_job_path,
