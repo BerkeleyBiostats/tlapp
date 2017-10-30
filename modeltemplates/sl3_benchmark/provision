@@ -1,0 +1,22 @@
+which R
+mkdir -p /data/R/x86_64-redhat-linux-gnu-library/3.2
+
+R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('SuperLearner')) install.packages('SuperLearner', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('glmnet')) install.packages('glmnet', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('speedglm')) install.packages('speedglm', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('future')) install.packages('future', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('origami')) devtools::install_github('jeremyrcoyle/origami')"
+R -e "if (!require('igraph')) devtools::install_version('igraph', version='1.0.1', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('uuid')) install.packages('uuid', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('memoise')) install.packages('memoise', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('sl3')) devtools::install_github('jeremyrcoyle/sl3')"
+R -e "if (!require('testthat')) install.packages('testthat', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('jsonlite')) install.packages('jsonlite', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('tltools')) devtools::install_github('jeremyrcoyle/tltools')"
+R -e "if (!require('rstackdeque')) install.packages('rstackdeque', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('rlang')) install.packages('rlang', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('visNetwork')) install.packages('visNetwork', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('delayed')) devtools::install_github('jeremyrcoyle/delayed@reduce-r-version')"
+R -e "if (!require('randomForest')) install.packages('randomForest', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('assertthat')) install.packages('assertthat', repos = 'http://cran.rstudio.com/')"

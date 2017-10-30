@@ -1,28 +1,24 @@
+from contextlib import redirect_stdout, redirect_stderr
 from urllib.parse import urlparse, urlunparse
-import pipes
-import logging
-import tempfile
-import os
-import sys
-import io
-import uuid
-import subprocess
-import traceback
-import json
-import shutil
 import boto3
+import io
+import json
+import logging
+import os
+import pipes
+import shutil
+import subprocess
+import sys
 import tarfile
+import tempfile
+import traceback
+import uuid
 from fabric.api import *
 from fabric.operations import *
 from fabric.contrib.files import exists
 from django.core.cache import cache
 from bs4 import BeautifulSoup
 from core import models
-
-
-from contextlib import redirect_stdout, redirect_stderr
-
-
 
 def pwd():
     output = run('pwd')
@@ -51,8 +47,6 @@ def change_image_links(html, job_id):
         tag["src"] = url
 
     return soup.prettify()
-
-
 
 def post_process_outputs(job):
 
@@ -273,7 +267,6 @@ def run_vps_job(job):
     job.output = report_content
 
     job.status = models.ModelRun.status_choices['success']
-
 
 class StreamingStringIO(io.StringIO):
      def __init__(self, job):
