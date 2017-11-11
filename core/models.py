@@ -22,6 +22,7 @@ class AnalysisTemplate(models.Model):
 	fields = JSONField(null=True, blank=True)
 	code = models.TextField(null=True, blank=True)
 	provision = models.TextField(null=True, blank=True)
+	needs_dataset = models.BooleanField(default=True)
 
 	def __str__(self):
 		return self.name

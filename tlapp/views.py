@@ -20,7 +20,8 @@ def index(request):
 		"id": template.id,
 		"name": template.name,
 		"code": template.code,
-		"fields": template.fields
+		"fields": template.fields,
+		"needsDataset": template.needs_dataset,
 	} for template in templates]
 
 	datasets = models.Dataset.objects.all()
