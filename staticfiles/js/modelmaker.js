@@ -17,8 +17,14 @@ G.models = G.models.map(function (model) {
     }
     return field;
   });
+
   return model;
 })
+
+G.models.unshift({
+  name: "Choose an analysis",
+  needsDataset: false,
+});
 
 function highlightCode () {
  $('pre code').each(function(i, block) {

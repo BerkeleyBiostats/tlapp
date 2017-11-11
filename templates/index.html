@@ -23,11 +23,6 @@
   <div class="col-lg-12">
 
 
-
-
-
-
-
      <div class="ibox-title">
         <h5>Analysis</h5>
       </div>
@@ -90,6 +85,7 @@
 </div> <!-- .ibox-content -->
 
 
+<div v-if="selectedTemplate.needsDataset"> <!-- dataset-wrapper -->
 
     <div class="ibox-title">
     <h5>Dataset</h5>
@@ -171,6 +167,8 @@
     </table>
     </div>
     </div>
+
+</div> <!-- dataset-wrapper -->
 
     </div> <!-- .ibox-content -->
     </div> <!-- .col-lg-12 -->
