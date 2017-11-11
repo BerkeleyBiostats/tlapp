@@ -22,6 +22,75 @@
   <div class="row">
   <div class="col-lg-12">
 
+
+
+
+
+
+
+     <div class="ibox-title">
+        <h5>Analysis</h5>
+      </div>
+
+      <div class="ibox-content">
+
+      <form method="get" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Template</label>
+        <div class="col-sm-10">
+        <select 
+          class="form-control m-b" 
+          name="account"
+          v-model="selectedTemplate"
+          v-on:change="templateSelected"
+        >
+        <option 
+          v-for="template in modelTemplates"
+          :value="template"
+        >
+          ${ template.name }
+        </option>
+        </select>
+        </div>
+      </div>
+      
+      <div class="hr-line-dashed"></div>
+
+      <div v-for="field in selectedTemplate.fields">
+
+      <div class="form-group">
+
+      <label class="col-sm-2 control-label">${ field.name }</label>
+
+      <div class="col-sm-10">
+        <div v-if="field.type === 'float'">
+          <input type="number" v-model="field.value" class="form-control"> 
+          <span v-if="field.help" class="help-block m-b-none">${ field.help }</span>
+        </div>
+        <div v-else-if="field.type === 'enum'">
+            <label v-for="choice in field.choices" class="checkbox-inline">
+              <input 
+                type="checkbox" 
+                :value="choice" 
+                v-model="field.value">
+                ${ choice }
+            </label>
+
+        </div>
+      </div> <!-- .col-sm-10 -->
+
+      </div> <!-- .form-group -->
+
+      <div class="hr-line-dashed"></div>
+
+      </div> <!-- .v-for selectedTemplate.parameters.field -->
+
+      </form>
+
+</div> <!-- .ibox-content -->
+
+
+
     <div class="ibox-title">
     <h5>Dataset</h5>
 
@@ -109,66 +178,7 @@
 
     <div class="row">
     <div class="col-lg-12">
-      <div class="ibox-title">
-        <h5>Analysis</h5>
-      </div>
-
-      <div class="ibox-content">
-
-      <form method="get" class="form-horizontal">
-      <div class="form-group">
-        <label class="col-sm-2 control-label">Template</label>
-        <div class="col-sm-10">
-        <select 
-          class="form-control m-b" 
-          name="account"
-          v-model="selectedTemplate"
-          v-on:change="templateSelected"
-        >
-        <option 
-          v-for="template in modelTemplates"
-          :value="template"
-        >
-          ${ template.name }
-        </option>
-        </select>
-        </div>
-      </div>
-      
-      <div class="hr-line-dashed"></div>
-
-      <div v-for="field in selectedTemplate.fields">
-
-      <div class="form-group">
-
-      <label class="col-sm-2 control-label">${ field.name }</label>
-
-      <div class="col-sm-10">
-        <div v-if="field.type === 'float'">
-          <input type="number" v-model="field.value" class="form-control"> 
-          <span v-if="field.help" class="help-block m-b-none">${ field.help }</span>
-        </div>
-        <div v-else-if="field.type === 'enum'">
-            <label v-for="choice in field.choices" class="checkbox-inline">
-              <input 
-                type="checkbox" 
-                :value="choice" 
-                v-model="field.value">
-                ${ choice }
-            </label>
-
-        </div>
-      </div> <!-- .col-sm-10 -->
-
-      </div> <!-- .form-group -->
-
-      <div class="hr-line-dashed"></div>
-
-      </div> <!-- .v-for selectedTemplate.parameters.field -->
-
-      </form>
-
-</div> <!-- .ibox-content -->
+ 
 
 
 <div class="ibox-title">
