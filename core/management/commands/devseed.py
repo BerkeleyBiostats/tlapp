@@ -253,6 +253,7 @@ class Command(BaseCommand):
             fields=inputs,
             code=code,
             provision=sample_provision,
+            needs_dataset=False,
         )   
         mt.save()
 
