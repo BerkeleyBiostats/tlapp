@@ -16,3 +16,12 @@ Push a sample ghap job and run the worker:
 	export GHAP_USERNAME=...
 	python manage.py push_sample_ghap_job
 	python manage.py worker
+
+Workflow for Analysis Templates
+---
+
+From RStudio: Copy the Analysis Template's `code` field into RStudio, then run "Knit with Parameters".
+
+From the command line: 
+
+	Rscript runner.R <code_filename.R> <params_filename.json> <output_filename.md>
