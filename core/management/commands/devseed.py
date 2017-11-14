@@ -4,14 +4,7 @@ from django.contrib.auth.models import User
 from core import models
 
 sample_script_inputs = [{
-    "name": "Learners",
-    "type": "enum",
-    "choices": [
-        "glmfast",
-        "SL.glmnet"
-    ]
-}, {
-  "name": "Sample Size", 
+  "name": "sample_size", 
   "type": "int", 
   "default": 10000
 }]
@@ -48,6 +41,8 @@ title: "SuperLearner Benchmarks"
 author: "Jeremy Coyle"
 date: "10/5/2017"
 output: html_document
+params:
+  sample_size: 10000
 ---
 
 ```{r setup, include=FALSE, results='hide'}

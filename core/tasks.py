@@ -95,6 +95,7 @@ def upload_to_ghap(job, username, password):
     temp_base_dir = '/tmp'
     remote_output_folder = make_temp_dir_name()
     remote_output_folder_full_path = os.path.join(temp_base_dir, remote_output_folder)
+    run('mkdir -p %s' % remote_output_folder_full_path)
 
     # Check if we need to clone a dataset
     if job.dataset.url.startswith('https://git.ghap.io'):
@@ -135,6 +136,12 @@ def upload_to_ghap(job, username, password):
     put(local_code_filename, remote_code_filename)
     print("Put code at %s" % remote_code_filename)
 
+    # Write runner script to a file...
+    app_root = os.environ.get("APP_ROOT")
+    runner_script_filename = os.path.join(app_root, "runner.R")
+    remote_runner_script_filename = os.path.join(remote_code_folder, 'runner.R')
+    put(runner_script_filename, remote_runner_script_filename)
+
     # Write inputs to a file...
     input_name = 'inputs.json'
     local_input_filename = os.path.join(local_code_folder, input_name)
@@ -162,15 +169,25 @@ def upload_to_ghap(job, username, password):
             provision_output = run(cmd)
 
     # Now run the script
-    run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.4/tltools/scripts/run_job.R'
+    # run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.4/tltools/scripts/run_job.R'
+    # cmd = "Rscript --default-packages=methods,stats,utils %s %s %s" % (
+    #     run_job_path,
+    #     remote_code_filename,
+    #     remote_input_filename
+    # )
+    # output = run(cmd)
+    # job.output = output
 
-    cmd = "Rscript --default-packages=methods,stats,utils %s %s %s" % (
-        run_job_path,
+    remote_output_filename = os.path.join(remote_output_folder_full_path, "REPORT.md")
+    cmd = "Rscript --default-packages=methods,stats,utils %s %s %s %s" % (
+        remote_runner_script_filename,
         remote_code_filename,
-        remote_input_filename
+        remote_input_filename,
+        remote_output_filename
     )
     output = run(cmd)
     job.output = output
+
 
     # Zip up the outputs
     with cd('/tmp'):
