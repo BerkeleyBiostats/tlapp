@@ -69,7 +69,7 @@ def job_output_download(request, job_id):
 @login_required
 @csrf_exempt
 def submit_job(request):
-	job_data = json.loads(request.body)
+	job_data = json.loads(request.body.decode('utf-8'))
 
 	ghap_username = None
 	ghap_password = None
