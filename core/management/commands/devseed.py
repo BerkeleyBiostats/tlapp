@@ -10,6 +10,10 @@ sample_script_inputs = [{
         "glmfast",
         "SL.glmnet"
     ]
+}, {
+  "name": "Sample Size", 
+  "type": "int", 
+  "default": 10000
 }]
 
 # R -e "if (!require('')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"

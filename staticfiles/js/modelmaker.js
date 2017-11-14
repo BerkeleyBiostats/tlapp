@@ -15,6 +15,8 @@ G.models = G.models.map(function (model) {
     // works properly
     if (field.type === 'enum') {
       field.value = [];
+    } else if (field.default) {
+      field.value = field.default;
     }
     return field;
   });

@@ -62,6 +62,10 @@
           <input type="number" v-model="field.value" class="form-control"> 
           <span v-if="field.help" class="help-block m-b-none">${ field.help }</span>
         </div>
+        <div v-if="field.type === 'int'">
+          <input type="number" v-model="field.value" class="form-control"> 
+          <span v-if="field.help" class="help-block m-b-none">${ field.help }</span>
+        </div>
         <div v-else-if="field.type === 'enum'">
             <label v-for="choice in field.choices" class="checkbox-inline">
               <input 
