@@ -1,13 +1,16 @@
 library("rjson")
 library("knitr")
+library("rmarkdown")
 
 args = commandArgs(trailingOnly=TRUE)
 
 code_filename <- args[1]
 params_filename <- args[2]
-output_filename <- args[3]
+output_directory <- args[3]
+output_filename <- file.path(output_directory, "REPORT.md")
 
-params <- fromJSON(file=params_filename)
+params_ <- fromJSON(file=params_filename)
 
-knit(code_filename, output=output_filename)
+setwd(output_directory)
+rmarkdown::render(code_filename, output_file=output_filename, params=params_)
 pandoc(output_filename)

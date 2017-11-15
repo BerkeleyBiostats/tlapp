@@ -40,7 +40,9 @@ sample_script = """
 title: "SuperLearner Benchmarks"
 author: "Jeremy Coyle"
 date: "10/5/2017"
-output: html_document
+output: 
+  html_document:
+    self_contained: false
 params:
   sample_size: 10000
 ---

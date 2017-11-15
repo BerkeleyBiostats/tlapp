@@ -125,7 +125,7 @@ def upload_to_ghap(job, username, password):
 
     # Write script to a file...    
     local_code_folder = tempfile.mkdtemp()
-    script_name = 'script.R'
+    script_name = 'script.Rmd'
     local_code_filename = os.path.join(local_code_folder, script_name)
     with open(local_code_filename, 'w') as code_file:
         code_file.write(job.model_template.code)
@@ -145,10 +145,9 @@ def upload_to_ghap(job, username, password):
     # Write inputs to a file...
     input_name = 'inputs.json'
     local_input_filename = os.path.join(local_code_folder, input_name)
-    inputs = job.inputs
-    inputs['output_directory'] = remote_output_folder_full_path
+    inputs = job.inputs['params']
     with open(local_input_filename, 'w') as input_file:
-        input_file.write(json.dumps(job.inputs))
+        input_file.write(json.dumps(inputs))
     remote_input_filename = os.path.join(remote_code_folder, input_name)
     # ...then upload to cluster
     put(local_input_filename, remote_input_filename)
@@ -183,7 +182,7 @@ def upload_to_ghap(job, username, password):
         remote_runner_script_filename,
         remote_code_filename,
         remote_input_filename,
-        remote_output_filename
+        remote_output_folder_full_path
     )
     output = run(cmd)
     job.output = output
