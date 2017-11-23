@@ -98,7 +98,7 @@ def upload_to_ghap(job, username, password):
     run('mkdir -p %s' % remote_output_folder_full_path)
 
     # Check if we need to clone a dataset
-    if job.dataset.url.startswith('https://git.ghap.io'):
+    if job.dataset and job.dataset.url.startswith('https://git.ghap.io'):
 
         # Check if the dataset has already been cloned
         o = urlparse(job.dataset.url)
@@ -128,7 +128,10 @@ def upload_to_ghap(job, username, password):
     script_name = 'script.Rmd'
     local_code_filename = os.path.join(local_code_folder, script_name)
     with open(local_code_filename, 'w') as code_file:
-        code_file.write(job.model_template.code)
+        if job.code:
+            code_file.write(job.code)
+        else:
+            code_file.write(job.model_template.code)
     # ...then upload to cluster
     remote_code_folder = make_temp_dir(temp_base_dir)
     remote_code_filename = os.path.join(remote_code_folder, script_name)
@@ -144,8 +147,15 @@ def upload_to_ghap(job, username, password):
 
     # Write inputs to a file...
     input_name = 'inputs.json'
-    local_input_filename = os.path.join(local_code_folder, input_name)
-    inputs = job.inputs['params']
+    local_input_filename = os.path.join(local_code_folder, input_name)  
+
+    if not job.inputs:
+        inputs = {}
+    elif 'params' in job.inputs:
+        inputs = job.inputs['params']
+    else:
+        inputs = job.inputs
+
     with open(local_input_filename, 'w') as input_file:
         input_file.write(json.dumps(inputs))
     remote_input_filename = os.path.join(remote_code_folder, input_name)
@@ -154,7 +164,7 @@ def upload_to_ghap(job, username, password):
     print("Put inputs at %s" % remote_input_filename)
 
     # Upload and run a provisioning script
-    if job.model_template.provision:
+    if job.model_template and job.model_template.provision:
         provision_name = 'provision.sh'
         local_provision_filename = os.path.join(local_code_folder, provision_name)
         with open(local_provision_filename, 'w') as provision_file:

@@ -79,8 +79,7 @@ def _submit_job(request):
 		ghap_password = ghap_credentials['password']
 		ghap_ip = ghap_credentials['ip']
 
-	# TODO: get this working again
-	# created_by = request.user,
+
 
 	job = models.ModelRun(
 		model_template_id = job_data.get('model_template', None),
@@ -91,6 +90,7 @@ def _submit_job(request):
 		ghap_username = ghap_username,
 		ghap_ip = ghap_ip,
 		code = job_data.get('code', None),
+		created_by = request.user,
 	)
 
 	print(job_data.get('code'))
@@ -119,7 +119,25 @@ def submit_job(request):
 
 @csrf_exempt
 def submit_job_token(request):
-	# TODO: Validate token
-	return _submit_job(request)
+	if check_token(request):
+		return _submit_job(request)
+	else:
+		return unauthorized_reponse()
+
+def unauthorized_reponse():
+	return HttpResponse('Unauthorized', status=401)
+
+def check_token(request):
+	if 'HTTP_AUTHORIZATION' not in request.META:
+		return False
+	token = request.META['HTTP_AUTHORIZATION']
+	token = models.Token.objects.filter(token=token).first()
+	if not token:
+		return False
+	request.user = token.user
+	return True
+
+
+
 
 

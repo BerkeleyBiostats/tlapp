@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+import uuid
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.auth.models import User
+
+class Token(models.Model):
+	user = models.OneToOneField(User, primary_key=True)
+	token = models.CharField(max_length=128)
+
+	def __str__(self):
+		return "%s %s" % (self.user.email, self.token)
 
 class Dataset(models.Model):
 	title = models.CharField(max_length=256)

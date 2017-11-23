@@ -8,3 +8,4 @@ from . import models
 admin.site.register(models.AnalysisTemplate)
 admin.site.register(models.Dataset)
 admin.site.register(models.ModelRun)
+admin.site.register(models.Token)
