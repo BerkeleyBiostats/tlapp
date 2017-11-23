@@ -129,10 +129,12 @@ def unauthorized_reponse():
 
 def check_token(request):
 	if 'HTTP_AUTHORIZATION' not in request.META:
+		print("Failed to find Authorization header")
 		return False
 	token = request.META['HTTP_AUTHORIZATION']
 	token = models.Token.objects.filter(token=token).first()
 	if not token:
+		print("Token %s didn't match" % token)
 		return False
 	request.user = token.user
 	return True
