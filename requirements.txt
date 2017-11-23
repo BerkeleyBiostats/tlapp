@@ -8,3 +8,4 @@ gunicorn
 whitenoise
 bs4
 sendgrid-django
+django_token
