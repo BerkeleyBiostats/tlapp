@@ -132,9 +132,10 @@ def check_token(request):
 		print("Failed to find Authorization header")
 		return False
 	token = request.META['HTTP_AUTHORIZATION']
+	print("Authorization header %s" % token)
 	token = models.Token.objects.filter(token=token).first()
 	if not token:
-		print("Token %s didn't match" % token)
+		print("Token didn't match")
 		return False
 	request.user = token.user
 	return True
