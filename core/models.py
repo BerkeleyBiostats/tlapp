@@ -4,6 +4,7 @@ import uuid
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 class Token(models.Model):
 	user = models.OneToOneField(User, primary_key=True)
@@ -72,6 +73,7 @@ class ModelRun(models.Model):
 		ret = {
 			'status': self.status,
 			'created_at': self.created_at,
+			'results_url': reverse('job_detail', args=[self.id])
 		}
 		if self.model_template is not None:
 			ret['model_template'] = self.model_template.name

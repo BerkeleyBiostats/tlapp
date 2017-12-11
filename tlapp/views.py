@@ -109,7 +109,10 @@ def _submit_job(request):
 		# application being compromised
 		cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
 
-	return JsonResponse(job.as_dict(), safe=False)
+	ret = job.as_dict()
+	ret['results_url'] = request.build_absolute_uri(ret['results_url'])
+
+	return JsonResponse(ret, safe=False)
 
 
 @login_required
