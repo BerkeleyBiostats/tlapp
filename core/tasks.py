@@ -98,17 +98,25 @@ def upload_to_ghap(job, username, password):
     run('mkdir -p %s' % remote_output_folder_full_path)
 
     # Check if we need to clone a dataset
+    ghap_dataset_url = None
     if job.dataset and job.dataset.url.startswith('https://git.ghap.io'):
+        ghap_dataset_url = job.dataset.url
+        ghap_repo_path = job.dataset.repository_path
+    if 'data' in job.inputs and 'uri' in job.inputs['data']:
+        ghap_dataset_url = job.inputs['data']['uri']
+        ghap_repo_path = job.inputs['data']['repository_path']
+
+    if ghap_dataset_url:
 
         # Check if the dataset has already been cloned
-        o = urlparse(job.dataset.url)
+        o = urlparse(ghap_dataset_url)
         repo_name = o.path.split('/')[-1][:-4]
         repo_base_path = '~/datasets'
         repo_path = os.path.join(repo_base_path, repo_name)
         repo_exists = exists(repo_path)
 
         # Set the uri to the file's path on the local file system
-        job.inputs['data']['uri'] = os.path.join(repo_path, job.dataset.repository_path)
+        job.inputs['data']['uri'] = os.path.join(repo_path, ghap_repo_path)
 
         if repo_exists:
             print("Not going to clone git repo since it already exists")
