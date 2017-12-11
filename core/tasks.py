@@ -146,6 +146,7 @@ def upload_to_ghap(job, username, password):
     input_name = 'inputs.json'
     local_input_filename = os.path.join(local_code_folder, input_name)
     inputs = job.inputs['params']
+
     with open(local_input_filename, 'w') as input_file:
         input_file.write(json.dumps(inputs))
     remote_input_filename = os.path.join(remote_code_folder, input_name)
