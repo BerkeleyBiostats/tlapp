@@ -75,3 +75,4 @@ class ModelRun(models.Model):
 		}
 		if self.model_template is not None:
 			ret['model_template'] = self.model_template.name
+		return ret
