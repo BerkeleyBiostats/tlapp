@@ -24,5 +24,6 @@ urlpatterns = [
     url(r'^jobs/(?P<job_id>[0-9]+)/$', views.job_detail, name='job_detail'),
     url(r'^jobs/', views.jobs, name='jobs'),
     url(r'^submit_job/', views.submit_job, name='submit_job'),
+    url(r'^submit_job_token/', views.submit_job_token, name='submit_job_token'),
     url(r'^accounts/', include('django.contrib.auth.urls')),
 ]

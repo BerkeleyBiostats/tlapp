@@ -66,9 +66,8 @@ def job_output_download(request, job_id):
 		f.write('hello')
 	return redirect('/static/bar.txt')
 
-@login_required
-@csrf_exempt
-def submit_job(request):
+
+def _submit_job(request):
 	job_data = json.loads(request.body.decode('utf-8'))
 
 	ghap_username = None
@@ -80,22 +79,28 @@ def submit_job(request):
 		ghap_password = ghap_credentials['password']
 		ghap_ip = ghap_credentials['ip']
 
+
+
 	job = models.ModelRun(
-		created_by = request.user,
-		model_template_id = job_data['model_template'],
-		dataset_id = job_data['dataset'],
+		model_template_id = job_data.get('model_template', None),
+		dataset_id = job_data.get('dataset', None),
 		status = models.ModelRun.status_choices['submitted'],
 		inputs = job_data['inputs'],
 		backend = job_data['backend'],
 		ghap_username = ghap_username,
 		ghap_ip = ghap_ip,
+		code = job_data.get('code', None),
+		created_by = request.user,
 	)
 
+	print(job_data.get('code'))
+
 	# nodes.Y and nodes.A expect a single element
-	if len(job.inputs['data']['nodes']['Y']) == 1:
-		job.inputs['data']['nodes']['Y'] = job.inputs['data']['nodes']['Y'][0]
-	if len(job.inputs['data']['nodes']['A']) == 1:
-		job.inputs['data']['nodes']['A'] = job.inputs['data']['nodes']['A'][0]
+	if 'data' in job.inputs:
+		if len(job.inputs['data']['nodes']['Y']) == 1:
+			job.inputs['data']['nodes']['Y'] = job.inputs['data']['nodes']['Y'][0]
+		if len(job.inputs['data']['nodes']['A']) == 1:
+			job.inputs['data']['nodes']['A'] = job.inputs['data']['nodes']['A'][0]
 
 	job.save()
 
@@ -104,7 +109,37 @@ def submit_job(request):
 		# application being compromised
 		cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
 
-	return JsonResponse(job.as_dict())
+	return JsonResponse(job.as_dict(), safe=False)
+
+
+@login_required
+@csrf_exempt
+def submit_job(request):
+	return _submit_job(request)
+
+@csrf_exempt
+def submit_job_token(request):
+	if check_token(request):
+		return _submit_job(request)
+	else:
+		return unauthorized_reponse()
+
+def unauthorized_reponse():
+	return HttpResponse('Unauthorized', status=401)
+
+def check_token(request):
+	if 'HTTP_AUTHORIZATION' not in request.META:
+		print("Failed to find Authorization header")
+		return False
+	token = request.META['HTTP_AUTHORIZATION']
+	print("Authorization header %s" % token)
+	token = models.Token.objects.filter(token=token).first()
+	if not token:
+		print("Token didn't match")
+		return False
+	request.user = token.user
+	return True
+
 
 
 

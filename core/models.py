@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+import uuid
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.auth.models import User
+
+class Token(models.Model):
+	user = models.OneToOneField(User, primary_key=True)
+	token = models.CharField(max_length=128)
+
+	def __str__(self):
+		return "%s %s" % (self.user.email, self.token)
 
 class Dataset(models.Model):
 	title = models.CharField(max_length=256)
@@ -37,7 +44,6 @@ class ModelRun(models.Model):
 	}
 
 	created_by = models.ForeignKey(User, blank=True, null=True)
-
 	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	inputs = JSONField(null=True, blank=True)
 	status = models.CharField(max_length=32)
@@ -49,16 +55,23 @@ class ModelRun(models.Model):
 	output_url = models.URLField(null=True, blank=True)
 	report_html = models.TextField(null=True, blank=True)	
 	traceback = models.TextField(null=True, blank=True)
-	model_template = models.ForeignKey(AnalysisTemplate)
+	model_template = models.ForeignKey(AnalysisTemplate, null=True, blank=True)
 	dataset = models.ForeignKey(Dataset, null=True, blank=True)
+
+	# Support pushing code instead of model template for one-off runs
+	code = models.TextField(null=True, blank=True)
 
 
 	def __str__(self):
-		return "%s %s" % (self.model_template.name, self.created_at)
+		if self.model_template:
+			return "%s %s" % (self.model_template.name, self.created_at)
+		else:
+			return "One-off %s" % (self.created_at)
 
 	def as_dict(self):
-		return {
+		ret = {
 			'status': self.status,
 			'created_at': self.created_at,
-			'model_template': self.model_template.name,
 		}
+		if self.model_template is not None:
+			ret['model_template'] = self.model_template.name
