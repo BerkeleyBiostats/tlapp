@@ -79,8 +79,6 @@ def _submit_job(request):
 		ghap_password = ghap_credentials['password']
 		ghap_ip = ghap_credentials['ip']
 
-
-
 	job = models.ModelRun(
 		model_template_id = job_data.get('model_template', None),
 		dataset_id = job_data.get('dataset', None),
@@ -92,16 +90,6 @@ def _submit_job(request):
 		code = job_data.get('code', None),
 		created_by = request.user,
 	)
-
-	print(job_data.get('code'))
-
-	# nodes.Y and nodes.A expect a single element
-	if 'data' in job.inputs:
-		if len(job.inputs['data']['nodes']['Y']) == 1:
-			job.inputs['data']['nodes']['Y'] = job.inputs['data']['nodes']['Y'][0]
-		if len(job.inputs['data']['nodes']['A']) == 1:
-			job.inputs['data']['nodes']['A'] = job.inputs['data']['nodes']['A'][0]
-
 	job.save()
 
 	if ghap_password:
