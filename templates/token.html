@@ -1,0 +1,25 @@
+{% extends "app.html" %}
+
+{% load staticfiles %}
+
+{% block body %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="ibox">
+        <div class="ibox-title">API Token</div>
+        <div class="ibox-content">
+        	{% if token %}
+	        	{{ token.token }}
+	        {% else %}
+	        	No token created for this account
+	        {% endif %}
+        </div>
+    </div>
+  <div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

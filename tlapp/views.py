@@ -12,6 +12,13 @@ from django.http import HttpResponse, JsonResponse
 from core import models
 
 @login_required
+def token(request):
+	context = {
+		"token": models.Token.objects.filter(user=request.user).first()
+	}
+	return render(request, 'token.html', context)
+
+@login_required
 def index(request):
 
 	templates = models.AnalysisTemplate.objects.all()
