@@ -88,6 +88,7 @@ def _submit_job(request):
 		ghap_username = ghap_username,
 		ghap_ip = ghap_ip,
 		code = job_data.get('code', None),
+		provision = job_data.get('provision', None),
 		created_by = request.user,
 	)
 	job.save()

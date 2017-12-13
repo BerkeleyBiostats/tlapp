@@ -172,11 +172,17 @@ def upload_to_ghap(job, username, password):
     print("Put inputs at %s" % remote_input_filename)
 
     # Upload and run a provisioning script
+    provision_code = None
     if job.model_template and job.model_template.provision:
+        provision_code = job.model_template.provision
+    elif job.provision:
+        provision_code = job.provision
+
+    if provision_code:
         provision_name = 'provision.sh'
         local_provision_filename = os.path.join(local_code_folder, provision_name)
         with open(local_provision_filename, 'w') as provision_file:
-            provision_file.write(job.model_template.provision)
+            provision_file.write(provision_code)
         remote_provision_filename = os.path.join(remote_code_folder, provision_name)
         put(local_provision_filename, remote_provision_filename, mode=0o755)
         print("Put provision script at %s" % remote_provision_filename)

@@ -61,6 +61,7 @@ class ModelRun(models.Model):
 
 	# Support pushing code instead of model template for one-off runs
 	code = models.TextField(null=True, blank=True)
+	provision = models.TextField(null=True, blank=True)
 
 
 	def __str__(self):
