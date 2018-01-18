@@ -11,8 +11,6 @@ sample_inputs = {
         {"name": "Abar"}
     ], 
     "data": {
-        "nodes": {"A": "parity", "Y": "haz", "W": ["apgar1", "apgar5", "gagebrth", "mage", "meducyrs", "sexn"]}, 
-        "type": "csv", 
         "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv"
     }, 
     "params": {
