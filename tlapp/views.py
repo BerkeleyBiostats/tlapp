@@ -123,6 +123,20 @@ def submit_job_token(request):
 	else:
 		return unauthorized_reponse()
 
+def _append_log(request, job_id):
+	log_lines = request.body.decode('utf-8')
+	job = models.ModelRun.objects.get(pk=job_id)
+	job.output = job.output + log_lines
+	job.save()
+	return JsonResponse({"status": "success"}, safe=False)
+
+@csrf_exempt
+def append_log_token(request, job_id):
+	if check_token(request):
+		return _append_log(request, job_id)
+	else:
+		return unauthorized_reponse()
+
 def unauthorized_reponse():
 	return HttpResponse('Unauthorized', status=401)
 

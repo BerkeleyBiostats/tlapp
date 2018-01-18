@@ -189,52 +189,50 @@ def upload_to_ghap(job, username, password):
         put(local_provision_filename, remote_provision_filename, mode=0o755)
         print("Put provision script at %s" % remote_provision_filename)
 
-        with cd(remote_code_folder):
-            cmd = "./provision.sh"
-            provision_output = run(cmd)
+        # TODO: make sure provision is run in screen session
+        # with cd(remote_code_folder):
+        #     cmd = "./provision.sh"
+        #     provision_output = run(cmd)
 
     # Now run the script
-    # run_job_path = '/data/R/x86_64-redhat-linux-gnu-library/3.4/tltools/scripts/run_job.R'
-    # cmd = "Rscript --default-packages=methods,stats,utils %s %s %s" % (
-    #     run_job_path,
-    #     remote_code_filename,
-    #     remote_input_filename
-    # )
-    # output = run(cmd)
-    # job.output = output
-
     remote_output_filename = os.path.join(remote_output_folder_full_path, "REPORT.md")
+
+    # TODO: run this in screen session
     cmd = "Rscript --default-packages=methods,stats,utils %s %s %s %s" % (
         remote_runner_script_filename,
         remote_code_filename,
         remote_input_filename,
         remote_output_folder_full_path
     )
-    output = run(cmd)
-    job.output = output
+
+    print("Command to run:")
+    print(cmd)
+
+    # output = run(cmd)
+    # job.output = output
 
 
     # Zip up the outputs
-    with cd('/tmp'):
-        zipped_outputs_filename = remote_output_folder + ".tar.gz"
-        run('tar -zcvf %s %s' % (zipped_outputs_filename, remote_output_folder))
-        local_outputs_filename = get(zipped_outputs_filename)[0]
+    # with cd('/tmp'):
+    #     zipped_outputs_filename = remote_output_folder + ".tar.gz"
+    #     run('tar -zcvf %s %s' % (zipped_outputs_filename, remote_output_folder))
+    #     local_outputs_filename = get(zipped_outputs_filename)[0]
 
-    print("Downloaded outputs to %s" % local_outputs_filename)
+    # print("Downloaded outputs to %s" % local_outputs_filename)
 
-    s3 = boto3.client('s3')
-    key = zipped_outputs_filename
-    bucket = 'tlapp'
-    s3.upload_file(local_outputs_filename, bucket, key)
+    # s3 = boto3.client('s3')
+    # key = zipped_outputs_filename
+    # bucket = 'tlapp'
+    # s3.upload_file(local_outputs_filename, bucket, key)
 
-    print("Uploaded outputs to %s" % key)
+    # print("Uploaded outputs to %s" % key)
 
-    url = s3.generate_presigned_url(
-        'get_object', 
-        Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
+    # url = s3.generate_presigned_url(
+    #     'get_object', 
+    #     Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
 
-    job.output_url = url
-    print("Signed url for outputs %s" % url)
+    # job.output_url = url
+    # print("Signed url for outputs %s" % url)
 
     return output
 
@@ -345,8 +343,8 @@ def handle_jobs():
                 pass
 
             job.save()
-            if job.status == models.ModelRun.status_choices['success']:
-                post_process_outputs(job)
+            # if job.status == models.ModelRun.status_choices['success']:
+            #     post_process_outputs(job)
 
         except: 
             print(traceback.format_exc())
