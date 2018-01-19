@@ -17,8 +17,20 @@ from fabric.api import *
 from fabric.operations import *
 from fabric.contrib.files import exists
 from django.core.cache import cache
+from django.template import loader, Context
 from bs4 import BeautifulSoup
 from core import models
+
+def put_script(content=None, script_name=None, local_code_folder=None, remote_code_folder=None):
+    # write lcoally
+    local_code_filename = os.path.join(local_code_folder, script_name)
+    with open(local_code_filename, 'w') as code_file:
+        code_file.write(content)
+    # push to cluster
+    remote_code_filename = os.path.join(remote_code_folder, script_name)
+    put(local_code_filename, remote_code_filename, mode=0o755)
+    print("Put code at %s" % remote_code_filename)
+
 
 def pwd():
     output = run('pwd')
@@ -123,7 +135,6 @@ def upload_to_ghap(job, username, password):
         if repo_exists:
             print("Not going to clone git repo since it already exists")
         else:
-
             # Add username and password to the git url
             o = list(tuple(o))
             o[1] = username + ":" + pipes.quote(password) + "@" + o[1]
@@ -207,6 +218,13 @@ def upload_to_ghap(job, username, password):
     print("Output PUT URL")
     print(output_put_url)
 
+    # Save this url for downloading later
+    url = s3.generate_presigned_url(
+        'get_object', 
+        Params={'Bucket': bucket, 'Key': key}, 
+        ExpiresIn=60*60*24*30)
+    job.output_url = url
+
     # Now run the script
     remote_output_filename = os.path.join(remote_output_folder_full_path, "REPORT.md")
 
@@ -221,6 +239,39 @@ def upload_to_ghap(job, username, password):
     print("Command to run:")
     print(cmd)
 
+    # upload push_logs.py
+    push_logs_template = loader.get_template('ghap_scripts/push_logs.py')
+    push_logs_script = push_logs_template.render()
+    put_script(
+        content=push_logs_script, 
+        script_name='push_logs.py',
+        local_code_folder=local_code_folder,
+        remote_code_folder=remote_code_folder)
+
+    # Generate wrapper script for screen session
+    wrapper_script_template = loader.get_template('ghap_scripts/wrapper.sh')
+
+    # TODO: generate the url using django url and join with urllib
+    wrapper_script = wrapper_script_template.render({
+        "token": job.created_by.token.token,
+        "logs_url": os.environ.get('BASE_URL') + "jobs/%s/append_log/" % job.id,
+        "finish_url": os.environ.get('BASE_URL') + "jobs/%s/finish/" % job.id,
+        "r_cmd": cmd,
+        "tar_file": zipped_outputs_filename,
+        "output_dir": remote_output_folder,
+        "put_url": output_put_url
+    })
+    put_script(
+        content=wrapper_script,
+        script_name='wrapper.sh',
+        local_code_folder=local_code_folder,
+        remote_code_folder=remote_code_folder
+    )
+
+    # Fire up the job in screen
+    with cd(remote_code_folder):
+        run("screen -d -m ./wrapper.sh; sleep 1")
+    
     # output = run(cmd)
     # job.output = output
 
@@ -240,11 +291,8 @@ def upload_to_ghap(job, username, password):
 
     # print("Uploaded outputs to %s" % key)
 
-    # url = s3.generate_presigned_url(
-    #     'get_object', 
-    #     Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
 
-    # job.output_url = url
+
     # print("Signed url for outputs %s" % url)
 
     return output
@@ -260,7 +308,6 @@ def run_ghap_job(job):
     }
 
     output = execute(upload_to_ghap, job, username, password)
-    job.status = models.ModelRun.status_choices['success']
 
 def run_vps_job(job):
     code_folder = tempfile.mkdtemp()

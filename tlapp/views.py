@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 
-from core import models
+from core import models, tasks
 
 @login_required
 def token(request):
@@ -134,6 +134,26 @@ def _append_log(request, job_id):
 def append_log_token(request, job_id):
 	if check_token(request):
 		return _append_log(request, job_id)
+	else:
+		return unauthorized_reponse()
+
+def _finish_job(request, job_id):
+	job_data = json.loads(request.body.decode('utf-8'))
+	job = models.ModelRun.objects.get(pk=job_id)
+
+	job.status = models.ModelRun.status_choices['success']
+	job.save()
+
+	# TODO: will need to queue this if takes longer than 30s
+	tasks.post_process_outputs(job)
+	job.save()
+
+	return JsonResponse({"status": "success"}, safe=False)
+
+@csrf_exempt
+def finish_job(request, job_id):
+	if check_token(request):
+		return _finish_job(request, job_id)
 	else:
 		return unauthorized_reponse()
 
