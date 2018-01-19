@@ -252,9 +252,11 @@ def upload_to_ghap(job, username, password):
     wrapper_script_template = loader.get_template('ghap_scripts/wrapper.sh')
 
     # TODO: generate the url using django url and join with urllib
+    token = job.created_by.token.token
+    logs_url = os.environ.get('BASE_URL') + "jobs/%s/append_log/" % job.id
     wrapper_script = wrapper_script_template.render({
-        "token": job.created_by.token.token,
-        "logs_url": os.environ.get('BASE_URL') + "jobs/%s/append_log/" % job.id,
+        "token": token,
+        "logs_url": logs_url,
         "finish_url": os.environ.get('BASE_URL') + "jobs/%s/finish/" % job.id,
         "r_cmd": cmd,
         "tar_file": zipped_outputs_filename,
