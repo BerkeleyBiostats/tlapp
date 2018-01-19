@@ -1,3 +1,5 @@
+sink(stdout(), type = "message")
+
 library("rjson")
 library("knitr")
 library("rmarkdown")
