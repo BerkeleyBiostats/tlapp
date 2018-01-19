@@ -12,9 +12,11 @@
     <p>Backend: {{ job.backend }}</p>
     <p>Created at: {{ job.created_at }}</p>
     <p>Status: {{ job.status }}</p>
+    {% if job.status == "success" %}
     <div>
         <a href="{{ job.output_url }}">Download Outputs</a>
     </div>
+    {% endif %}
 
         </div>
     </div>
