@@ -239,12 +239,12 @@ def upload_to_ghap(job, username, password):
     print("Command to run:")
     print(cmd)
 
-    # upload push_logs.py
-    push_logs_template = loader.get_template('ghap_scripts/push_logs.py')
-    push_logs_script = push_logs_template.render()
+    # upload x.py
+    x_template = loader.get_template('ghap_scripts/x.py')
+    x_script = x_template.render()
     put_script(
-        content=push_logs_script, 
-        script_name='push_logs.py',
+        content=x_script, 
+        script_name='x.py',
         local_code_folder=local_code_folder,
         remote_code_folder=remote_code_folder)
 
@@ -270,7 +270,7 @@ def upload_to_ghap(job, username, password):
 
     # Fire up the job in screen
     with cd(remote_code_folder):
-        run("screen -d -m ./wrapper.sh; sleep 1")
+        run("screen -d -m TLAPP_TOKEN=%s TLAPP_LOGS_URL=%s python x.py; sleep 1" % (token, logs_url))
     
     # output = run(cmd)
     # job.output = output

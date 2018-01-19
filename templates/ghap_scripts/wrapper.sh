@@ -1,9 +1,9 @@
 export TLAPP_TOKEN={{ token }}
 export TLAPP_LOGS_URL={{ logs_url }}
 
-echo "Starting analysis" | python push_logs.py
+echo "Starting analysis"
 
-{{ r_cmd }} | python push_logs.py
+{{ r_cmd }}
 
 cd /tmp
 tar -zcvf {{ tar_file }} {{ output_dir }}
