@@ -129,8 +129,8 @@ def upload_to_ghap(job, username, password):
             o[1] = username + ":" + pipes.quote(password) + "@" + o[1]
             git_url_with_password = urlunparse(tuple(o))
 
-            # Clone it
-            with cd(repo_base_path):
+            # Clone it, hiding the command so password doesn't appear in logs
+            with cd(repo_base_path), hide('running'):
                 run('git clone %s' % git_url_with_password)
 
     # Write script to a file...    
@@ -193,6 +193,19 @@ def upload_to_ghap(job, username, password):
         # with cd(remote_code_folder):
         #     cmd = "./provision.sh"
         #     provision_output = run(cmd)
+
+    # Generate signed PUT url for outputs zip
+    s3 = boto3.client('s3')
+    bucket = 'tlapp'
+    zipped_outputs_filename = remote_output_folder + ".tar.gz"
+    key = zipped_outputs_filename
+    output_put_url = s3.generate_presigned_url(
+        'put_object', 
+        Params={'Bucket': bucket, 'Key': key}, 
+        ExpiresIn=60*60*24*30,
+        HttpMethod='PUT')
+    print("Output PUT URL")
+    print(output_put_url)
 
     # Now run the script
     remote_output_filename = os.path.join(remote_output_folder_full_path, "REPORT.md")
