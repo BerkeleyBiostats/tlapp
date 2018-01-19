@@ -104,7 +104,7 @@ def upload_to_ghap(job, username, password):
         ghap_repo_path = job.dataset.repository_path
     if 'data' in job.inputs and \
        'uri' in job.inputs['data'] and \
-       'repository_path' in job.inputs['data']['uri']:
+       'repository_path' in job.inputs['data']:
         ghap_dataset_url = job.inputs['data']['uri']
         ghap_repo_path = job.inputs['data']['repository_path']
 
