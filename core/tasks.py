@@ -102,7 +102,9 @@ def upload_to_ghap(job, username, password):
     if job.dataset and job.dataset.url.startswith('https://git.ghap.io'):
         ghap_dataset_url = job.dataset.url
         ghap_repo_path = job.dataset.repository_path
-    if 'data' in job.inputs and 'uri' in job.inputs['data']:
+    if 'data' in job.inputs and \
+       'uri' in job.inputs['data'] \
+       'repository_path' in job.inputs['data']['uri']:
         ghap_dataset_url = job.inputs['data']['uri']
         ghap_repo_path = job.inputs['data']['repository_path']
 
@@ -127,8 +129,8 @@ def upload_to_ghap(job, username, password):
             o[1] = username + ":" + pipes.quote(password) + "@" + o[1]
             git_url_with_password = urlunparse(tuple(o))
 
-            # Clone it
-            with cd(repo_base_path):
+            # Clone it, hiding the command so password doesn't appear in logs
+            with cd(repo_base_path), hide('running'):
                 run('git clone %s' % git_url_with_password)
 
     # Write script to a file...    
