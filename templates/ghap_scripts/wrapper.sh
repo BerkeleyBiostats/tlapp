@@ -1,6 +1,12 @@
 export TLAPP_TOKEN={{ token }}
 export TLAPP_LOGS_URL={{ logs_url }}
 
+
+echo "Making sure tltools package is available for runner"
+
+R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+R -e "if (!require('tltools')) devtools::install_github('jeremyrcoyle/tltools')"
+
 echo "Starting analysis"
 
 {{ r_cmd }}
