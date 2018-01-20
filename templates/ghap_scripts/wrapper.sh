@@ -7,6 +7,10 @@ echo "Making sure tltools package is available for runner"
 R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
 R -e "devtools::install_github('jeremyrcoyle/tltools')"
 
+echo "Running provision script"
+
+./provision.sh
+
 echo "Starting analysis"
 
 {{ r_cmd }}
