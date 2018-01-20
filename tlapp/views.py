@@ -73,6 +73,28 @@ def job_output_download(request, job_id):
 		f.write('hello')
 	return redirect('/static/bar.txt')
 
+def expand_r_package_definition(package_definition):
+    if package_definition.startswith("github://"):
+        full_package_name = package_definition[len("github://"):]
+        package_name = full_package_name.split("/")[-1]
+        output = "R -e \"if (!require('%s')) devtools::install_github('%s')\"" % (package_name, full_package_name)
+    elif "@" in package_definition:
+        package_name, version = package_definition.split("@")
+        output = "R -e \"if (!require('%s')) devtools::install_version('%s', version='%s', repos = 'http://cran.rstudio.com/')\"" % (package_name, package_name, version)
+    else:
+        package_name = package_definition
+        output = "R -e \"if (!require('%s')) install.packages('%s', repos = 'http://cran.rstudio.com/')\"" % (package_name, package_name)
+
+    return output
+
+def build_provision_code(r_packages_section):
+    create_directories = """
+
+mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.2/"
+mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.4/"
+
+"""
+    return create_directories + "\n".join([expand_r_package_definition(pd) for pd in r_packages_section])
 
 def _submit_job(request):
 	job_data = json.loads(request.body.decode('utf-8'))
@@ -85,6 +107,9 @@ def _submit_job(request):
 		ghap_username = ghap_credentials['username']
 		ghap_password = ghap_credentials['password']
 		ghap_ip = ghap_credentials['ip']
+
+	if 'r_packages' in job_data:
+		job_data['provision'] = build_provision_code(job_data['r_packages'])
 
 	job = models.ModelRun(
 		model_template_id = job_data.get('model_template', None),
