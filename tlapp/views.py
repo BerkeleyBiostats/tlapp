@@ -77,7 +77,7 @@ def expand_r_package_definition(package_definition):
     if package_definition.startswith("github://"):
         full_package_name = package_definition[len("github://"):]
         package_name = full_package_name.split("/")[-1]
-        output = "R -e \"if (!require('%s')) devtools::install_github('%s')\"" % (package_name, full_package_name)
+        output = "R -e \"devtools::install_github('%s')\"" % (full_package_name)
     elif "@" in package_definition:
         package_name, version = package_definition.split("@")
         output = "R -e \"if (!require('%s')) devtools::install_version('%s', version='%s', repos = 'http://cran.rstudio.com/')\"" % (package_name, package_name, version)
