@@ -66,6 +66,15 @@
           <input type="number" v-model="field.value" class="form-control"> 
           <span v-if="field.help" class="help-block m-b-none">${ field.help }</span>
         </div>
+        <div v-else-if="field.type === 'boolean'">
+            <label class="checkbox-inline">
+              <input 
+                type="checkbox" 
+                :value="field.name" 
+                v-model="field.value">
+                Enabled
+            </label>
+        </div>
         <div v-else-if="field.type === 'enum'">
             <label v-for="choice in field.choices" class="checkbox-inline">
               <input 
@@ -74,7 +83,6 @@
                 v-model="field.value">
                 ${ choice }
             </label>
-
         </div>
       </div> <!-- .col-sm-10 -->
 

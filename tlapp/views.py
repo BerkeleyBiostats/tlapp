@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 import os
 import json
+import yaml
+import re
 
 from django.core.cache import cache
 from django.views.decorators.csrf import csrf_exempt
@@ -18,11 +20,42 @@ def token(request):
 	}
 	return render(request, 'token.html', context)
 
+def convert_params(name, defn):
+	kind = defn.get('input')
+	mapping = {
+		'numeric': 'int',
+		'checkbox': 'boolean'
+	}
+	return {
+		"name": name,
+		"type": mapping.get(kind),
+		"default": defn.get("value")
+	}
+
+
+def extract_fields(code):
+
+	pattern = r"---\n([\s\S]+)\n---\n"
+	matches = re.search(pattern, code)
+
+	if matches is None:
+		return None
+
+	header = yaml.load(matches.group(1))
+
+	try:
+		params = header["params"]["script_params"]["value"]
+	except:
+		return None
+
+	inputs = [convert_params(n, d) for n, d in params.items()]
+	return inputs
+
 @login_required
 def index(request):
 
 	templates = models.AnalysisTemplate.objects.all()
-
+	
 	templates_json = [{
 		"id": template.id,
 		"name": template.name,
@@ -30,6 +63,11 @@ def index(request):
 		"fields": template.fields,
 		"needsDataset": template.needs_dataset,
 	} for template in templates]
+
+	for template in templates_json:
+		fields = extract_fields(template["code"])
+		if fields:
+			template["fields"] = fields
 
 	datasets = models.Dataset.objects.all()
 

@@ -97,10 +97,11 @@ var app = new Vue({
   		};
 
   		// GET /someUrl
-		this.$http.post('/submit_job/', job).then(response => {
-			window.location.href = '/jobs/';
-		}, response => {
-		});
+  		this.$http.post('/submit_job/', job).then(response => {
+  			window.location.href = '/jobs/';
+  		}, response => {
+  		});
+
   	},
   },
 });

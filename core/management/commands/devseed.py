@@ -44,7 +44,14 @@ output:
   html_document:
     self_contained: false
 params:
-  sample_size: 10000
+  script_params:
+    value:
+      sample_size:
+        input: 'numeric'
+        value: 200
+      threshold:
+        input: 'checkbox'
+        value: FALSE
 ---
 
 ```{r setup, include=FALSE, results='hide'}
