@@ -60,9 +60,9 @@ var app = new Vue({
     },
   	sendJob: function (backend) {
   		var inputs = {};
-      inputs.params = {}
+      inputs.script_params = {}
       this.selectedTemplate.fields.forEach(function (field) {
-        inputs.params[field.name] = field.value;
+        inputs.script_params[field.name] = field.value;
       });
 
   		var whereRole = (variables, role) => {
@@ -80,13 +80,13 @@ var app = new Vue({
 
   		inputs.data = {
   			uri: this.activeDataset.url,
-  			type: 'csv',
-  			nodes: {
-  				Y: whereRoleForActive('Y'),
-  				A: whereRoleForActive('A'),
-  				W: whereRoleForActive('W'),
-  			}
   		};
+
+      inputs.nodes = {
+        Y: whereRoleForActive('Y'),
+        A: whereRoleForActive('A'),
+        W: whereRoleForActive('W'),
+      };
 
   		var job = {
   			inputs,

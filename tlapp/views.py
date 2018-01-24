@@ -159,16 +159,23 @@ def _submit_job(request):
 	if 'r_packages' in job_data:
 		job_data['provision'] = build_provision_code(job_data['r_packages'])
 
+	if 'model_template' in job_data:
+		template = models.AnalysisTemplate.objects.get(pk=job_data['model_template'])
+		code = template.code
+		provision = template.provision
+	else:
+		code = job_data.get('code')		
+		provision = job_data.get('provision')
+
 	job = models.ModelRun(
-		model_template_id = job_data.get('model_template', None),
 		dataset_id = job_data.get('dataset', None),
 		status = models.ModelRun.status_choices['submitted'],
 		inputs = job_data['inputs'],
 		backend = job_data['backend'],
 		ghap_username = ghap_username,
 		ghap_ip = ghap_ip,
-		code = job_data.get('code', None),
-		provision = job_data.get('provision', None),
+		code = code,
+		provision = provision,
 		created_by = request.user,
 	)
 	job.save()
