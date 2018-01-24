@@ -51,7 +51,15 @@ def change_image_links(html, job_id):
     img_tags = soup.find_all("img")
 
     for tag in img_tags:
-        key = job_id + "/" + tag.get("src")
+        
+        src = tag.get("src")
+        
+        # Some Rmd documents embed images directly in the html with
+        # data attributes.
+        if src.startswith("data:"):
+            continue
+
+        key = job_id + "/" + src
         url = s3.generate_presigned_url(
             'get_object', 
             Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
