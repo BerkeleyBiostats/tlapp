@@ -27,16 +27,17 @@
 
 <div class="row">
 <div class="col-lg-12">
-    <div class="ibox">
-        <div class="ibox-title">Output</div>
-        <div class="ibox-content">
 
+<div class="ibox">
+    <div class="ibox-title">Output</div>
+    <div class="ibox-content">
 {% if job.status == 'success' %}
     {{ job.report_html | safe }}
 {% endif %}
+        
+    </div>
+</div>
 
-    </div>
-    </div>
 </div>
 </div>
 
