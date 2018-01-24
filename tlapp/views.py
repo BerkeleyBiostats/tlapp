@@ -35,7 +35,7 @@ def convert_params(name, defn):
 
 def extract_fields(code):
 
-	pattern = r"---\n([\s\S]+)\n---\n"
+	pattern = r"---([\s\S]+)---"
 	matches = re.search(pattern, code)
 
 	if matches is None:
