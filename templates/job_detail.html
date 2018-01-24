@@ -32,7 +32,7 @@
     <div class="ibox-title">Output</div>
     <div class="ibox-content">
 {% if job.status == 'success' %}
-    {{ job.report_html | safe }}
+<iframe src="{% url 'job_output' job.id %}" frameborder="0" scrolling="no" onload="resizeIframe(this)" width="100%" />
 {% endif %}
         
     </div>

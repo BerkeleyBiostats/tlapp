@@ -56,6 +56,7 @@ def jobs(request):
 	}
 	return render(request, 'jobs.html', context)
 
+@login_required
 def job_detail(request, job_id):
 	job = models.ModelRun.objects.get(pk=job_id)
 	context = {
@@ -63,6 +64,15 @@ def job_detail(request, job_id):
 		"inputs_formatted": json.dumps(job.inputs, indent=2),
 	}
 	return render(request, 'job_detail.html', context)
+
+@login_required
+def job_output(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	context = {
+		"job": job
+	}
+	return render(request, 'job_output.html', context)
+
 
 def job_output_download(request, job_id):
 	job = models.ModelRun.objects.get(pk=job_id)
