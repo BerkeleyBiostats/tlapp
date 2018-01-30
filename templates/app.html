@@ -16,9 +16,15 @@
     <i class="fa fa-reorder"></i>
     </button>
     
-    <a href="#" class="navbar-brand">Targeted Learning</a>
+    <a class="navbar-brand">
+        <img src="{% static 'longbow.png' %}" class="navbar-brand" />
+        Longbow
+    </a>
   </div>
   <div class="navbar-collapse collapse" id="navbar">
+    <ul class="nav navbar-nav">
+        <li><a>Targeted Learning Platform</a></li>
+    </ul>
     <ul class="nav navbar-top-links navbar-right">
         <li>
             <a href="{% url 'token' %}">

@@ -25,3 +25,8 @@ From RStudio: Copy the Analysis Template's `code` field into RStudio, then run "
 From the command line: 
 
 	Rscript runner.R <code_filename.R> <params_filename.json> <output_filename.md>
+
+Creative Commons Credits
+---
+
+Bow Icon: bow by Milky - Digital innovation from the Noun Project
