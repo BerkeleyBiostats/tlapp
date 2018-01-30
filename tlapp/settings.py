@@ -24,7 +24,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '7=9qd5g$@9teiv&#r69+*5k%o%wq*s!po)$63da)@pvra1nd8w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.environ.get('ENVIRONMENT') == 'development':
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -143,3 +144,9 @@ else:
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
+
+
+if os.environ.get('ENVIRONMENT') == 'development':
+    SECURE_SSL_REDIRECT = False
+else:
+    SECURE_SSL_REDIRECT = True
