@@ -39,17 +39,17 @@ var app = new Vue({
   delimiters: ['${', '}'],
   el: '#modelmaker',
   data: {
-  	roles: ['W', 'A', 'Y'],
+  	roles: ['W', 'A', 'Y', '-'],
     message: 'Hello Vue!',
-	modelTemplates: G.models,
-	selectedTemplate: G.models[0],
-	datasets: G.datasets,
-	activeDataset: G.datasets[0],
-  ghapCredentials: {
-    username: '',
-    password: '',
-    ip: '',
-  },
+	  modelTemplates: G.models,
+	  selectedTemplate: G.models[0],
+	  datasets: G.datasets,
+	  activeDataset: G.datasets[0],
+    ghapCredentials: {
+      username: '',
+      password: '',
+      ip: '',
+    },
   },
   mounted: function () {
     highlightCode();
@@ -82,11 +82,10 @@ var app = new Vue({
   			uri: this.activeDataset.url,
   		};
 
-      inputs.nodes = {
-        Y: whereRoleForActive('Y'),
-        A: whereRoleForActive('A'),
-        W: whereRoleForActive('W'),
-      };
+      inputs.nodes = {};
+      this.roles.forEach(function (role) {
+        inputs.nodes[role] = whereRoleForActive(role);
+      });
 
   		var job = {
   			inputs,
@@ -96,11 +95,13 @@ var app = new Vue({
         dataset: this.activeDataset.id,
   		};
 
+      console.log(inputs);
+
   		// GET /someUrl
-  		this.$http.post('/submit_job/', job).then(response => {
-  			window.location.href = '/jobs/';
-  		}, response => {
-  		});
+  		// this.$http.post('/submit_job/', job).then(response => {
+  		// 	window.location.href = '/jobs/';
+  		// }, response => {
+  		// });
 
   	},
   },
