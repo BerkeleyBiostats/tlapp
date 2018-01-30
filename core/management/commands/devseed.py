@@ -275,6 +275,23 @@ class Command(BaseCommand):
         },]
 
         code = """
+---
+title: "Another Sample"
+author: "Jeremy Coyle"
+date: "10/5/2017"
+output: 
+  html_document:
+    self_contained: false
+params:
+  roles:
+    value:
+      - W
+      - A
+      - Y
+      - exclude
+      - id
+---
+
             print('foo')
         """
 

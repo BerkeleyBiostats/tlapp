@@ -34,22 +34,28 @@ def convert_params(name, defn):
 
 
 def extract_fields(code):
-
-	pattern = r"---([\s\S]+)---"
-	matches = re.search(pattern, code)
-
-	if matches is None:
-		return None
-
-	header = yaml.load(matches.group(1))
-
+	header = get_yaml_header(code)
 	try:
 		params = header["params"]["script_params"]["value"]
 	except:
 		return None
-
 	inputs = [convert_params(n, d) for n, d in params.items()]
 	return inputs
+
+def get_yaml_header(code):
+	pattern = r"---([\s\S]+)---"
+	matches = re.search(pattern, code)
+	if matches is None:
+		return None
+	header = yaml.load(matches.group(1))
+	return header
+
+def extract_roles(code):
+	header = get_yaml_header(code)
+	try:
+		return header["params"]["roles"]["value"]
+	except:
+		return ["W", "A", "Y", "-"]
 
 @login_required
 def index(request):
@@ -68,6 +74,8 @@ def index(request):
 		fields = extract_fields(template["code"])
 		if fields:
 			template["fields"] = fields
+
+		template["roles"] = extract_roles(template["code"])
 
 	datasets = models.Dataset.objects.all()
 
