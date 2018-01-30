@@ -150,3 +150,6 @@ if os.environ.get('ENVIRONMENT') == 'development':
     SECURE_SSL_REDIRECT = False
 else:
     SECURE_SSL_REDIRECT = True
+
+APPEND_SLASH = True
+PREPEND_WWW = True
