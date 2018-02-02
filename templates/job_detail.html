@@ -10,16 +10,33 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="ibox">
-                <div class="ibox-title">{{ job.model_template.name }}</div>
+                <div class="ibox-title">
+{% if job.model_template %}
+    {{ job.model_template.name }}
+{% else %}
+    One-off job
+{% endif %}
+            </div>
                 <div class="ibox-content">
             <p>Backend: {{ job.backend }}</p>
             <p>Created at: {{ job.created_at }}</p>
             <p>Status: {{ job.status }}</p>
+
+            <div class="row">
+                
             {% if job.status == "success" %}
-            <div>
+            <div class="col-md-2">
                 <a href="{{ job.output_url }}">Download Outputs</a>
             </div>
+            <div class="col-md-2">
+                <a href="{% url 'job_view_logs' job.id %}">
+                    View Logs
+                </a>
+            </div>
             {% endif %}
+
+            </div>
+
                 </div>
             </div>
           </div>

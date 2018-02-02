@@ -133,6 +133,15 @@ def job_logs(request, job_id):
 		"status": job.status
 	}, safe=False)
 
+@login_required
+def job_view_logs(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	context = {
+		"job": job
+	}
+
+	return render(request, 'job_logs.html', context)
+
 def job_output_download(request, job_id):
 	job = models.ModelRun.objects.get(pk=job_id)
 	outputs_dir = '/tmp/outputs'

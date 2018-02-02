@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^jobs/(?P<job_id>[0-9]+)/download/$', views.job_output_download, name='job_output_download'),
     url(r'^jobs/(?P<job_id>[0-9]+)/output/$', views.job_output, name='job_output'),
     url(r'^jobs/(?P<job_id>[0-9]+)/logs/$', views.job_logs, name='job_logs'),
+    url(r'^jobs/(?P<job_id>[0-9]+)/view_logs/$', views.job_view_logs, name='job_view_logs'),
     url(r'^jobs/(?P<job_id>[0-9]+)/$', views.job_detail, name='job_detail'),
     url(r'^jobs/(?P<job_id>[0-9]+)/append_log/$', views.append_log_token, name='job_append_log_token'),
     url(r'^jobs/(?P<job_id>[0-9]+)/finish/$', views.finish_job, name='job_finish'),
