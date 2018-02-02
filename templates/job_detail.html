@@ -24,7 +24,7 @@
 
             <div class="row">
                 
-            {% if job.status == "success" %}
+            {% if job.status == "viewable" %}
             <div class="col-md-2">
                 <a href="{{ job.output_url }}">Download Outputs</a>
             </div>
@@ -42,7 +42,7 @@
           </div>
         </div>
 
-        {% if job.status == 'success' %}
+        {% if job.status == 'viewable' %}
         <div class="row">
         <div class="col-lg-12">
 
@@ -58,14 +58,14 @@
         {% endif %}
     </div>
     
-    {% if job.status != 'success' %}
+    {% if job.status != 'viewable' %}
     <pre id="logs">
 Fetching logs...       
     </pre>
 
     <div id="logs-actions">
         <label class="checkbox-inline">
-            <input type="checkbox">
+            <input type="checkbox" checked disabled>
             Autoscroll
         </label>
     </div>
@@ -89,7 +89,7 @@ Fetching logs...
 
 
 <script>
-var logs = "hello";
+var previousLogs = "hello";
 var logsDisplay = document.getElementById('logs');
 var logsApp = new Vue();
 var firstRun = true;
@@ -99,15 +99,17 @@ var pollLogs = window.setInterval(function() {
         var logs = response.data.logs;
         var status = response.data.status;
 
-        if (status === 'success') {
+        if (status === 'viewable') {
             clearInterval(pollLogs);
             if (!firstRun) {
                 location.reload();
             }
-        } else {
+        } else if (previousLogs !== logs) {
             logsDisplay.innerHTML = logs;
             logsDisplay.scrollTop = logsDisplay.scrollHeight;            
         }
+
+        previousLogs = logs;
 
         firstRun = false;
 

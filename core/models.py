@@ -42,6 +42,7 @@ class ModelRun(models.Model):
 		'running': 'running',
 		'success': 'success',
 		'error':' error',
+		'viewable': 'viewable',
 	}
 
 	created_by = models.ForeignKey(User, blank=True, null=True)

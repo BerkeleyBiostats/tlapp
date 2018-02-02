@@ -256,6 +256,8 @@ def _finish_job(request, job_id):
 
 	# TODO: will need to queue this if takes longer than 30s
 	tasks.post_process_outputs(job)
+
+	job.status = models.ModelRun.status_choices['viewable']
 	job.save()
 
 	return JsonResponse({"status": "success"}, safe=False)
