@@ -52,6 +52,10 @@ params:
       threshold:
         input: 'checkbox'
         value: FALSE
+      learner:
+        input: select
+        choices: [super, mega, ultra]
+        value: super
 ---
 
 ```{r setup, include=FALSE, results='hide'}

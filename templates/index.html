@@ -84,6 +84,12 @@
                 ${ choice }
             </label>
         </div>
+        <div v-else-if="field.type === 'select'">
+            <select v-model="field.value">
+              <option v-for="choice in field.choices">${ choice }</option>
+            </select>
+        </div>
+
       </div> <!-- .col-sm-10 -->
 
       </div> <!-- .form-group -->

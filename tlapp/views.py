@@ -24,13 +24,15 @@ def convert_params(name, defn):
 	kind = defn.get('input')
 	mapping = {
 		'numeric': 'int',
-		'checkbox': 'boolean'
+		'checkbox': 'boolean',
+		'select': 'select'
 	}
-	return {
-		"name": name,
-		"type": mapping.get(kind),
-		"default": defn.get("value")
-	}
+
+	defn["name"] = name
+	defn["type"] = mapping.get(kind)
+	defn["default"] = defn.get("value")
+
+	return defn
 
 
 def extract_fields(code):
