@@ -148,8 +148,10 @@ AUTHENTICATION_BACKENDS = (
 
 if os.environ.get('ENVIRONMENT') == 'development':
     SECURE_SSL_REDIRECT = False
+    PREPEND_WWW = False
 else:
     SECURE_SSL_REDIRECT = True
+    PREPEND_WWW = True
 
 APPEND_SLASH = True
-PREPEND_WWW = True
+

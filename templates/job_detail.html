@@ -4,60 +4,58 @@
 
 {% block body %}
 
-<div class="row">
-  <div class="col-lg-12">
-    <div class="ibox">
-        <div class="ibox-title">{{ job.model_template.name }}</div>
-        <div class="ibox-content">
-    <p>Backend: {{ job.backend }}</p>
-    <p>Created at: {{ job.created_at }}</p>
-    <p>Status: {{ job.status }}</p>
-    {% if job.status == "success" %}
-    <div>
-        <a href="{{ job.output_url }}">Download Outputs</a>
+<div id="fullscreen">
+
+    <div id="fullscreentop">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">{{ job.model_template.name }}</div>
+                <div class="ibox-content">
+            <p>Backend: {{ job.backend }}</p>
+            <p>Created at: {{ job.created_at }}</p>
+            <p>Status: {{ job.status }}</p>
+            {% if job.status == "success" %}
+            <div>
+                <a href="{{ job.output_url }}">Download Outputs</a>
+            </div>
+            {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+
+        {% if job.status == 'success' %}
+        <div class="row">
+        <div class="col-lg-12">
+
+        <div class="ibox">
+            <div class="ibox-title">Output</div>
+            <div class="ibox-content">
+        <iframe src="{% url 'job_output' job.id %}" frameborder="0" scrolling="no" onload="resizeIframe(this)" width="100%"></iframe>        
+            </div>
+        </div>
+
+        </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if job.status != 'success' %}
+    <pre id="logs">
+Fetching logs...       
+    </pre>
+
+    <div id="logs-actions">
+        <label class="checkbox-inline">
+            <input type="checkbox">
+            Autoscroll
+        </label>
     </div>
     {% endif %}
 
-        </div>
-    </div>
-
-
-  <div>
-</div>
-
-<div class="row">
-<div class="col-lg-12">
-
-<div class="ibox">
-    <div class="ibox-title">Output</div>
-    <div class="ibox-content">
-{% if job.status == 'success' %}
-<iframe src="{% url 'job_output' job.id %}" frameborder="0" scrolling="no" onload="resizeIframe(this)" width="100%"></iframe>
-{% endif %}
-        
-    </div>
-</div>
 
 </div>
-</div>
-
-<div class="row">
-<div class="col-lg-12">
-    <div class="ibox">
-        <div class="ibox-title">Logs</div>
-        <div class="ibox-content">
-        <pre>{{ job.output }}</pre>
-    </div>
-    </div>
-</div>
-</div>
-
-<!-- <div>
-    <p>Inputs</p>
-    <pre>
-    {{ inputs_formatted }}
-    </pre>
-</div> -->
 
 
 {% endblock %}
@@ -71,4 +69,35 @@
     <!-- Custom and plugin javascript -->
     <script src="{% static 'js/inspinia.js' %}"></script>
     <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
+
+
+<script>
+var logs = "hello";
+var logsDisplay = document.getElementById('logs');
+var logsApp = new Vue();
+var firstRun = true;
+
+var pollLogs = window.setInterval(function() {
+    logsApp.$http.get('logs/').then(response => {
+        var logs = response.data.logs;
+        var status = response.data.status;
+
+        if (status === 'success') {
+            clearInterval(pollLogs);
+            if (!firstRun) {
+                location.reload();
+            }
+        } else {
+            logsDisplay.innerHTML = logs;
+            logsDisplay.scrollTop = logsDisplay.scrollHeight;            
+        }
+
+        firstRun = false;
+
+    });
+}, 500);
+</script>
+
+
+
 {% endblock %}

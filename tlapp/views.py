@@ -121,6 +121,17 @@ def job_output(request, job_id):
 	}
 	return render(request, 'job_output.html', context)
 
+@login_required
+def job_logs(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	context = {
+		"job": job
+	}
+
+	return JsonResponse({
+		"logs": job.output,
+		"status": job.status
+	}, safe=False)
 
 def job_output_download(request, job_id):
 	job = models.ModelRun.objects.get(pk=job_id)
