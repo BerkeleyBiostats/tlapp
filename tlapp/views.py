@@ -6,6 +6,7 @@ import yaml
 import re
 
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -305,7 +306,10 @@ def _templates(request):
 	template.provision = build_provision_code(provision)
 	template.save()
 
-	return JsonResponse({"success": True}, safe=False)
+	return JsonResponse({
+		"success": True,
+		"url": request.build_absolute_uri("/?initialChoice=%s" % template.id)
+	}, safe=False)
 
 
 
