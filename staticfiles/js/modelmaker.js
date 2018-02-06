@@ -1,4 +1,3 @@
-
 G.datasets = G.datasets.map(function (dataset) {
 	dataset.variables = dataset.variables.map(function (variableName) {
 		return {
@@ -35,7 +34,13 @@ function highlightCode () {
     });
 };
 
+var router = new VueRouter({
+    mode: 'history',
+    routes: []
+});
+
 var app = new Vue({
+  router,
   delimiters: ['${', '}'],
   el: '#modelmaker',
   data: {
@@ -51,6 +56,17 @@ var app = new Vue({
     },
   },
   mounted: function () {
+
+    var that = this;
+
+    if (this.$route.query.initialChoice) {
+      G.models.forEach((model) => {
+        if (model.id == this.$route.query.initialChoice) {
+          that.selectedTemplate = model;
+        }
+      });
+    }
+
     highlightCode();
   },
   methods: {
