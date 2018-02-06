@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^jobs/(?P<job_id>[0-9]+)/append_log/$', views.append_log_token, name='job_append_log_token'),
     url(r'^jobs/(?P<job_id>[0-9]+)/finish/$', views.finish_job, name='job_finish'),
     url(r'^jobs/', views.jobs, name='jobs'),
+    url(r'^templates/', views.templates, name='templates'),    
     url(r'^token/', views.token, name='token'),
     url(r'^submit_job/', views.submit_job, name='submit_job'),
     url(r'^submit_job_token/', views.submit_job_token, name='submit_job_token'),

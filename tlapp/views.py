@@ -285,6 +285,42 @@ def check_token(request):
 	request.user = token.user
 	return True
 
+def _templates(request):
+	# TODO: don't assume it's a POST request
+	script_contents = request.body.decode('utf-8')
+
+	header = get_yaml_header(script_contents)
+
+	name = header['title']
+	provision = header.get('required_packages')
+	template = models.AnalysisTemplate.objects.filter(name=name).first()
+
+	if template is None:
+		template = models.AnalysisTemplate()
+
+	template.name = name
+	template.fields = None
+	template.code = script_contents
+	template.needs_dataset = True
+	template.provision = build_provision_code(provision)
+	template.save()
+
+	return JsonResponse({"success": True}, safe=False)
+
+
+
+@csrf_exempt
+def templates(request):
+	if check_token(request):
+		return _templates(request)
+	else:
+		return unauthorized_reponse()
+
+
+
+
+
+
 
 
 

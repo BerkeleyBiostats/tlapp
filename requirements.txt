@@ -9,3 +9,4 @@ whitenoise
 bs4
 sendgrid-django
 pyyaml
+requests
