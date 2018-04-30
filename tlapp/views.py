@@ -123,7 +123,7 @@ def job_output(request, job_id):
 	return render(request, 'job_output.html', context)
 
 @login_required
-def job_logs(request, job_id):
+def _job_logs(request, job_id):
 	job = models.ModelRun.objects.get(pk=job_id)
 	context = {
 		"job": job
@@ -133,6 +133,35 @@ def job_logs(request, job_id):
 		"logs": job.output,
 		"status": job.status
 	}, safe=False)
+
+
+@login_required
+@csrf_exempt
+def job_logs(request, job_id):
+	return _job_logs(request, job_id)
+
+@csrf_exempt
+def job_logs_token(request, job_id):
+	if check_token(request):
+		return _job_logs(request, job_id)
+	else:
+		return unauthorized_reponse()
+
+@login_required
+def _job_status(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	context = {
+		"job": job
+	}
+
+	return JsonResponse(job.status, safe=False)
+
+@csrf_exempt
+def job_status_token(request, job_id):
+	if check_token(request):
+		return _job_status(request, job_id)
+	else:
+		return unauthorized_reponse()
 
 @login_required
 def job_view_logs(request, job_id):
@@ -152,6 +181,17 @@ def job_output_download(request, job_id):
 		f.write('hello')
 	return redirect('/static/bar.txt')
 
+def _job_download_url(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	return JsonResponse(job.output_url, safe=False)
+
+@csrf_exempt
+def job_download_url_token(request, job_id):
+	if check_token(request):
+		return _job_download_url(request, job_id)
+	else:
+		return unauthorized_reponse()
+	
 def expand_r_package_definition(package_definition):
     if package_definition.startswith("github://"):
         full_package_name = package_definition[len("github://"):]
