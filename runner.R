@@ -1,6 +1,6 @@
 sink(stdout(), type = "message")
 
-library(tltools)
+library(longbowtools)
 
 args = commandArgs(trailingOnly=TRUE)
 

@@ -13,7 +13,7 @@ R -e "if (!require('memoise')) install.packages('memoise', repos = 'http://cran.
 R -e "if (!require('sl3')) devtools::install_github('jeremyrcoyle/sl3')"
 R -e "if (!require('testthat')) install.packages('testthat', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('jsonlite')) install.packages('jsonlite', repos = 'http://cran.rstudio.com/')"
-R -e "if (!require('tltools')) devtools::install_github('jeremyrcoyle/tltools')"
+R -e "if (!require('longbowtools')) devtools::install_github('tlverse/longbowtools')"
 R -e "if (!require('rstackdeque')) install.packages('rstackdeque', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('rlang')) install.packages('rlang', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('visNetwork')) install.packages('visNetwork', repos = 'http://cran.rstudio.com/')"
