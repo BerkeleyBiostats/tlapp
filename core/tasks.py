@@ -16,6 +16,7 @@ import uuid
 from fabric.api import *
 from fabric.operations import *
 from fabric.contrib.files import exists
+from django.conf import settings
 from django.core.cache import cache
 from django.template import loader, Context
 from bs4 import BeautifulSoup
@@ -395,6 +396,9 @@ def handle_jobs():
     ).first()
 
     if job is None:
+        return 0
+
+    if job.created_by.running_job_count() >= settings.MAX_CONCURRENT_JOBS:
         return 0
 
     job.status = models.ModelRun.status_choices['running']

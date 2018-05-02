@@ -155,3 +155,5 @@ else:
 
 APPEND_SLASH = True
 
+MAX_CONCURRENT_JOBS = os.environ.get('MAX_CONCURRENT_JOBS', 1)
+
