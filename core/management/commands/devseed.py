@@ -325,6 +325,12 @@ class Command(BaseCommand):
             'admin', 'admin@example.com', 'admin')
         user.save()
 
+        token = models.Token(
+          user=user,
+          token="admintoken"
+        )
+        token.save()
+
         inputs = sample_script_inputs
 
         code = sample_script
