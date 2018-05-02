@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 from core import models
 
 def put_script(content=None, script_name=None, local_code_folder=None, remote_code_folder=None):
-    # write lcoally
+    # write locally
     local_code_filename = os.path.join(local_code_folder, script_name)
     with open(local_code_filename, 'w') as code_file:
         code_file.write(content)
@@ -342,7 +342,7 @@ def run_vps_job(job):
     with open(input_filename, 'w') as input_file:
         input_file.write(json.dumps(job.inputs))
 
-    rpath = '/usr/local/lib/R/site-library/tltools/'
+    rpath = '/usr/local/lib/R/site-library/longbowtools/'
     cmd = [
         "Rscript",
         "--default-packages=methods,stats",

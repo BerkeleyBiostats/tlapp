@@ -33,4 +33,4 @@ R -e "if (!require('igraph')) devtools::install_version('igraph', version='1.0.1
 R -e "if (!require('sl3')) devtools::install_github('jeremyrcoyle/sl3')"
 R -e "if (!require('testthat')) install.packages('testthat', repos = 'http://cran.rstudio.com/')"
 R -e "if (!require('knitr')) install.packages('knitr', repos = 'http://cran.rstudio.com/')"
-R -e "if (!require('tltools')) devtools::install_github('jeremyrcoyle/tltools')"
+R -e "if (!require('longbowtools')) devtools::install_github('tlverse/longbowtools')"
