@@ -6,6 +6,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+def get_user_running_job_count(self):
+	return ModelRun.objects.filter(
+		created_by=self, 
+		status=ModelRun.status_choices['running']
+	).count()
+
+User.add_to_class("running_job_count", get_user_running_job_count)
+
 class Token(models.Model):
 	user = models.OneToOneField(User, primary_key=True)
 	token = models.CharField(max_length=128)
