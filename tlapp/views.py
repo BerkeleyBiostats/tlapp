@@ -99,9 +99,17 @@ def index(request):
 
 @login_required
 def jobs(request):
-	jobs = models.ModelRun.objects.filter(created_by=request.user).order_by('-created_at')
+
+	if request.user.is_superuser:
+		jobs = models.ModelRun.objects
+	else:
+		jobs = models.ModelRun.objects.filter(created_by=request.user)
+
+	jobs = jobs.order_by('-created_at')
+
 	context = {
 		"jobs": jobs,
+		"superuser": request.user.is_superuser,
 	}
 	return render(request, 'jobs.html', context)
 

@@ -19,6 +19,12 @@
     </h2>
     <p><span class="text-muted">Submitted</span> {{ job.created_at }}</p>
     <p><span class="text-muted">Status</span> {{ job.status }}</p>
+    {% if superuser %}
+    <p><span class="text-muted">User</span> 
+        {{ job.created_by.username }} 
+        {{ job.created_by.email }}
+    </p>
+    {% endif %}
     {% if job.output_url %}
     <div>
         <a href="{{ job.output_url }}">Download Outputs</a>
