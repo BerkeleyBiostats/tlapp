@@ -108,7 +108,7 @@ def jobs(request):
 
 	jobs = jobs.order_by('-created_at')
 
-	paginator = Paginator(jobs, 2)
+	paginator = Paginator(jobs, 30)
 	page = request.GET.get('page')
 	jobs = paginator.get_page(page)
 
