@@ -6,7 +6,8 @@ import yaml
 import re
 
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -106,6 +107,10 @@ def jobs(request):
 		jobs = models.ModelRun.objects.filter(created_by=request.user)
 
 	jobs = jobs.order_by('-created_at')
+
+	paginator = Paginator(jobs, 2)
+	page = request.GET.get('page')
+	jobs = paginator.get_page(page)
 
 	context = {
 		"jobs": jobs,

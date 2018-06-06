@@ -15,7 +15,7 @@ def get_user_running_job_count(self):
 User.add_to_class("running_job_count", get_user_running_job_count)
 
 class Token(models.Model):
-	user = models.OneToOneField(User, primary_key=True)
+	user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
 	token = models.CharField(max_length=128)
 
 	def __str__(self):
@@ -53,7 +53,7 @@ class ModelRun(models.Model):
 		'viewable': 'viewable',
 	}
 
-	created_by = models.ForeignKey(User, blank=True, null=True)
+	created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 	created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	inputs = JSONField(null=True, blank=True)
 	status = models.CharField(max_length=32)
@@ -65,8 +65,8 @@ class ModelRun(models.Model):
 	output_url = models.URLField(null=True, blank=True)
 	report_html = models.TextField(null=True, blank=True)	
 	traceback = models.TextField(null=True, blank=True)
-	model_template = models.ForeignKey(AnalysisTemplate, null=True, blank=True)
-	dataset = models.ForeignKey(Dataset, null=True, blank=True)
+	model_template = models.ForeignKey(AnalysisTemplate, null=True, blank=True, on_delete=models.SET_NULL)
+	dataset = models.ForeignKey(Dataset, null=True, blank=True, on_delete=models.SET_NULL)
 
 	# Support pushing code instead of model template for one-off runs
 	code = models.TextField(null=True, blank=True)
