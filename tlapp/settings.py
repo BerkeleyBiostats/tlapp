@@ -157,3 +157,4 @@ APPEND_SLASH = True
 
 MAX_CONCURRENT_JOBS = int(os.environ.get('MAX_CONCURRENT_JOBS', '1'))
 
+HOSTNAME = os.environ.get("HOSTNAME", "http://localhost:63000/")
