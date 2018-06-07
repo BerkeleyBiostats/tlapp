@@ -393,7 +393,7 @@ def handle_jobs():
     # Pick off a random ModelRun job
     job = models.ModelRun.objects.filter(
         status=models.ModelRun.status_choices['submitted'],
-    ).first()
+    ).order_by('?').first()
 
     if job is None:
         return 0
