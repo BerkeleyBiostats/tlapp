@@ -98,13 +98,27 @@ def index(request):
 
 	return render(request, 'index.html', context)
 
+def parse_id_comma_list(raw):
+	if not raw:
+		return None
+	sp = raw.split(",")
+	return [int(x) for x in sp]
+
 @login_required
 def jobs(request):
+
+	response_format = request.GET.get("format")
+
+	ids = request.GET.get("ids")
+	ids = parse_id_comma_list(ids)
 
 	if request.user.is_superuser:
 		jobs = models.ModelRun.objects
 	else:
 		jobs = models.ModelRun.objects.filter(created_by=request.user)
+
+	if ids:
+		jobs = jobs.filter(id__in=ids)
 
 	jobs = jobs.order_by('-created_at')
 
@@ -116,7 +130,14 @@ def jobs(request):
 		"jobs": jobs,
 		"superuser": request.user.is_superuser,
 	}
-	return render(request, 'jobs.html', context)
+
+	if response_format == 'json':
+		# TODO: add the rest of pagination
+		return JsonResponse({
+			'jobs': [job.as_dict() for job in jobs]
+		})
+	else:
+		return render(request, 'jobs.html', context)
 
 @login_required
 def job_detail(request, job_id):
