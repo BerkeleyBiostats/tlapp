@@ -104,9 +104,9 @@ def parse_id_comma_list(raw):
 	sp = raw.split(",")
 	return [int(x) for x in sp]
 
-@login_required
-def jobs(request):
 
+
+def _jobs(request):
 	response_format = request.GET.get("format")
 
 	ids = request.GET.get("ids")
@@ -138,6 +138,13 @@ def jobs(request):
 		})
 	else:
 		return render(request, 'jobs.html', context)
+
+@csrf_exempt
+def jobs(request):
+	if request.user.is_authenticated or check_token(request):
+		return _jobs(request)
+	else:
+		return unauthorized_reponse()
 
 @login_required
 def job_detail(request, job_id):
@@ -355,7 +362,7 @@ def _restart_job(request, job_id):
 
 @csrf_exempt
 def restart_job(request, job_id):
-	if request.user or check_token(request):
+	if request.user.is_authenticated or check_token(request):
 		return _restart_job(request, job_id)
 	else:
 		return unauthorized_reponse()
