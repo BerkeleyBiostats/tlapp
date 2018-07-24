@@ -251,6 +251,9 @@ def _submit_job(request):
 		code = job_data.get('code')		
 		provision = job_data.get('provision')
 
+	if job_data.get('skip_provision'):
+		provision = 'echo "skipping provisioning"'
+
 	job = models.ModelRun(
 		dataset_id = job_data.get('dataset', None),
 		status = models.ModelRun.status_choices['submitted'],
