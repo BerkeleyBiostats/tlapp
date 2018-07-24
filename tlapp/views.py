@@ -323,6 +323,19 @@ def finish_job(request, job_id):
 	else:
 		return unauthorized_reponse()
 
+def _restart_job(request, job_id):
+	job = models.ModelRun.objects.get(pk=job_id)
+	job.status = models.ModelRun.status_choices['submitted']
+	job.save()
+	return JsonResponse({"status": "success"}, safe=False)
+
+@csrf_exempt
+def restart_job(request, job_id):
+	if request.user or check_token(request):
+		return _restart_job(request, job_id)
+	else:
+		return unauthorized_reponse()
+
 def unauthorized_reponse():
 	return HttpResponse('Unauthorized', status=401)
 

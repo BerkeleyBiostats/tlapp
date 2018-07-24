@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^jobs/(?P<job_id>[0-9]+)/$', views.job_detail, name='job_detail'),
     url(r'^jobs/(?P<job_id>[0-9]+)/append_log/$', views.append_log_token, name='job_append_log_token'),
     url(r'^jobs/(?P<job_id>[0-9]+)/finish/$', views.finish_job, name='job_finish'),
+    url(r'^jobs/(?P<job_id>[0-9]+)/restart/$', views.restart_job, name='job_restart'),
     url(r'^jobs/', views.jobs, name='jobs'),
     url(r'^templates/', views.templates, name='templates'),    
     url(r'^token/', views.token, name='token'),
