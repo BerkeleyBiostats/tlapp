@@ -5,7 +5,7 @@ export TLAPP_LOGS_URL={{ logs_url }}
 echo "Making sure longbowtools package is available for runner"
 
 R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
-R -e "devtools::install_github('tlverse/longbowtools')"
+R -e "if (!require('longbowtools')) devtools::install_github('tlverse/longbowtools')"
 
 echo "Running provision script"
 
