@@ -138,8 +138,13 @@ def upload_to_ghap(job, username, password):
         repo_path = os.path.join(repo_base_path, repo_name)
         repo_exists = exists(repo_path)
 
-        # Set the uri to the file's path on the local file system
-        job.inputs['data']['uri'] = os.path.join(repo_path, ghap_repo_path)
+        # 2018-07: It appears this isn't used anywhere after being set, 
+        # but it breaks restarting jobs. Commenting out and renaming for
+        # now to see if it breaks anything.
+        # 
+        # # Set the uri to the file's path on the local file system
+        # job.inputs['data']['uri'] = os.path.join(repo_path, ghap_repo_path)
+        job.inputs['data']['expanded_url'] = os.path.join(repo_path, ghap_repo_path)
 
         if repo_exists:
             print("Not going to clone git repo since it already exists")
