@@ -334,7 +334,6 @@ def append_log_token(request, job_id):
 		return unauthorized_reponse()
 
 def _finish_job(request, job_id):
-	job_data = json.loads(request.body.decode('utf-8'))
 	job = models.ModelRun.objects.get(pk=job_id)
 
 	job.status = models.ModelRun.status_choices['success']
