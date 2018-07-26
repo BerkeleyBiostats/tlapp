@@ -350,7 +350,7 @@ def _finish_job(request, job_id):
 
 @csrf_exempt
 def finish_job(request, job_id):
-	if check_token(request):
+	if request.user.is_authenticated or check_token(request):
 		return _finish_job(request, job_id)
 	else:
 		return unauthorized_reponse()
