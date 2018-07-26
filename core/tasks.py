@@ -129,6 +129,13 @@ def upload_to_ghap(job, username, password):
         ghap_dataset_url = job.inputs['data']['uri']
         ghap_repo_path = job.inputs['data']['repository_path']
 
+    # For job restarting, the job.inputs.data.uri will have
+    # changed. The old value is stored in 
+    # job.inputs.data.ghap_dataset_url
+    if 'data' in job.inputs and \
+        'ghap_dataset_url' in job.inputs['data']:
+        ghap_dataset_url = job.inputs['data']['ghap_dataset_url']
+
     if ghap_dataset_url:
 
         # Check if the dataset has already been cloned
@@ -141,6 +148,7 @@ def upload_to_ghap(job, username, password):
         # Set the uri to the file's path on the local file system
         # (used by tltools)
         job.inputs['data']['uri'] = os.path.join(repo_path, ghap_repo_path)
+        job.inputs['data']['ghap_dataset_url'] = ghap_dataset_url
 
         if repo_exists:
             print("Not going to clone git repo since it already exists")
