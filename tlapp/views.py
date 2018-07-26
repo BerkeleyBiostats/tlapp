@@ -122,7 +122,8 @@ def _jobs(request):
 
 	jobs = jobs.order_by('-created_at')
 
-	paginator = Paginator(jobs, 30)
+	per_page = request.GET.get('per_page', 30)
+	paginator = Paginator(jobs, per_page)
 	page = request.GET.get('page')
 	jobs = paginator.get_page(page)
 
