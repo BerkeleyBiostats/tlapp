@@ -1,0 +1,1 @@
+python archer/cli.py "$@"

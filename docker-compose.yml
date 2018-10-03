@@ -1,0 +1,15 @@
+version: '3'
+services:
+  cluster:
+    build:
+      context: .
+      dockerfile: Dockerfile.cluster
+    ports:
+      - "22:22"
+  archer:
+    build: .
+    image: archer
+    volumes:
+      - .:/app
+    depends_on:
+      - cluster

@@ -1,0 +1,1 @@
+docker-compose run --entrypoint "bash -c" archer "python /app/archer/cli.py $@"
