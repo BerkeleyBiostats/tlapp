@@ -73,33 +73,22 @@ This is math: $y=x^2$
 """,
 }
 
+# 128.32.59.171
 
-class Command(BaseCommand):
-    help = "Test for regressions after a release"
+job_data["ghap_credentials"] = {
+    "username": os.environ.get("USERNAME"),
+    "password": os.environ.get("PASSWORD"),
+    "ip": "bluevelvet.biostat.berkeley.edu",
+}
 
-    def add_arguments(self, parser):
-        parser.add_argument("username")
-        parser.add_argument("password")
-        parser.add_argument("ip")
+token = os.environ.get("TOKEN")
 
-    def handle(self, *args, **options):
+# Construct URL to submit job
+endpoint = "https://www.longbowapp.com/submit_job_token/"
 
-        job_data["ghap_credentials"] = {
-            "username": options["username"],
-            "password": options["password"],
-            "ip": options["ip"],
-        }
+response = requests.post(endpoint, data=json.dumps(job_data), headers={
+    "Authorization": token
+})
 
-        # Construct URL to submit job
-        endpoint = os.path.join(settings.HOSTNAME, "submit_job_token/")
-
-        # Get an admin token
-        admin = models.User.objects.filter(is_superuser=True).first()
-        token = admin.token.token
-
-        response = requests.post(endpoint, data=json.dumps(job_data), headers={
-            "Authorization": token
-        })
-
-        print(response.json())
+print(response.json())
 
