@@ -248,18 +248,31 @@ def expand_r_package_definition(package_definition):
 
     return output
 
-def build_provision_code(r_packages_section):
-    create_directories = """
+def build_provision_code(r_packages_section, backend=None):
+
+	preamble = ""
+
+	if backend == "ghap":
+	    preamble = """
 
 mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.2/"
 mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.4/"
 
 """
-    return create_directories + "\n".join([expand_r_package_definition(pd) for pd in r_packages_section])
+	elif backend == "bluevelvet":
+		preamble = """
+
+module load pandoc-2.1.2
+module load gcc-4.9.4
+
+"""
+
+    return preamble + "\n".join([expand_r_package_definition(pd) for pd in r_packages_section])
 
 def _submit_job(request):
 	job_data = json.loads(request.body.decode('utf-8'))
 
+	backend = job_data.get('backend', 'bluevelvet')
 	ghap_username = None
 	ghap_password = None
 	ghap_ip = None
@@ -270,7 +283,7 @@ def _submit_job(request):
 		ghap_ip = ghap_credentials['ip']
 
 	if 'r_packages' in job_data:
-		job_data['provision'] = build_provision_code(job_data['r_packages'])
+		job_data['provision'] = build_provision_code(job_data['r_packages'], backend=backend)
 
 	if 'model_template' in job_data:
 		template = models.AnalysisTemplate.objects.get(pk=job_data['model_template'])

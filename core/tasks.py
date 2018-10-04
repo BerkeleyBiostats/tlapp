@@ -290,7 +290,7 @@ def upload_to_ghap(job, username, password):
 
     # Fire up the job in screen
     with cd(remote_code_folder):
-        run("export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
+        run("pip install requests --user; export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
     
     # output = run(cmd)
     # job.output = output
