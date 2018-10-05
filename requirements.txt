@@ -5,7 +5,7 @@ django-redis
 Fabric3
 psycopg2
 gunicorn
-whitenoise
+whitenoise==4.1
 bs4
 sendgrid-django
 pyyaml
