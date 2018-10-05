@@ -419,8 +419,7 @@ def handle_jobs():
         try:
             if job.backend == 'ghap':
                 run_ghap_job(job)
-            elif:
-                job.backend == 'bluevelvet':
+            elif job.backend == 'bluevelvet':
                 run_ghap_job(job)
             else:
                 # TODO: this won't work running it on Heroku. 
