@@ -264,6 +264,7 @@ mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.4/"
 
 module load pandoc-2.1.2
 module load gcc-4.9.4
+module load python-3.5.2
 
 """
     

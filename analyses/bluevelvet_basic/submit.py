@@ -78,7 +78,7 @@ This is math: $y=x^2$
 job_data["ghap_credentials"] = {
     "username": os.environ.get("USERNAME"),
     "password": os.environ.get("PASSWORD"),
-    "ip": "128.32.59.171",
+    "ip": "bluevelvet.biostat.berkeley.edu",
 }
 
 token = os.environ.get("TOKEN")
