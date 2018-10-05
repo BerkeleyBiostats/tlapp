@@ -90,5 +90,7 @@ response = requests.post(endpoint, data=json.dumps(job_data), headers={
     "Authorization": token
 })
 
+print(response)
+print(response.text)
 print(response.json())
 
