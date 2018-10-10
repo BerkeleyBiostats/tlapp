@@ -1,8 +1,9 @@
 boto3
+click==7.0
 Django==2.0.6
 dj_database_url==0.4.2
 django-redis
-fabric==2.4.0
+Fabric3
 psycopg2
 gunicorn
 whitenoise

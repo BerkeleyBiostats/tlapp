@@ -1,15 +1,28 @@
 version: '3'
 services:
+  db:
+    image: postgres:10.1-alpine
+    environment:
+      - POSTGRES_DB=longbow
+      - POSTGRES_USER=longbow
+      - POSTGRES_PASSWORD=longbow
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.webapp
+    command: python manage.py runserver 0.0.0.0:5721
+    ports:
+      - "5721:5721"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgres://longbow:longbow@db/longbow
   cluster:
     build:
       context: .
       dockerfile: Dockerfile.cluster
     ports:
-      - "22:22"
-  archer:
-    build: .
-    image: archer
-    volumes:
-      - .:/app
-    depends_on:
-      - cluster
+      - "22022:22022"
