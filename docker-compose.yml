@@ -1,5 +1,7 @@
 version: '3'
 services:
+  redis:
+    image: redis:3.2.11-alpine
   db:
     image: postgres:10.1-alpine
     environment:
@@ -10,6 +12,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.webapp
+    image: longbow_web
     command: python manage.py runserver 0.0.0.0:5721
     ports:
       - "5721:5721"
@@ -17,12 +20,14 @@ services:
       - db
     volumes:
       - .:/app
-    environment:
-      - ENVIRONMENT=development
-      - DATABASE_URL=postgres://longbow:longbow@db/longbow
+    env_file:
+      - dev.env
+  worker:
+    image: longbow_web
+    env_file:
+      - dev.env
+    command: python manage.py worker
   cluster:
     build:
       context: .
       dockerfile: Dockerfile.cluster
-    ports:
-      - "22022:22022"

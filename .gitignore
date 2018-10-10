@@ -3,3 +3,4 @@
 *.sqlite3
 marc.pare*
 venv
+dev.env

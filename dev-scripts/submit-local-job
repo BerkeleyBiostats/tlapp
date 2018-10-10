@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+import json
+import os
+import sys
+import requests
+
+job_directory = sys.argv[1]
+
+job_script_filename = os.path.join(job_directory, "code.Rmd")
+inputs_filename = os.path.join(job_directory, "inputs.json")
+
+with open(job_script_filename) as f:
+	job_code = f.read()
+
+with open(inputs_filename) as f:
+	job_data = json.loads(f.read())
+
+job_data["code"] = job_code
+
+job_data["ghap_credentials"] = {
+	"username": "root",
+	"password": "root",
+	"ip": "cluster",
+}
+
+endpoint = os.path.join("http://localhost:5721/submit_job_token/")
+response = requests.post(endpoint, data=json.dumps(job_data), headers = {
+	"Authorization": "admintoken"
+})
+
+print(response)
+print(response.text)
