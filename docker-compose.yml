@@ -22,12 +22,25 @@ services:
       - .:/app
     env_file:
       - dev.env
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
   worker:
     image: longbow_web
     env_file:
       - dev.env
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     command: python manage.py worker
   cluster:
     build:
       context: .
       dockerfile: Dockerfile.cluster
+    volumes:
+      - ~/.ssh:/root/.ssh
+  jumper:
+    image: longbow_web
+    volumes:
+      - ~/.ssh:/root/.ssh
+    command: ssh -nN -R 5721:webapp:5721 ${GHAP_USERNAME}@${GHAP_IP}

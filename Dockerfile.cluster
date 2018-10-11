@@ -18,6 +18,8 @@ RUN add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 	r-base
 
+RUN pip install requests
+
 RUN mkdir /var/run/sshd
 
 RUN echo 'root:root' |chpasswd
