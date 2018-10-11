@@ -1,0 +1,1 @@
+docker-compose run --entrypoint "bash -c" webapp "python manage.py makemigrations"

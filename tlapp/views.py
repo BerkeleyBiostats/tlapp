@@ -280,6 +280,14 @@ def _submit_job(request):
 		code = job_data.get('code')		
 		provision = job_data.get('provision')
 
+	# Override provision with anything in the code header
+	# (Consider removing the ability to specify `required_packages` in
+	# inputs.json)
+	header = get_yaml_header(code)
+	provision_header = header.get('required_packages')
+	if provision_header:
+		provision = build_provision_code(provision_header)
+	
 	if job_data.get('skip_provision'):
 		provision = 'echo "skipping provisioning"'
 
@@ -290,6 +298,7 @@ def _submit_job(request):
 		backend = job_data['backend'],
 		ghap_username = ghap_username,
 		ghap_ip = ghap_ip,
+		base_url = job_data.get("base_url"),
 		code = code,
 		provision = provision,
 		created_by = request.user,

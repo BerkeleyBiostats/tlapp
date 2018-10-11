@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import json
+import os
+import sys
+import requests
+import click
+
+@click.command()
+@click.argument("job_directory")
+@click.option("--username")
+@click.option("--password")
+@click.option("--ip")
+@click.option("--baseurl")
+def cli(job_directory, username, password, ip, baseurl):
+
+	job_script_filename = os.path.join(job_directory, "code.Rmd")
+	inputs_filename = os.path.join(job_directory, "inputs.json")
+
+	with open(job_script_filename) as f:
+		job_code = f.read()
+
+	job_data = {
+		"backend": "ghap"
+	}
+
+	with open(inputs_filename) as f:
+		job_data["inputs"] = json.loads(f.read())
+
+	job_data["code"] = job_code
+
+	job_data["ghap_credentials"] = {
+		"username": username,
+		"password": password,
+		"ip": ip,
+	}
+
+	if baseurl:
+		job_data["base_url"] = baseurl
+
+	endpoint = os.path.join("http://localhost:5721/submit_job_token/")
+	response = requests.post(endpoint, data=json.dumps(job_data), headers = {
+		"Authorization": "admintoken"
+	})
+
+	print(response)
+	print(response.text)
+
+if __name__ == "__main__":
+	cli()

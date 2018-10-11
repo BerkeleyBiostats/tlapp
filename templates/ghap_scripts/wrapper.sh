@@ -1,6 +1,7 @@
 export TLAPP_TOKEN={{ token }}
 export TLAPP_LOGS_URL={{ logs_url }}
 
+export R_LIBS_USER=$HOME/rlibs
 
 echo "Making sure longbowtools package is available for runner"
 
