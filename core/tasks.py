@@ -297,7 +297,7 @@ def upload_to_ghap(job, username, password):
 
     # Fire up the job in screen
     with cd(remote_code_folder):
-        run("export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
+        run("pip install requests --user; export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
     
     # output = run(cmd)
     # job.output = output
@@ -424,6 +424,8 @@ def handle_jobs():
     with redirect_stdout(f), redirect_stderr(f):        
         try:
             if job.backend == 'ghap':
+                run_ghap_job(job)
+            elif job.backend == 'bluevelvet':
                 run_ghap_job(job)
             else:
                 # TODO: this won't work running it on Heroku. 
