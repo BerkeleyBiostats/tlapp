@@ -5,7 +5,37 @@
 {% block body %}
 
 <div class="row">
-  <div class="col-lg-12">
+  <div class="col-lg-2">
+    
+    <h4>Status</h4>
+    <div>
+    {% if status_filter %}
+        <div class="feed-activity-list clear-list">
+        {% for status, count in status_counts.items %}
+        {% if status == status_filter %}
+        <div class="feed-element">
+        <span class="label">{{ count | title }}</span>
+        <span><a href="?status={{ status }}">{{ status | title }}</a></span>
+        </div>
+        <div class="m-t-sm"><a href="?">Remove Filter</a></div>
+        {% endif %}
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="feed-activity-list clear-list">
+        {% for status, count in status_counts.items %}
+        <div class="feed-element">
+        <span class="label">{{ count | title }}</span>
+        <span><a href="?status={{ status }}">{{ status | title }}</a></span>
+        </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+    </div>
+
+
+  </div>
+  <div class="col-lg-10">
 
     
     <div class="btn-group pull-right">
@@ -25,7 +55,6 @@
             {% endif %}
         </span>
     </div>
-
 
     {% for job in jobs %}
 

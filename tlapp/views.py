@@ -122,6 +122,14 @@ def _jobs(request):
 
     jobs = jobs.order_by('-created_at')
 
+    status_counts = {}
+    for choice in models.ModelRun.status_choices.keys():
+        status_counts[choice] = jobs.filter(status=choice).count()
+
+    status_filter = request.GET.get("status")
+    if status_filter:
+        jobs = jobs.filter(status=status_filter)
+
     per_page = request.GET.get('per_page', 30)
     paginator = Paginator(jobs, per_page)
     page = request.GET.get('page')
@@ -130,6 +138,8 @@ def _jobs(request):
     context = {
         "jobs": jobs,
         "superuser": request.user.is_superuser,
+        "status_counts": status_counts,
+        "status_filter": status_filter,
     }
 
     if response_format == 'json':
