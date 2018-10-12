@@ -370,7 +370,7 @@ def append_log_token(request, job_id):
 
 def _finish_job(request, job_id):
     try:
-        data = jsons.loads(request.body.decode("utf-8"))
+        data = json.loads(request.body.decode("utf-8"))
     except:
         data = {}
     job = models.ModelRun.objects.get(pk=job_id)
