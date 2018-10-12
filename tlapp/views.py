@@ -370,16 +370,8 @@ def append_log_token(request, job_id):
 
 def _finish_job(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-
-    job.status = models.ModelRun.status_choices['success']
+    job.status = models.ModelRun.status_choices['executed']
     job.save()
-
-    # TODO: will need to queue this if takes longer than 30s
-    tasks.post_process_outputs(job)
-
-    job.status = models.ModelRun.status_choices['viewable']
-    job.save()
-
     return JsonResponse({"status": "success"}, safe=False)
 
 @csrf_exempt

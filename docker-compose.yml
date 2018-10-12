@@ -37,6 +37,18 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     command: python manage.py worker
+  postprocessor:
+    image: longbow_web
+    env_file:
+      - dev.env
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    command: python manage.py postprocessor
   cluster:
     build:
       context: .

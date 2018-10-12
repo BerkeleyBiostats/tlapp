@@ -48,9 +48,10 @@ class ModelRun(models.Model):
 	status_choices = {
 		'submitted': 'submitted',
 		'running': 'running',
-		'success': 'success',
+		'executed': 'executed',
+		'postprocessing': 'postprocessing',
 		'error':' error',
-		'viewable': 'viewable',
+		'success': 'success',
 	}
 
 	created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
@@ -69,6 +70,9 @@ class ModelRun(models.Model):
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(AnalysisTemplate, null=True, blank=True, on_delete=models.SET_NULL)
 	dataset = models.ForeignKey(Dataset, null=True, blank=True, on_delete=models.SET_NULL)
+	postprocessing_attempted_at = models.DateTimeField(blank=True, null=True)
+	postprocessing_traceback = models.TextField(null=True, blank=True)
+
 
 	# Support pushing code instead of model template for one-off runs
 	code = models.TextField(null=True, blank=True)

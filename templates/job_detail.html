@@ -24,7 +24,7 @@
 
             <div class="row">
                 
-            {% if job.status == "viewable" %}
+            {% if job.status == "success" %}
             <div class="col-md-2">
                 <a href="{{ job.output_url }}">Download Outputs</a>
             </div>
@@ -42,7 +42,7 @@
           </div>
         </div>
 
-        {% if job.status == 'viewable' %}
+        {% if job.status == "success" %}
         <div class="row">
         <div class="col-lg-12">
 
@@ -58,7 +58,7 @@
         {% endif %}
     </div>
     
-    {% if job.status != 'viewable' %}
+    {% if job.status != "success" %}
     <pre id="logs">
 Fetching logs...       
     </pre>
@@ -99,7 +99,7 @@ var pollLogs = window.setInterval(function() {
         var logs = response.data.logs;
         var status = response.data.status;
 
-        if (status === 'viewable') {
+        if (status === "success") {
             clearInterval(pollLogs);
             if (!firstRun) {
                 location.reload();
