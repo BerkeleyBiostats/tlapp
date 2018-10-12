@@ -12,7 +12,9 @@ import click
 @click.option("--password")
 @click.option("--ip")
 @click.option("--baseurl")
-def cli(job_directory, username, password, ip, baseurl):
+@click.option("--longbowurl", default="http://localhost:5721/")
+@click.option("--token", default="admintoken")
+def cli(job_directory, username, password, ip, baseurl, longbowurl, token):
 
 	job_script_filename = os.path.join(job_directory, "code.Rmd")
 	inputs_filename = os.path.join(job_directory, "inputs.json")
@@ -38,9 +40,9 @@ def cli(job_directory, username, password, ip, baseurl):
 	if baseurl:
 		job_data["base_url"] = baseurl
 
-	endpoint = os.path.join("http://localhost:5721/submit_job_token/")
+	endpoint = os.path.join(longbowurl, "submit_job_token/")
 	response = requests.post(endpoint, data=json.dumps(job_data), headers = {
-		"Authorization": "admintoken"
+		"Authorization": token
 	})
 
 	print(response)

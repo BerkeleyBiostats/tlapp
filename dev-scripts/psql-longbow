@@ -1,0 +1,1 @@
+docker exec -it tlapp_db_1 psql -U longbow

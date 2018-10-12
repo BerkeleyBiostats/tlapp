@@ -1,0 +1,1 @@
+submit-job --username=$GHAP_USERNAME --password=$GHAP_PASSWORD --ip=$GHAP_IP --longbowurl=https://www.longbowapp.com/ --token=$PROD_API_TOKEN $@
