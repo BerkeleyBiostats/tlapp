@@ -60,10 +60,10 @@
 
     <h2>
         <a href="{% url 'job_detail' job.id %}">
-            {% if job.model_template %}
-                {{ job.model_template.name }}
+            {% if job.title %}
+                {{ job.title }}
             {% else %}
-                clusterit job
+                [untitled job]
             {% endif %}
         </a>
     </h2>
