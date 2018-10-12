@@ -17,18 +17,30 @@ R -e "if (!require('longbowtools')) devtools::install_github('tlverse/longbowtoo
 
 echo "Starting analysis"
 
-{{ r_cmd }}
+if {{ r_cmd }} ; then
+	echo "Running analysis succeeded"
 
-cd /tmp
-tar -zcvf {{ tar_file }} {{ output_dir }}
+	cd /tmp
+	tar -zcvf {{ tar_file }} {{ output_dir }}
 
-curl \
-  --request PUT \
-  --upload-file {{ tar_file }} \
-  "{{ put_url | safe }}"
+	curl \
+	  --request PUT \
+	  --upload-file {{ tar_file }} \
+	  "{{ put_url | safe }}"
 
-curl \
-  --request POST \
-  -H "Authorization: $TLAPP_TOKEN" \
-  -d "{}" \
-  "{{ finish_url | safe }}"
+	curl \
+	  --request POST \
+	  -H "Authorization: $TLAPP_TOKEN" \
+	  -d "{}" \
+	  "{{ finish_url | safe }}"
+
+else
+	echo "Running analysis failed"
+
+	curl \
+	  --request POST \
+	  -H "Authorization: $TLAPP_TOKEN" \
+	  -d '{status: "error"}' \
+	  "{{ finish_url | safe }}"
+
+fi

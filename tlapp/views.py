@@ -369,10 +369,17 @@ def append_log_token(request, job_id):
         return unauthorized_reponse()
 
 def _finish_job(request, job_id):
+    try:
+        data = jsons.loads(request.body.decode("utf-8"))
+    except:
+        data = {}
     job = models.ModelRun.objects.get(pk=job_id)
-    job.status = models.ModelRun.status_choices['executed']
+    if data.get("status") == "error":
+        job.status = models.ModelRun.status_choices["error"]
+    else:
+        job.status = models.ModelRun.status_choices["executed"]
     job.save()
-    return JsonResponse({"status": "success"}, safe=False)
+    return JsonResponse({"status": job.status}, safe=False)
 
 @csrf_exempt
 def finish_job(request, job_id):

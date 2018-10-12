@@ -50,7 +50,7 @@ class ModelRun(models.Model):
 		'running': 'running',
 		'executed': 'executed',
 		'postprocessing': 'postprocessing',
-		'error':' error',
+		'error': 'error',
 		'success': 'success',
 	}
 
