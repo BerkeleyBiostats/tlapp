@@ -40,7 +40,7 @@ else
 	curl \
 	  --request POST \
 	  -H "Authorization: $TLAPP_TOKEN" \
-	  -d '{status: "error"}' \
+	  -d '{"status": "error"}' \
 	  "{{ finish_url | safe }}"
 
 fi
