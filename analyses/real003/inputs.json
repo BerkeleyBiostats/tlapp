@@ -1,0 +1,70 @@
+{
+    "roles": [
+        "exclude",
+        "strata",
+        "id",
+        "W",
+        "A",
+        "Y"
+    ],
+    "data": {
+        "uri": "https://git.ghap.io/stash/scm/hbgd-teams/UCB-SuperLearner.git",
+        "repository_path": "Stunting rallies/st_prev_rf.Rdata"
+    },
+    "nodes": {
+        "W": [
+            "arm",
+            "sex",
+            "W_mage",
+            "W_fage",
+            "meducyrs",
+            "feducyrs",
+            "hhwealth_quart",
+            "hfoodsec",
+            "single",
+            "W_nrooms",
+            "W_nhh",
+            "W_nchldlt5",
+            "brthmon",
+            "W_parity",
+            "trth2o",
+            "cleanck",
+            "impfloor",
+            "impsan",
+            "safeh20"
+        ],
+        "A": [
+            "gagebrth"
+        ],
+        "Y": [
+            "stunted"
+        ],
+        "strata": [
+            [
+                "agecat",
+                "studyid",
+                "country"
+            ]
+        ],
+        "id": [
+            "id"
+        ]
+    },
+    "script_params": {
+        "parallelize": [
+            false
+        ],
+        "count_A": [
+            true
+        ],
+        "count_Y": [
+            true
+        ],
+        "baseline_level": [
+            null
+        ]
+    },
+    "output_directory": [
+        ""
+    ]
+}

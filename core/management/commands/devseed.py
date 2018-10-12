@@ -382,18 +382,6 @@ params:
         )
         mt2.save()
 
-        job = models.ModelRun(
-            model_template=mt,
-            status=models.ModelRun.status_choices['submitted'],
-        )
-        job.save()
-
-        job = models.ModelRun(
-            model_template=mt2,
-            status=models.ModelRun.status_choices['submitted'],
-        )
-        job.save()
-
         dataset = models.Dataset(
             title="Subset of growth data from the collaborative perinatal project (CPP)",
             url="https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",

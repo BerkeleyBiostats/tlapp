@@ -271,11 +271,18 @@ def upload_to_ghap(job, username, password):
 
     # TODO: generate the url using django url and join with urllib
     token = job.created_by.token.token
-    logs_url = os.environ.get('BASE_URL') + "jobs/%s/append_log/" % job.id
+
+    if job.base_url: 
+        base_url = job.base_url
+    else:
+        base_url = os.environ.get("BASE_URL")
+
+    logs_url = base_url + "jobs/%s/append_log/" % job.id
+
     wrapper_script = wrapper_script_template.render({
         "token": token,
         "logs_url": logs_url,
-        "finish_url": os.environ.get('BASE_URL') + "jobs/%s/finish/" % job.id,
+        "finish_url": base_url + "jobs/%s/finish/" % job.id,
         "r_cmd": cmd,
         "tar_file": zipped_outputs_filename,
         "output_dir": remote_output_folder,
@@ -326,7 +333,6 @@ def run_ghap_job(job):
     env.passwords = {
         "%s@%s:22" % (username, server): password
     }
-
     output = execute(upload_to_ghap, job, username, password)
 
 def run_vps_job(job):

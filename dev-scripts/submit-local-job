@@ -1,0 +1,1 @@
+submit-job --username=root --password=root --ip=cluster $@

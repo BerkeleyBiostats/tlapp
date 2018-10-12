@@ -1,0 +1,38 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	curl \
+	gnupg2 \
+	libcurl4-openssl-dev \
+	libssl-dev \
+	openssh-server \
+	pandoc \
+	python \
+	python-pip \
+	screen \
+	software-properties-common
+
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+RUN add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	r-base
+
+RUN pip install requests
+
+RUN mkdir /var/run/sshd
+
+RUN echo 'root:root' |chpasswd
+
+RUN sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+# RUN sed -ri 's/#Port 22/Port 22022/g' /etc/ssh/sshd_config
+
+RUN mkdir /root/.ssh
+
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+EXPOSE 22
+
+CMD    ["/usr/sbin/sshd", "-D"]

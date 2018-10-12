@@ -271,54 +271,62 @@ module load python-3.5.2
     return preamble + "\n".join([expand_r_package_definition(pd) for pd in r_packages_section])
 
 def _submit_job(request):
-    job_data = json.loads(request.body.decode('utf-8'))
+	job_data = json.loads(request.body.decode('utf-8'))
 
-    backend = job_data.get('backend', 'bluevelvet')
-    ghap_username = None
-    ghap_password = None
-    ghap_ip = None
-    if 'ghap_credentials' in job_data:
-        ghap_credentials = job_data['ghap_credentials']
-        ghap_username = ghap_credentials['username']
-        ghap_password = ghap_credentials['password']
-        ghap_ip = ghap_credentials['ip']
+	ghap_username = None
+	ghap_password = None
+	ghap_ip = None
+	if 'ghap_credentials' in job_data:
+		ghap_credentials = job_data['ghap_credentials']
+		ghap_username = ghap_credentials['username']
+		ghap_password = ghap_credentials['password']
+		ghap_ip = ghap_credentials['ip']
 
-    if 'r_packages' in job_data:
-        job_data['provision'] = build_provision_code(job_data['r_packages'], backend=backend)
+	if 'r_packages' in job_data:
+		job_data['provision'] = build_provision_code(job_data['r_packages'])
 
-    if 'model_template' in job_data:
-        template = models.AnalysisTemplate.objects.get(pk=job_data['model_template'])
-        code = template.code
-        provision = template.provision
-    else:
-        code = job_data.get('code')     
-        provision = job_data.get('provision')
+	if 'model_template' in job_data:
+		template = models.AnalysisTemplate.objects.get(pk=job_data['model_template'])
+		code = template.code
+		provision = template.provision
+	else:
+		code = job_data.get('code')		
+		provision = job_data.get('provision')
 
-    if job_data.get('skip_provision'):
-        provision = 'echo "skipping provisioning"'
+	# Override provision with anything in the code header
+	# (Consider removing the ability to specify `required_packages` in
+	# inputs.json)
+	header = get_yaml_header(code)
+	provision_header = header.get('required_packages')
+	if provision_header:
+		provision = build_provision_code(provision_header)
+	
+	if job_data.get('skip_provision'):
+		provision = 'echo "skipping provisioning"'
 
-    job = models.ModelRun(
-        dataset_id = job_data.get('dataset', None),
-        status = models.ModelRun.status_choices['submitted'],
-        inputs = job_data['inputs'],
-        backend = job_data['backend'],
-        ghap_username = ghap_username,
-        ghap_ip = ghap_ip,
-        code = code,
-        provision = provision,
-        created_by = request.user,
-    )
-    job.save()
+	job = models.ModelRun(
+		dataset_id = job_data.get('dataset', None),
+		status = models.ModelRun.status_choices['submitted'],
+		inputs = job_data['inputs'],
+		backend = job_data['backend'],
+		ghap_username = ghap_username,
+		ghap_ip = ghap_ip,
+		base_url = job_data.get("base_url"),
+		code = code,
+		provision = provision,
+		created_by = request.user,
+	)
+	job.save()
 
-    if ghap_password:
-        # expire saved password after a day to reduce impact of the 
-        # application being compromised
-        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
+	if ghap_password:
+		# expire saved password after a day to reduce impact of the 
+		# application being compromised
+		cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
 
-    ret = job.as_dict()
-    ret['results_url'] = request.build_absolute_uri(ret['results_url'])
+	ret = job.as_dict()
+	ret['results_url'] = request.build_absolute_uri(ret['results_url'])
 
-    return JsonResponse(ret, safe=False)
+	return JsonResponse(ret, safe=False)
 
 
 @login_required
