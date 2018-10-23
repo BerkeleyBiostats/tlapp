@@ -5,6 +5,7 @@ import json
 import yaml
 import re
 
+from django.db import transaction
 from django.core.cache import cache
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -356,9 +357,11 @@ def submit_job_token(request):
 
 def _append_log(request, job_id):
     log_lines = request.body.decode('utf-8')
-    job = models.ModelRun.objects.get(pk=job_id)
-    job.output = job.output + log_lines
-    job.save()
+
+    with transaction.atomic():
+        job = models.ModelRun.objects.get(pk=job_id)
+        job.output = job.output + log_lines
+        job.save()
     return JsonResponse({"status": "success"}, safe=False)
 
 @csrf_exempt
