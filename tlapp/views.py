@@ -357,11 +357,9 @@ def submit_job_token(request):
 
 def _append_log(request, job_id):
     log_lines = request.body.decode('utf-8')
-
-    with transaction.atomic():
-        job = models.ModelRun.objects.get(pk=job_id)
-        job.output = job.output + log_lines
-        job.save()
+    job = models.ModelRun.objects.get(pk=job_id)
+    job.output = job.output + log_lines
+    job.save(update_fields=["output"])
     return JsonResponse({"status": "success"}, safe=False)
 
 @csrf_exempt
