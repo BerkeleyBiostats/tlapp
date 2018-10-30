@@ -92,7 +92,6 @@ def post_process_outputs(job):
 
 
 def handle_a_job():
-    logger.info("Picking a job to postprocess")
     # Pick off a random job that hasn't been postprocessed
     job = (
         models.ModelRun.objects.filter(
@@ -101,7 +100,6 @@ def handle_a_job():
         .order_by("?")
         .first()
     )
-    logger.info("Picked a job to postprocess %s" % job)
 
     if job is None:
         return 0
@@ -119,7 +117,5 @@ def handle_a_job():
         job.status = models.ModelRun.status_choices["error"]
     finally:
         job.save()
-
-    logger.info("Finished postprocessing")
 
     return 1
