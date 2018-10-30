@@ -16,6 +16,7 @@ from django.template import loader, Context
 from bs4 import BeautifulSoup
 from core import models
 
+logger = logging.getLogger('django')
 
 def change_image_links(html, job_id):
     print("Replacing relative image links with S3 signed urls")
@@ -91,6 +92,7 @@ def post_process_outputs(job):
 
 
 def handle_a_job():
+    logger.info("Picking a job to postprocess")
     # Pick off a random job that hasn't been postprocessed
     job = (
         models.ModelRun.objects.filter(
@@ -99,6 +101,7 @@ def handle_a_job():
         .order_by("?")
         .first()
     )
+    logger.info("Picked a job to postprocess %s" % job)
 
     if job is None:
         return 0
@@ -116,5 +119,7 @@ def handle_a_job():
         job.status = models.ModelRun.status_choices["error"]
     finally:
         job.save()
+
+    logger.info("Finished postprocessing")
 
     return 1
