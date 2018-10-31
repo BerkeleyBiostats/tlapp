@@ -343,6 +343,8 @@ def _submit_job(request):
     return JsonResponse(ret, safe=False)
 
 
+# TODO: remove and replace with /analysis routes
+
 @login_required
 @csrf_exempt
 def submit_job(request):
@@ -352,6 +354,48 @@ def submit_job(request):
 def submit_job_token(request):
     if check_token(request):
         return _submit_job(request)
+    else:
+        return unauthorized_reponse()
+
+def _create_analysis(request):
+    # Create the ModelRun in the `created` state
+    job_data = json.loads(request.body.decode('utf-8'))
+
+    code = job_data.get('code')     
+    
+    # Grab provision information from the code
+    header = get_yaml_header(code)
+    provision_header = header.get('required_packages')
+    if provision_header:
+        provision = build_provision_code(provision_header)
+
+    if job_data.get('skip_provision'):
+        provision = 'echo "skipping provisioning"'
+
+    title = header.get("title")
+
+    base_url = job_data.get("base_url")
+    
+    job = models.ModelRun(
+        status = models.ModelRun.status_choices['created'],
+        inputs = job_data['inputs'],
+        base_url = base_url,
+        title = title,
+        code = code,
+        provision = provision,
+        created_by = request.user,
+    )
+    job.save()
+
+    ret = job.as_dict()
+    ret['results_url'] = request.build_absolute_uri(ret['results_url'])
+
+    return JsonResponse(ret, safe=False)
+
+@csrf_exempt
+def create_analysis_token(request):
+    if check_token(request):
+        return _create_analysis(request)
     else:
         return unauthorized_reponse()
 

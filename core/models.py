@@ -46,6 +46,7 @@ class AnalysisTemplate(models.Model):
 class ModelRun(models.Model):
 
 	status_choices = {
+		'created': 'created',
 		'submitted': 'submitted',
 		'running': 'running',
 		'executed': 'executed',
