@@ -20,15 +20,19 @@ from django.template import loader, Context
 from bs4 import BeautifulSoup
 from core import models
 
-def put_script(content=None, script_name=None, local_code_folder=None, remote_code_folder=None):
+logger = logging.getLogger('django')
+
+
+def put_script(c, content=None, script_name=None, local_code_folder=None, remote_code_folder=None):
     # write locally
     local_code_filename = os.path.join(local_code_folder, script_name)
     with open(local_code_filename, 'w') as code_file:
         code_file.write(content)
     # push to cluster
     remote_code_filename = os.path.join(remote_code_folder, script_name)
-    c.put(local_code_filename, remote_code_filename, mode=0o755)
-    print("Put code at %s" % remote_code_filename)
+    os.chmod(local_code_filename, 0o755)
+    c.put(local_code_filename, remote_code_filename)
+    logger.info("Put code at %s" % remote_code_filename)
 
 
 def pwd():
@@ -81,7 +85,7 @@ def upload_to_ghap(c, job, username, password):
         job.inputs['data']['ghap_dataset_url'] = ghap_dataset_url
 
         if repo_exists:
-            print("Not going to clone git repo since it already exists")
+            logger.info("Not going to clone git repo since it already exists")
         else:
             # Add username and password to the git url
             o = list(tuple(o))
@@ -106,7 +110,7 @@ def upload_to_ghap(c, job, username, password):
     remote_code_filename = os.path.join(remote_code_folder, script_name)
     c.run('mkdir -p %s' % remote_code_folder)
     c.put(local_code_filename, remote_code_filename)
-    print("Put code at %s" % remote_code_filename)
+    logger.info("Put code at %s" % remote_code_filename)
 
     # Write runner script to a file...
     app_root = os.environ.get("APP_ROOT")
@@ -130,7 +134,7 @@ def upload_to_ghap(c, job, username, password):
     remote_input_filename = os.path.join(remote_code_folder, input_name)
     # ...then upload to cluster
     c.put(local_input_filename, remote_input_filename)
-    print("Put inputs at %s" % remote_input_filename)
+    logger.info("Put inputs at %s" % remote_input_filename)
 
     # Upload and run a provisioning script
     provision_code = None
@@ -145,8 +149,9 @@ def upload_to_ghap(c, job, username, password):
         with open(local_provision_filename, 'w') as provision_file:
             provision_file.write(provision_code)
         remote_provision_filename = os.path.join(remote_code_folder, provision_name)
-        c.put(local_provision_filename, remote_provision_filename, mode=0o755)
-        print("Put provision script at %s" % remote_provision_filename)
+        os.chmod(local_provision_filename, 0o755)
+        c.put(local_provision_filename, remote_provision_filename)
+        logger.info("Put provision script at %s" % remote_provision_filename)
 
         # TODO: make sure provision is run in screen session
         # with cd(remote_code_folder):
@@ -163,8 +168,8 @@ def upload_to_ghap(c, job, username, password):
         Params={'Bucket': bucket, 'Key': key}, 
         ExpiresIn=60*60*24*30,
         HttpMethod='PUT')
-    print("Output PUT URL")
-    print(output_put_url)
+    logger.info("Output PUT URL")
+    logger.info(output_put_url)
 
     # Save this url for downloading later
     url = s3.generate_presigned_url(
@@ -184,13 +189,13 @@ def upload_to_ghap(c, job, username, password):
         remote_output_folder_full_path
     )
 
-    print("Command to run:")
-    print(cmd)
+    logger.info("Command to run:")
+    logger.info(cmd)
 
     # upload x.py
     x_template = loader.get_template('ghap_scripts/x.py')
     x_script = x_template.render()
-    put_script(
+    put_script(c, 
         content=x_script, 
         script_name='x.py',
         local_code_folder=local_code_folder,
@@ -218,7 +223,7 @@ def upload_to_ghap(c, job, username, password):
         "output_dir": remote_output_folder,
         "put_url": output_put_url
     })
-    put_script(
+    put_script(c, 
         content=wrapper_script,
         script_name='wrapper.sh',
         local_code_folder=local_code_folder,
@@ -226,8 +231,19 @@ def upload_to_ghap(c, job, username, password):
     )
 
     # Fire up the job in screen
-    with cd(remote_code_folder):
-        c.run("pip install requests --user; export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
+    commands = [
+        "cd %s" % remote_code_folder,
+        "pip install requests --user",
+        "export TLAPP_TOKEN=%s" % token,
+        "export TLAPP_LOGS_URL=%s" % logs_url,
+        "screen -d -m python x.py",
+        "sleep 1"
+    ]
+    command = ";".join(commands)
+
+    logger.info(command)
+
+    output = c.run(command)
 
     return output
 
@@ -243,18 +259,18 @@ def run_vps_job(job):
     code_folder = tempfile.mkdtemp()
     output_folder = tempfile.mkdtemp()
 
-    print(code_folder)
-    print("Outputs %s" % output_folder)
+    logger.info(code_folder)
+    logger.info("Outputs %s" % output_folder)
 
     script_name = 'script.R'
     code_filename = os.path.join(code_folder, script_name)
-    print(code_filename)
+    logger.info(code_filename)
     with open(code_filename, 'w') as code_file:
         code_file.write(job.model_template.code)
 
     input_name = 'inputs.json'
     input_filename = os.path.join(code_folder, input_name)
-    print(input_name)
+    logger.info(input_name)
 
     inputs = job.inputs
     inputs['output_directory'] = output_folder
@@ -271,7 +287,7 @@ def run_vps_job(job):
         input_filename,
     ]
 
-    print(" ".join(cmd))
+    logger.info(" ".join(cmd))
 
     script_resp = subprocess.check_output(cmd)
     job.output = script_resp
@@ -289,7 +305,7 @@ def run_vps_job(job):
         Params={'Bucket': bucket, 'Key': key}, ExpiresIn=60*60*24*30)
 
     job.output_url = url
-    print(url)
+    logger.info(url)
 
     report_filename = os.path.join(output_folder, 'REPORT.html')
     with open(report_filename, mode='r') as report_file:
@@ -342,11 +358,11 @@ def handle_jobs():
             #     post_process_outputs(job)
 
         except: 
-            print(traceback.format_exc())
+            traceback.print_exc()
             job.status = models.ModelRun.status_choices['error']
 
     job.output = f.getvalue()
-    print(job.output)
+    logger.info(job.output)
     job.save()
 
     return 1
