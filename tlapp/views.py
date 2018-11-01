@@ -421,8 +421,6 @@ def _run_analysis(request, analysis_id):
     if run_data["backend"] == "savio":
         print("submitting to savio")
         cluster.savio.submit_job(job, run_data["username"], run_data["password"])
-    job.status = models.ModelRun.status_choices["running"]
-    job.save(update_fields=["status"])
     return JsonResponse({"status": "success"}, safe=False)
 
 
