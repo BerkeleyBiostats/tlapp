@@ -19,7 +19,7 @@ from core import models
 logger = logging.getLogger('django')
 
 def change_image_links(html, job_id):
-    print("Replacing relative image links with S3 signed urls")
+    logger.info("Replacing relative image links with S3 signed urls")
     s3 = boto3.client("s3")
     bucket = "tlapp"
 
@@ -55,7 +55,7 @@ def post_process_outputs(job):
     output_zip_key = parts.path[1:]  # Remove leading slash
 
     output_path = "/tmp/%s" % output_zip_key
-    print("Downloading job outputs to %s" % output_path)
+    logger.info("Downloading job outputs to %s" % output_path)
 
     s3.Object("tlapp", output_zip_key).download_file(output_path)
 
@@ -75,20 +75,20 @@ def post_process_outputs(job):
         f.extend(filenames)
         k.extend(keys)
 
-    print("Files to upload to s3:")
-    print(zip(f, k))
+    logger.info("Files to upload to s3:")
+    logger.info(zip(f, k))
 
     for filename, key in zip(f, k):
         s3.Object("tlapp", key).upload_file(filename)
 
     report_path = os.path.join(output_path, "REPORT.html")
     if os.path.exists(report_path):
-        print("Found a report")
+        logger.info("Found a report")
         with open(report_path) as f:
             job.report_html = f.read()
             job.report_html = change_image_links(job.report_html, output_dirname)
     else:
-        print("Didn't find a report")
+        logger.info("Didn't find a report")
 
 
 def handle_a_job():

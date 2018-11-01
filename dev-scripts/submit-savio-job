@@ -3,4 +3,4 @@ echo "Savio password:"
 
 read password
 
-submit-analysis --username=$SAVIO_USERNAME --password=$password $@
+submit-analysis --username=$SAVIO_USERNAME --password=$password --baseurl=https://a493a18d.ngrok.io/ $@

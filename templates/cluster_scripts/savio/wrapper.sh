@@ -25,7 +25,6 @@ echo "Starting analysis"
 if {{ r_cmd }} ; then
 	echo "Running analysis succeeded"
 
-	cd /tmp
 	tar -zcvf {{ tar_file }} {{ output_dir }}
 
 	curl \

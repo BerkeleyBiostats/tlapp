@@ -51,7 +51,7 @@ def submit_savio_job(job, username, password):
     local_code_folder = tempfile.mkdtemp()
 
     remote_output_folder = make_temp_dir_name()
-    remote_output_folder_full_path = "~/longbow/%s/outputs" % local_code_folder
+    remote_output_folder_full_path = "~/longbow/%s/%s" % (os.path.basename(local_code_folder), remote_output_folder)
 
     def create_file(name=None, content=None, copy_from_path=None, template=None, template_params=None, executable=False):
         if copy_from_path:
@@ -129,7 +129,7 @@ def submit_savio_job(job, username, password):
 
     # TODO: generate the url using django url and join with urllib
     logs_url = base_url + "jobs/%s/append_log/" % job.id
-    job_url = base_url + "job/%s/" % job.id
+    job_url = base_url + "jobs/%s/" % job.id
 
     create_file(
         name="wrapper.sh",
@@ -188,143 +188,6 @@ def submit_savio_job(job, username, password):
         output = c.run(command)
 
     return output
-
-    # temp_base_dir = "longbow"
-    # remote_output_folder = make_temp_dir_name()
-    # remote_output_folder_full_path = os.path.join(temp_base_dir, remote_output_folder)
-    
-    # c.run("rm -rf ~/longbow")
-    # c.run("mkdir -p ~/longbow/%s" % remote_output_folder)
-
-
-    # local_code_folder = tempfile.mkdtemp()
-    # remote_code_folder = make_temp_dir_name()
-    # remote_code_folder_full_path = os.path.join(temp_base_dir, remote_code_folder)
-
-    # c.run("mkdir -p ~/longbow/%s" % remote_code_folder)
-
-    # print("Putting scripts in directory %s" % remote_code_folder)
-
-    # # Upload the notebook code
-    # put_file(c,
-    #     content=job.code,
-    #     script_name="script.Rmd",
-    #     local_code_folder=local_code_folder,
-    #     remote_code_folder=remote_code_folder_full_path,
-    #     mode=0o755)
-    
-    # # Upload the runner script
-    # app_root = os.environ.get("APP_ROOT")
-    # runner_script_filename = os.path.join(app_root, "runner.R")
-    # remote_runner_script_filename = os.path.join(remote_code_folder_full_path, "runner.R")
-    # c.put(runner_script_filename, remote_runner_script_filename)
-
-    # # Upload the inputs json
-    # input_name = "inputs.json"    
-    # inputs = job.inputs
-    # put_file(c,
-    #     content=json.dumps(inputs),
-    #     script_name="inputs.json",
-    #     local_code_folder=local_code_folder,
-    #     remote_code_folder=remote_code_folder_full_path)
-
-    # # Upload the provision script
-    # put_file(c,
-    #     content=job.provision,
-    #     script_name="provision.sh",
-    #     local_code_folder=local_code_folder,
-    #     remote_code_folder=remote_code_folder_full_path,
-    #     mode=0o755)
-
-    # # Generate signed PUT url for outputs zip
-    # s3_urls = generate_s3_urls(remote_output_folder)
-    # output_put_url = s3_urls["put"]
-    # job.output_url = s3_urls["get"]
-    # job.save(update_fields=["output_url"])
-
-    # # upload x.py
-    # x_template = loader.get_template("ghap_scripts/x.py")
-    # x_script = x_template.render()
-    # put_file(c,
-    #     content=x_script,
-    #     script_name="x.py",
-    #     local_code_folder=local_code_folder,
-    #     remote_code_folder=remote_code_folder_full_path,
-    # )
-
-    # # Upload the wrapper script
-    # remote_output_filename = os.path.join(remote_output_folder_full_path, "REPORT.md")
-    # remote_code_filename = os.path.join(remote_code_folder_full_path, "script.Rmd")
-    # remote_input_filename = os.path.join(remote_code_folder_full_path, "inputs.json")
-
-    # cmd = "Rscript --default-packages=methods,stats,utils %s %s %s %s" % (
-    #     remote_runner_script_filename,
-    #     remote_code_filename,
-    #     remote_input_filename,
-    #     remote_output_folder_full_path,
-    # )
-
-    # print("Command to run:")
-    # print(cmd)
-
-    # # Generate wrapper script
-    # wrapper_script_template = loader.get_template("cluster_scripts/savio/wrapper.sh")
-
-    # token = job.created_by.token.token
-
-    # if job.base_url:
-    #     base_url = job.base_url
-    # else:
-    #     base_url = os.environ.get("BASE_URL")
-
-    # # TODO: generate the url using django url and join with urllib
-    # logs_url = base_url + "jobs/%s/append_log/" % job.id
-
-    # wrapper_script = wrapper_script_template.render(
-    #     {
-    #         "token": token,
-    #         "logs_url": logs_url,
-    #         "finish_url": base_url + "jobs/%s/finish/" % job.id,
-    #         "r_cmd": cmd,
-    #         "tar_file": zipped_outputs_filename,
-    #         "output_dir": remote_output_folder,
-    #         "put_url": output_put_url,
-    #     }
-    # )
-    # put_file(c,
-    #     content=wrapper_script,
-    #     script_name="wrapper.sh",
-    #     local_code_folder=local_code_folder,
-    #     remote_code_folder=remote_code_folder_full_path,
-    #     mode=0o755
-    # )
-
-    # # Generate slurm script
-    # slurm_script_template = loader.get_template("cluster_scripts/savio/wrapper.sh")
-    # slurm_script = slurm_script_template.render({"id": job.id})
-    # put_file(c,
-    #     content=slurm_script,
-    #     script_name="slurm.sh",
-    #     local_code_folder=local_code_folder,
-    #     remote_code_folder=remote_code_folder_full_path,
-    #     mode=0o755
-    # )
-
-    # # Fire up the job
-    # # TODO: these commands should be in a template file so they're easier to tweak
-    # cluster_commands = [
-    #     "module load python",
-    #     "module load r",
-    #     "pip install requests --user",
-    #     "export TLAPP_TOKEN=%s" % token,
-    #     "export TLAPP_LOGS_URL=%s" % logs_url,
-    #     "sbatch slurm.sh",
-    # ]
-    # cluster_command = ";".join(cluster_commands)
-    # with c.cd(remote_code_folder_full_path):
-    #     c.run(cluster_command)
-
-    # return output
 
 class StreamingStringIO(io.StringIO):
     def __init__(self, job):

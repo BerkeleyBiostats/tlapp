@@ -165,6 +165,7 @@ def update_job(job, job_data):
     job.save()
 
 @login_required
+@csrf_exempt
 def job_detail(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
 
@@ -174,7 +175,7 @@ def job_detail(request, job_id):
         return JsonResponse({
             "job": job.as_dict()
         })
-        
+
     context = {
         "job": job,
         "inputs_formatted": json.dumps(job.inputs, indent=2),
@@ -435,7 +436,10 @@ def run_analysis_token(request, analysis_id):
 def _append_log(request, job_id):
     log_lines = request.body.decode('utf-8')
     job = models.ModelRun.objects.get(pk=job_id)
-    job.output = job.output + log_lines
+    if job.output is None:
+        job.output = log_lines
+    else:
+        job.output = job.output + log_lines
     job.save(update_fields=["output"])
     return JsonResponse({"status": "success"}, safe=False)
 
