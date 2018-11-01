@@ -51,6 +51,7 @@ def submit_savio_job(job, username, password):
     local_code_folder = tempfile.mkdtemp()
 
     remote_output_folder = make_temp_dir_name()
+    remote_output_folder_full_path = "~/longbow/%s/outputs" % local_code_folder
 
     def create_file(name=None, content=None, copy_from_path=None, template=None, template_params=None, executable=False):
         if copy_from_path:
@@ -110,10 +111,10 @@ def submit_savio_job(job, username, password):
     job.save(update_fields=["output_url"])
 
     cmd = "Rscript --default-packages=methods,stats,utils %s %s %s %s" % (
-        "remote_runner_script_filename",
-        "remote_code_filename",
-        "remote_input_filename",
-        "remote_output_folder_full_path",
+        "runner.R",
+        "script.Rmd",
+        "inputs.json",
+        remote_output_folder_full_path,
     )
 
     # Generate wrapper script
@@ -128,6 +129,7 @@ def submit_savio_job(job, username, password):
 
     # TODO: generate the url using django url and join with urllib
     logs_url = base_url + "jobs/%s/append_log/" % job.id
+    job_url = base_url + "job/%s/" % job.id
 
     create_file(
         name="wrapper.sh",
@@ -135,10 +137,11 @@ def submit_savio_job(job, username, password):
         template_params={
             "token": token,
             "logs_url": logs_url,
+            "job_url": job_url,
             "finish_url": base_url + "jobs/%s/finish/" % job.id,
             "r_cmd": cmd,
-            "tar_file": "zipped_outputs_filename",
-            "output_dir": "remote_output_folder",
+            "tar_file": remote_output_folder + ".tar.gz",
+            "output_dir": remote_output_folder,
             "put_url": output_put_url,
         }
     )
@@ -163,6 +166,7 @@ def submit_savio_job(job, username, password):
 
     # Create string of commands to download, untar, and run
     commands = [
+        "mkdir -p %s" % remote_output_folder_full_path,
         "cd ~/longbow",
         "wget -O %s '%s'" % (tar_filename, get_url),
         "tar xvzf %s" % tar_filename,

@@ -159,9 +159,22 @@ def jobs(request):
     else:
         return unauthorized_reponse()
 
+def update_job(job, job_data):
+    # TODO: validate the status
+    job.status = job_data.get("status")
+    job.save()
+
 @login_required
 def job_detail(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
+
+    if request.method == "POST":
+        job_data = json.loads(request.body.decode('utf-8'))
+        update_job(job, job_data)
+        return JsonResponse({
+            "job": job.as_dict()
+        })
+        
     context = {
         "job": job,
         "inputs_formatted": json.dumps(job.inputs, indent=2),
