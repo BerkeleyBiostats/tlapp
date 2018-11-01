@@ -1,6 +1,1 @@
-
-echo "Savio password:"
-
-read password
-
-submit-analysis --username=$SAVIO_USERNAME --password=$password --baseurl=https://a493a18d.ngrok.io/ $@
+submit-analysis --username=$SAVIO_USERNAME --pin=$SAVIO_PIN --secret=$SAVIO_SECRET --baseurl=https://a493a18d.ngrok.io/ $@
