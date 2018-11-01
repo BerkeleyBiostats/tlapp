@@ -15,6 +15,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 
 from core import models, tasks
+import cluster
 
 @login_required
 def token(request):
@@ -378,7 +379,7 @@ def _create_analysis(request):
     
     job = models.ModelRun(
         status = models.ModelRun.status_choices['created'],
-        inputs = job_data['inputs'],
+        inputs = job_data.get("inputs", {}),
         base_url = base_url,
         title = title,
         code = code,
@@ -389,6 +390,7 @@ def _create_analysis(request):
 
     ret = job.as_dict()
     ret['results_url'] = request.build_absolute_uri(ret['results_url'])
+    ret['job_id'] = job.id
 
     return JsonResponse(ret, safe=False)
 
@@ -396,6 +398,24 @@ def _create_analysis(request):
 def create_analysis_token(request):
     if check_token(request):
         return _create_analysis(request)
+    else:
+        return unauthorized_reponse()
+
+def _run_analysis(request, analysis_id):
+    run_data = json.loads(request.body.decode('utf-8'))
+    job = models.ModelRun.objects.get(pk=analysis_id)
+    if run_data["backend"] == "savio":
+        print("submitting to savio")
+        cluster.savio.submit_savio_job(job, run_data["username"], run_data["password"])
+    job.status = models.ModelRun.status_choices["running"]
+    job.save(update_fields=["status"])
+    return JsonResponse({"status": "success"}, safe=False)
+
+
+@csrf_exempt
+def run_analysis_token(request, analysis_id):
+    if check_token(request):
+        return _run_analysis(request, analysis_id)
     else:
         return unauthorized_reponse()
 

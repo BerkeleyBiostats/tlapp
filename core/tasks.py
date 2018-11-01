@@ -13,9 +13,7 @@ import tarfile
 import tempfile
 import traceback
 import uuid
-from fabric.api import *
-from fabric.operations import *
-from fabric.contrib.files import exists
+from fabric.connection import Connection
 from django.conf import settings
 from django.core.cache import cache
 from django.template import loader, Context

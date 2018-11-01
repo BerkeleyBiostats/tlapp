@@ -1,1 +1,6 @@
-submit-analysis $@
+
+echo "Savio password:"
+
+read password
+
+submit-analysis --username=$SAVIO_USERNAME --password=$password $@

@@ -13,7 +13,7 @@ dj-database-url==0.4.2
 Django==2.1.2
 django-redis==4.9.0
 docutils==0.14
-Fabric3==1.14.post1
+fabric==2.4.0
 gunicorn==19.9.0
 idna==2.7
 jmespath==0.9.3

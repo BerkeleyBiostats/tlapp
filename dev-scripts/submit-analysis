@@ -24,10 +24,21 @@ def post_job(job_script_filename, inputs_filename, username, password, ip, baseu
 	response = requests.post(endpoint, data=json.dumps(job_data), headers = {
 		"Authorization": token
 	})
+	print(response)
+	response_data = response.json()
+	print(response_data)
 
+	endpoint = os.path.join(longbowurl, "run_analysis_token/%s/" % response_data["job_id"])
+	job_data = {
+		"backend": "savio",
+		"username": username,
+		"password": password
+	}
+	response = requests.post(endpoint, data=json.dumps(job_data), headers = {
+		"Authorization": token
+	})
 	print(response)
 	print(response.text)
-
 
 @click.command()
 @click.argument("job_directory")
