@@ -347,16 +347,8 @@ def handle_jobs():
                 run_ghap_job(job)
             elif job.backend == 'bluevelvet':
                 run_ghap_job(job)
-            else:
-                # TODO: this won't work running it on Heroku. 
-                # Maybe reimplement as ssh flow like ghap job?
-                # run_vps_job(job)
-                pass
 
             job.save()
-            # if job.status == models.ModelRun.status_choices['success']:
-            #     post_process_outputs(job)
-
         except: 
             traceback.print_exc()
             job.status = models.ModelRun.status_choices['error']
