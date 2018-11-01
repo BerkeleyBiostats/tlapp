@@ -420,7 +420,7 @@ def _run_analysis(request, analysis_id):
     job = models.ModelRun.objects.get(pk=analysis_id)
     if run_data["backend"] == "savio":
         print("submitting to savio")
-        cluster.savio.submit_savio_job(job, run_data["username"], run_data["password"])
+        cluster.savio.submit_job(job, run_data["username"], run_data["password"])
     job.status = models.ModelRun.status_choices["running"]
     job.save(update_fields=["status"])
     return JsonResponse({"status": "success"}, safe=False)
@@ -491,7 +491,6 @@ def check_token(request):
         print("Failed to find Authorization header")
         return False
     token = request.META['HTTP_AUTHORIZATION']
-    print("Authorization header %s" % token)
     token = models.Token.objects.filter(token=token).first()
     if not token:
         print("Token didn't match")

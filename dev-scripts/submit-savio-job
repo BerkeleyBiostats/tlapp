@@ -1,1 +1,1 @@
-submit-analysis --username=$SAVIO_USERNAME --pin=$SAVIO_PIN --secret=$SAVIO_SECRET --baseurl=https://a493a18d.ngrok.io/ $@
+submit-analysis --username=$SAVIO_USERNAME --pin=$SAVIO_PIN --secret=$SAVIO_SECRET --baseurl=https://longbowdev.ngrok.io/ $@

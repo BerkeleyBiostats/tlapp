@@ -15,7 +15,6 @@ from core import models
 
 logger = logging.getLogger('django')
 
-
 def make_temp_dir_name():
     return str(uuid.uuid4())
 
@@ -203,18 +202,12 @@ def submit_job(job, username, password):
     job.status = models.ModelRun.status_choices["submitted"]
     job.save(update_fields=["status"])
 
-    submit_savio_job(job, username, password)
+    f = StreamingStringIO(job)
+    with redirect_stdout(f), redirect_stderr(f):
+        try:
+            submit_savio_job(job, username, password)
+        except:
+            traceback.print_exc()
+            job.status = models.ModelRun.status_choices["error"]
+            job.save(update_fields=["status"])
 
-    # f = StreamingStringIO(job)
-    # with redirect_stdout(f), redirect_stderr(f):
-    #     try:
-    #         submit_savio_job(job, username, password)
-    #     except:
-    #         traceback.print_exc()
-    #         job.status = models.ModelRun.status_choices["error"]
-    #         job.save(update_fields=["status"])
-
-    # # TODO: do you actually need these lines? Isn't output already streamed
-    # #       via StreamingStringIO to the db table?
-    # job.output = f.getvalue()
-    # job.save(update_fields=["output"])
