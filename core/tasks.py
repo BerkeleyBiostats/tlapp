@@ -27,7 +27,7 @@ def put_script(content=None, script_name=None, local_code_folder=None, remote_co
         code_file.write(content)
     # push to cluster
     remote_code_filename = os.path.join(remote_code_folder, script_name)
-    put(local_code_filename, remote_code_filename, mode=0o755)
+    c.put(local_code_filename, remote_code_filename, mode=0o755)
     print("Put code at %s" % remote_code_filename)
 
 
@@ -42,11 +42,11 @@ def make_temp_dir(base_dir):
     return os.path.join(base_dir, make_temp_dir_name())
 
 
-def upload_to_ghap(job, username, password):
+def upload_to_ghap(c, job, username, password):
     temp_base_dir = '/tmp'
     remote_output_folder = make_temp_dir_name()
     remote_output_folder_full_path = os.path.join(temp_base_dir, remote_output_folder)
-    run('mkdir -p %s' % remote_output_folder_full_path)
+    c.run('mkdir -p %s' % remote_output_folder_full_path)
 
     # Check if we need to clone a dataset
     ghap_dataset_url = None
@@ -73,7 +73,7 @@ def upload_to_ghap(job, username, password):
         repo_name = o.path.split('/')[-1][:-4]
         repo_base_path = '~/datasets'
         repo_path = os.path.join(repo_base_path, repo_name)
-        repo_exists = exists(repo_path)
+        repo_exists = c.exists(repo_path)
 
         # Set the uri to the file's path on the local file system
         # (used by tltools)
@@ -89,8 +89,8 @@ def upload_to_ghap(job, username, password):
             git_url_with_password = urlunparse(tuple(o))
 
             # Clone it, hiding the command so password doesn't appear in logs
-            with cd(repo_base_path), hide('running'):
-                run('git clone %s' % git_url_with_password)
+            with c.cd(repo_base_path), c.hide('running'):
+                c.run('git clone %s' % git_url_with_password)
 
     # Write script to a file...    
     local_code_folder = tempfile.mkdtemp()
@@ -104,15 +104,15 @@ def upload_to_ghap(job, username, password):
     # ...then upload to cluster
     remote_code_folder = make_temp_dir(temp_base_dir)
     remote_code_filename = os.path.join(remote_code_folder, script_name)
-    run('mkdir -p %s' % remote_code_folder)
-    put(local_code_filename, remote_code_filename)
+    c.run('mkdir -p %s' % remote_code_folder)
+    c.put(local_code_filename, remote_code_filename)
     print("Put code at %s" % remote_code_filename)
 
     # Write runner script to a file...
     app_root = os.environ.get("APP_ROOT")
     runner_script_filename = os.path.join(app_root, "runner.R")
     remote_runner_script_filename = os.path.join(remote_code_folder, 'runner.R')
-    put(runner_script_filename, remote_runner_script_filename)
+    c.put(runner_script_filename, remote_runner_script_filename)
 
     # Write inputs to a file...
     input_name = 'inputs.json'
@@ -129,7 +129,7 @@ def upload_to_ghap(job, username, password):
         input_file.write(json.dumps(inputs))
     remote_input_filename = os.path.join(remote_code_folder, input_name)
     # ...then upload to cluster
-    put(local_input_filename, remote_input_filename)
+    c.put(local_input_filename, remote_input_filename)
     print("Put inputs at %s" % remote_input_filename)
 
     # Upload and run a provisioning script
@@ -145,7 +145,7 @@ def upload_to_ghap(job, username, password):
         with open(local_provision_filename, 'w') as provision_file:
             provision_file.write(provision_code)
         remote_provision_filename = os.path.join(remote_code_folder, provision_name)
-        put(local_provision_filename, remote_provision_filename, mode=0o755)
+        c.put(local_provision_filename, remote_provision_filename, mode=0o755)
         print("Put provision script at %s" % remote_provision_filename)
 
         # TODO: make sure provision is run in screen session
@@ -227,43 +227,17 @@ def upload_to_ghap(job, username, password):
 
     # Fire up the job in screen
     with cd(remote_code_folder):
-        run("pip install requests --user; export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
-    
-    # output = run(cmd)
-    # job.output = output
-
-
-    # Zip up the outputs
-    # with cd('/tmp'):
-    #     zipped_outputs_filename = remote_output_folder + ".tar.gz"
-    #     run('tar -zcvf %s %s' % (zipped_outputs_filename, remote_output_folder))
-    #     local_outputs_filename = get(zipped_outputs_filename)[0]
-
-    # print("Downloaded outputs to %s" % local_outputs_filename)
-
-    # s3 = boto3.client('s3')
-    # key = zipped_outputs_filename
-    # bucket = 'tlapp'
-    # s3.upload_file(local_outputs_filename, bucket, key)
-
-    # print("Uploaded outputs to %s" % key)
-
-
-
-    # print("Signed url for outputs %s" % url)
+        c.run("pip install requests --user; export TLAPP_TOKEN=%s; export TLAPP_LOGS_URL=%s; screen -d -m python x.py; sleep 1" % (token, logs_url))
 
     return output
 
 def run_ghap_job(job):
-    # Configure login parameters for fabric ssh connection
     username = job.ghap_username
     server = job.ghap_ip
     password = cache.get("ghap_password_%s" % job.id)
-    env.hosts = ["%s@%s" % (username, server)]
-    env.passwords = {
-        "%s@%s:22" % (username, server): password
-    }
-    output = execute(upload_to_ghap, job, username, password)
+    host = "%s@%s" % (username, server)
+    with Connection(host=host, connect_kwargs={"password": password}) as c:
+        output = upload_to_ghap(c, job, username, password)
 
 def run_vps_job(job):
     code_folder = tempfile.mkdtemp()
