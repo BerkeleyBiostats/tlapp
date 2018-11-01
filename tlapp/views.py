@@ -17,20 +17,16 @@ from django.http import HttpResponse, JsonResponse
 from core import models, tasks
 import cluster
 
+
 @login_required
 def token(request):
-    context = {
-        "token": models.Token.objects.filter(user=request.user).first()
-    }
-    return render(request, 'token.html', context)
+    context = {"token": models.Token.objects.filter(user=request.user).first()}
+    return render(request, "token.html", context)
+
 
 def convert_params(name, defn):
-    kind = defn.get('input')
-    mapping = {
-        'numeric': 'int',
-        'checkbox': 'boolean',
-        'select': 'select'
-    }
+    kind = defn.get("input")
+    mapping = {"numeric": "int", "checkbox": "boolean", "select": "select"}
 
     defn["name"] = name
     defn["type"] = mapping.get(kind)
@@ -48,6 +44,7 @@ def extract_fields(code):
     inputs = [convert_params(n, d) for n, d in params.items()]
     return inputs
 
+
 def get_yaml_header(code):
     pattern = r"---([\s\S]+)---"
     matches = re.search(pattern, code)
@@ -56,6 +53,7 @@ def get_yaml_header(code):
     header = yaml.load(matches.group(1))
     return header
 
+
 def extract_roles(code):
     header = get_yaml_header(code)
     try:
@@ -63,18 +61,22 @@ def extract_roles(code):
     except:
         return ["W", "A", "Y", "-"]
 
+
 @login_required
 def index(request):
 
     templates = models.AnalysisTemplate.objects.all()
-    
-    templates_json = [{
-        "id": template.id,
-        "name": template.name,
-        "code": template.code,
-        "fields": template.fields,
-        "needsDataset": template.needs_dataset,
-    } for template in templates]
+
+    templates_json = [
+        {
+            "id": template.id,
+            "name": template.name,
+            "code": template.code,
+            "fields": template.fields,
+            "needsDataset": template.needs_dataset,
+        }
+        for template in templates
+    ]
 
     for template in templates_json:
         fields = extract_fields(template["code"])
@@ -85,12 +87,15 @@ def index(request):
 
     datasets = models.Dataset.objects.all()
 
-    datasets_json = [{
-        "id": dataset.id,
-        "title": dataset.title,
-        "url": dataset.url,
-        "variables": dataset.variables['names'],
-    } for dataset in datasets]
+    datasets_json = [
+        {
+            "id": dataset.id,
+            "title": dataset.title,
+            "url": dataset.url,
+            "variables": dataset.variables["names"],
+        }
+        for dataset in datasets
+    ]
 
     context = {
         "templates": templates,
@@ -98,14 +103,14 @@ def index(request):
         "datasets_json": json.dumps(datasets_json),
     }
 
-    return render(request, 'index.html', context)
+    return render(request, "index.html", context)
+
 
 def parse_id_comma_list(raw):
     if not raw:
         return None
     sp = raw.split(",")
     return [int(x) for x in sp]
-
 
 
 def _jobs(request):
@@ -122,7 +127,7 @@ def _jobs(request):
     if ids:
         jobs = jobs.filter(id__in=ids)
 
-    jobs = jobs.order_by('-created_at')
+    jobs = jobs.order_by("-created_at")
 
     status_counts = {}
     for choice in models.ModelRun.status_choices.keys():
@@ -132,9 +137,9 @@ def _jobs(request):
     if status_filter:
         jobs = jobs.filter(status=status_filter)
 
-    per_page = request.GET.get('per_page', 30)
+    per_page = request.GET.get("per_page", 30)
     paginator = Paginator(jobs, per_page)
-    page = request.GET.get('page')
+    page = request.GET.get("page")
     jobs = paginator.get_page(page)
 
     context = {
@@ -144,13 +149,12 @@ def _jobs(request):
         "status_filter": status_filter,
     }
 
-    if response_format == 'json':
+    if response_format == "json":
         # TODO: add the rest of pagination
-        return JsonResponse({
-            'jobs': [job.as_dict() for job in jobs]
-        })
+        return JsonResponse({"jobs": [job.as_dict() for job in jobs]})
     else:
-        return render(request, 'jobs.html', context)
+        return render(request, "jobs.html", context)
+
 
 @csrf_exempt
 def jobs(request):
@@ -159,10 +163,12 @@ def jobs(request):
     else:
         return unauthorized_reponse()
 
+
 def update_job(job, job_data):
     # TODO: validate the status
     job.status = job_data.get("status")
     job.save()
+
 
 @login_required
 @csrf_exempt
@@ -170,43 +176,34 @@ def job_detail(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
 
     if request.method == "POST":
-        job_data = json.loads(request.body.decode('utf-8'))
+        job_data = json.loads(request.body.decode("utf-8"))
         update_job(job, job_data)
-        return JsonResponse({
-            "job": job.as_dict()
-        })
+        return JsonResponse({"job": job.as_dict()})
 
-    context = {
-        "job": job,
-        "inputs_formatted": json.dumps(job.inputs, indent=2),
-    }
-    return render(request, 'job_detail.html', context)
+    context = {"job": job, "inputs_formatted": json.dumps(job.inputs, indent=2)}
+    return render(request, "job_detail.html", context)
+
 
 @login_required
 def job_output(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    context = {
-        "job": job
-    }
-    return render(request, 'job_output.html', context)
+    context = {"job": job}
+    return render(request, "job_output.html", context)
+
 
 @login_required
 def _job_logs(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    context = {
-        "job": job
-    }
+    context = {"job": job}
 
-    return JsonResponse({
-        "logs": job.output,
-        "status": job.status
-    }, safe=False)
+    return JsonResponse({"logs": job.output, "status": job.status}, safe=False)
 
 
 @login_required
 @csrf_exempt
 def job_logs(request, job_id):
     return _job_logs(request, job_id)
+
 
 @csrf_exempt
 def job_logs_token(request, job_id):
@@ -215,14 +212,14 @@ def job_logs_token(request, job_id):
     else:
         return unauthorized_reponse()
 
+
 @login_required
 def _job_status(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    context = {
-        "job": job
-    }
+    context = {"job": job}
 
     return JsonResponse(job.status, safe=False)
+
 
 @csrf_exempt
 def job_status_token(request, job_id):
@@ -231,27 +228,29 @@ def job_status_token(request, job_id):
     else:
         return unauthorized_reponse()
 
+
 @login_required
 def job_view_logs(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    context = {
-        "job": job
-    }
+    context = {"job": job}
 
-    return render(request, 'job_logs.html', context)
+    return render(request, "job_logs.html", context)
+
 
 def job_output_download(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    outputs_dir = '/tmp/outputs'
+    outputs_dir = "/tmp/outputs"
     if not os.path.exists(outputs_dir):
         os.makedirs(outputs_dir)
-    with open(os.path.join(outputs_dir, 'bar.txt'), 'w') as f:
-        f.write('hello')
-    return redirect('/static/bar.txt')
+    with open(os.path.join(outputs_dir, "bar.txt"), "w") as f:
+        f.write("hello")
+    return redirect("/static/bar.txt")
+
 
 def _job_download_url(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
     return JsonResponse(job.output_url, safe=False)
+
 
 @csrf_exempt
 def job_download_url_token(request, job_id):
@@ -259,20 +258,28 @@ def job_download_url_token(request, job_id):
         return _job_download_url(request, job_id)
     else:
         return unauthorized_reponse()
-    
+
+
 def expand_r_package_definition(package_definition):
     if package_definition.startswith("github://"):
-        full_package_name = package_definition[len("github://"):]
+        full_package_name = package_definition[len("github://") :]
         package_name = full_package_name.split("/")[-1]
         output = "R -e \"devtools::install_github('%s')\"" % (full_package_name)
     elif "@" in package_definition:
         package_name, version = package_definition.split("@")
-        output = "R -e \"if (!require('%s')) devtools::install_version('%s', version='%s', repos = 'http://cran.rstudio.com/')\"" % (package_name, package_name, version)
+        output = (
+            "R -e \"if (!require('%s')) devtools::install_version('%s', version='%s', repos = 'http://cran.rstudio.com/')\""
+            % (package_name, package_name, version)
+        )
     else:
         package_name = package_definition
-        output = "R -e \"if (!require('%s')) install.packages('%s', repos = 'http://cran.rstudio.com/')\"" % (package_name, package_name)
+        output = (
+            "R -e \"if (!require('%s')) install.packages('%s', repos = 'http://cran.rstudio.com/')\""
+            % (package_name, package_name)
+        )
 
     return output
+
 
 def build_provision_code(r_packages_section, backend=None):
 
@@ -293,77 +300,120 @@ module load gcc-4.9.4
 module load python-3.5.2
 
 """
-    
-    return preamble + "\n".join([expand_r_package_definition(pd) for pd in r_packages_section])
 
-def _submit_job(request):
-    job_data = json.loads(request.body.decode('utf-8'))
+    return preamble + "\n".join(
+        [expand_r_package_definition(pd) for pd in r_packages_section]
+    )
 
+
+def create_savio_job(request, job_data):
+    code = job_data.get("code")
+
+    # Grab provision information from the code
+    header = get_yaml_header(code)
+    provision_header = header.get("required_packages")
+    if provision_header:
+        provision = build_provision_code(provision_header)
+
+    if job_data.get("skip_provision"):
+        provision = 'echo "skipping provisioning"'
+
+    title = header.get("title")
+
+    base_url = job_data.get("base_url")
+
+    job = models.ModelRun(
+        status=models.ModelRun.status_choices["created"],
+        inputs=job_data.get("inputs", {}),
+        base_url=base_url,
+        title=title,
+        code=code,
+        provision=provision,
+        created_by=request.user,
+    )
+    job.save()
+
+    ret = job.as_dict()
+    ret["results_url"] = request.build_absolute_uri(ret["results_url"])
+    ret["job_id"] = job.id
+
+    return ret
+
+def create_ghap_job(request, job_data):
     ghap_username = None
     ghap_password = None
     ghap_ip = None
-    if 'ghap_credentials' in job_data:
-        ghap_credentials = job_data['ghap_credentials']
-        ghap_username = ghap_credentials['username']
-        ghap_password = ghap_credentials['password']
-        ghap_ip = ghap_credentials['ip']
+    if "ghap_credentials" in job_data:
+        ghap_credentials = job_data["ghap_credentials"]
+        ghap_username = ghap_credentials["username"]
+        ghap_password = ghap_credentials["password"]
+        ghap_ip = ghap_credentials["ip"]
 
-    if 'r_packages' in job_data:
-        job_data['provision'] = build_provision_code(job_data['r_packages'])
+    if "r_packages" in job_data:
+        job_data["provision"] = build_provision_code(job_data["r_packages"])
 
-    if 'model_template' in job_data:
-        template = models.AnalysisTemplate.objects.get(pk=job_data['model_template'])
+    if "model_template" in job_data:
+        template = models.AnalysisTemplate.objects.get(pk=job_data["model_template"])
         code = template.code
         provision = template.provision
     else:
-        code = job_data.get('code')     
-        provision = job_data.get('provision')
+        code = job_data.get("code")
+        provision = job_data.get("provision")
 
     # Override provision with anything in the code header
     # (Consider removing the ability to specify `required_packages` in
     # inputs.json)
     header = get_yaml_header(code)
-    provision_header = header.get('required_packages')
+    provision_header = header.get("required_packages")
     if provision_header:
         provision = build_provision_code(provision_header)
 
     title = header.get("title")
-    
-    if job_data.get('skip_provision'):
+
+    if job_data.get("skip_provision"):
         provision = 'echo "skipping provisioning"'
 
     job = models.ModelRun(
-        dataset_id = job_data.get('dataset', None),
-        status = models.ModelRun.status_choices['submitted'],
-        inputs = job_data['inputs'],
-        backend = job_data['backend'],
-        ghap_username = ghap_username,
-        ghap_ip = ghap_ip,
-        base_url = job_data.get("base_url"),
-        title = title,
-        code = code,
-        provision = provision,
-        created_by = request.user,
+        dataset_id=job_data.get("dataset", None),
+        status=models.ModelRun.status_choices["submitted"],
+        inputs=job_data["inputs"],
+        backend=job_data["backend"],
+        ghap_username=ghap_username,
+        ghap_ip=ghap_ip,
+        base_url=job_data.get("base_url"),
+        title=title,
+        code=code,
+        provision=provision,
+        created_by=request.user,
     )
     job.save()
 
     if ghap_password:
-        # expire saved password after a day to reduce impact of the 
+        # expire saved password after a day to reduce impact of the
         # application being compromised
-        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60*60*24)
+        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60 * 60 * 24)
 
     ret = job.as_dict()
-    ret['results_url'] = request.build_absolute_uri(ret['results_url'])
+    ret["results_url"] = request.build_absolute_uri(ret["results_url"])
 
-    return JsonResponse(ret, safe=False)
+def _submit_job(request):
+    job_data = json.loads(request.body.decode("utf-8"))
 
+    if job_data["backend"] == "savio":
+        response = create_savio_job(request, job_data)
+        creds = job_data["savio_credentials"]
+        cluster.savio.submit_job(job, creds["username"], creds["password"])
+    else:
+        response = create_ghap_job(request, job_data)
+    
+    return JsonResponse(response, safe=False)
 
-# TODO: remove and replace with /analysis routes
 
 @login_required
 @csrf_exempt
 def submit_job(request):
     return _submit_job(request)
+
 
 @csrf_exempt
 def submit_job_token(request):
@@ -372,67 +422,9 @@ def submit_job_token(request):
     else:
         return unauthorized_reponse()
 
-def _create_analysis(request):
-    # Create the ModelRun in the `created` state
-    job_data = json.loads(request.body.decode('utf-8'))
-
-    code = job_data.get('code')     
-    
-    # Grab provision information from the code
-    header = get_yaml_header(code)
-    provision_header = header.get('required_packages')
-    if provision_header:
-        provision = build_provision_code(provision_header)
-
-    if job_data.get('skip_provision'):
-        provision = 'echo "skipping provisioning"'
-
-    title = header.get("title")
-
-    base_url = job_data.get("base_url")
-    
-    job = models.ModelRun(
-        status = models.ModelRun.status_choices['created'],
-        inputs = job_data.get("inputs", {}),
-        base_url = base_url,
-        title = title,
-        code = code,
-        provision = provision,
-        created_by = request.user,
-    )
-    job.save()
-
-    ret = job.as_dict()
-    ret['results_url'] = request.build_absolute_uri(ret['results_url'])
-    ret['job_id'] = job.id
-
-    return JsonResponse(ret, safe=False)
-
-@csrf_exempt
-def create_analysis_token(request):
-    if check_token(request):
-        return _create_analysis(request)
-    else:
-        return unauthorized_reponse()
-
-def _run_analysis(request, analysis_id):
-    run_data = json.loads(request.body.decode('utf-8'))
-    job = models.ModelRun.objects.get(pk=analysis_id)
-    if run_data["backend"] == "savio":
-        print("submitting to savio")
-        cluster.savio.submit_job(job, run_data["username"], run_data["password"])
-    return JsonResponse({"status": "success"}, safe=False)
-
-
-@csrf_exempt
-def run_analysis_token(request, analysis_id):
-    if check_token(request):
-        return _run_analysis(request, analysis_id)
-    else:
-        return unauthorized_reponse()
 
 def _append_log(request, job_id):
-    log_lines = request.body.decode('utf-8')
+    log_lines = request.body.decode("utf-8")
     job = models.ModelRun.objects.get(pk=job_id)
     if job.output is None:
         job.output = log_lines
@@ -441,12 +433,14 @@ def _append_log(request, job_id):
     job.save(update_fields=["output"])
     return JsonResponse({"status": "success"}, safe=False)
 
+
 @csrf_exempt
 def append_log_token(request, job_id):
     if check_token(request):
         return _append_log(request, job_id)
     else:
         return unauthorized_reponse()
+
 
 def _finish_job(request, job_id):
     try:
@@ -461,6 +455,7 @@ def _finish_job(request, job_id):
     job.save()
     return JsonResponse({"status": job.status}, safe=False)
 
+
 @csrf_exempt
 def finish_job(request, job_id):
     if request.user.is_authenticated or check_token(request):
@@ -468,11 +463,13 @@ def finish_job(request, job_id):
     else:
         return unauthorized_reponse()
 
+
 def _restart_job(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    job.status = models.ModelRun.status_choices['submitted']
+    job.status = models.ModelRun.status_choices["submitted"]
     job.save()
     return JsonResponse({"status": "success"}, safe=False)
+
 
 @csrf_exempt
 def restart_job(request, job_id):
@@ -481,14 +478,16 @@ def restart_job(request, job_id):
     else:
         return unauthorized_reponse()
 
+
 def unauthorized_reponse():
-    return HttpResponse('Unauthorized', status=401)
+    return HttpResponse("Unauthorized", status=401)
+
 
 def check_token(request):
-    if 'HTTP_AUTHORIZATION' not in request.META:
+    if "HTTP_AUTHORIZATION" not in request.META:
         print("Failed to find Authorization header")
         return False
-    token = request.META['HTTP_AUTHORIZATION']
+    token = request.META["HTTP_AUTHORIZATION"]
     token = models.Token.objects.filter(token=token).first()
     if not token:
         print("Token didn't match")
@@ -496,14 +495,15 @@ def check_token(request):
     request.user = token.user
     return True
 
+
 def _templates(request):
     # TODO: don't assume it's a POST request
-    script_contents = request.body.decode('utf-8')
+    script_contents = request.body.decode("utf-8")
 
     header = get_yaml_header(script_contents)
 
-    name = header['title']
-    provision = header.get('required_packages')
+    name = header["title"]
+    provision = header.get("required_packages")
     template = models.AnalysisTemplate.objects.filter(name=name).first()
 
     if template is None:
@@ -516,11 +516,13 @@ def _templates(request):
     template.provision = build_provision_code(provision)
     template.save()
 
-    return JsonResponse({
-        "success": True,
-        "url": request.build_absolute_uri("/?initialChoice=%s" % template.id)
-    }, safe=False)
-
+    return JsonResponse(
+        {
+            "success": True,
+            "url": request.build_absolute_uri("/?initialChoice=%s" % template.id),
+        },
+        safe=False,
+    )
 
 
 @csrf_exempt
@@ -529,13 +531,3 @@ def templates(request):
         return _templates(request)
     else:
         return unauthorized_reponse()
-
-
-
-
-
-
-
-
-
-
