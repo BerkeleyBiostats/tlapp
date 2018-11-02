@@ -114,6 +114,8 @@ def _jobs(request):
     else:
         jobs = models.ModelRun.objects.filter(created_by=request.user)
 
+    jobs = jobs.filter(parent=None)
+
     if ids:
         jobs = jobs.filter(id__in=ids)
 

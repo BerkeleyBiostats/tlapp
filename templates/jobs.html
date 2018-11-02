@@ -5,39 +5,9 @@
 {% block body %}
 
 <div class="row">
-  <div class="col-lg-2">
     
-    <h4 class="m-b-md">Status</h4>
-    <div>
-    {% if status_filter %}
-        <div class="feed-activity-list clear-list">
-        {% for status, count in status_counts.items %}
-        {% if status == status_filter %}
-        <div class="feed-element">
-        <span class="label">{{ count | title }}</span>
-        <span><a href="?status={{ status }}">{{ status | title }}</a></span>
-        </div>
-        <div class="m-t-sm"><a href="?">Remove Filter</a></div>
-        {% endif %}
-        {% endfor %}
-        </div>
-    {% else %}
-        <div class="feed-activity-list clear-list">
-        {% for status, count in status_counts.items %}
-        <div class="feed-element">
-        <span class="label">{{ count | title }}</span>
-        <span><a href="?status={{ status }}">{{ status | title }}</a></span>
-        </div>
-        {% endfor %}
-        </div>
-    {% endif %}
-    </div>
+  <div class="col-lg-12">
 
-
-  </div>
-  <div class="col-lg-10">
-
-    
     <div class="btn-group pull-right">
         <span class="step-links">
             {% if jobs.has_previous %}
@@ -56,33 +26,57 @@
         </span>
     </div>
 
-    {% for job in jobs %}
+    
+    <div class="ibox">
+    <div class="ibox-content">
+        <div class="project-list">
+            <table class="table table-hover">
+                <tbody>
 
-    <h2>
-        <a href="{% url 'job_detail' job.id %}">
-            {% if job.title %}
-                {{ job.title }}
-            {% else %}
-                [untitled job]
-            {% endif %}
-        </a>
-    </h2>
-    <p><span class="text-muted">Submitted</span> {{ job.created_at }}</p>
-    <p><span class="text-muted">Status</span> {{ job.status }}</p>
-    {% if superuser %}
-    <p><span class="text-muted">User</span> 
-        {{ job.created_by.username }} 
-        {{ job.created_by.email }}
-    </p>
-    {% endif %}
-    {% if job.output_url %}
-    <div>
-        <a href="{{ job.output_url }}">Download Outputs</a>
+{% for job in jobs %}
+                <tr>
+                    <td class="project-status">
+                        <span class="label label-primary">{{ job.status }}</span>
+                    </td>
+                    <td class="project-title">
+                        <a href="{% url 'job_detail' job.id %}">{% if job.title %}
+                            {{ job.title }}
+                        {% else %}
+                            [untitled job]
+                        {% endif %}</a>
+                        <br>
+                        <small>Created {{ job.created_at }}</small>
+                    </td>
+                    <td class="project-completion">  
+                        <div>{% if superuser %}
+                        <p><span class="text-muted">User</span> 
+                            {{ job.created_by.username }} 
+                            {{ job.created_by.email }}
+                        </p>
+                        {% endif %}</div>
+                    </td>
+                    <td class="project-completion">                        
+                        <small>Progress</small>
+                        <div class="progress progress-mini">
+                            <div style="width: 48%;" class="progress-bar"></div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if job.output_url %}
+                        <div>
+                            <a href="{{ job.output_url }}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> Download Outputs</a>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+{% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
 
-    {% endif %}
-    <hr>
-    {% endfor %}
+
   </div>
 </div>
 

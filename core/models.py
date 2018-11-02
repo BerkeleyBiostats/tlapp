@@ -74,6 +74,7 @@ class ModelRun(models.Model):
 	dataset = models.ForeignKey(Dataset, null=True, blank=True, on_delete=models.SET_NULL)
 	postprocessing_attempted_at = models.DateTimeField(blank=True, null=True)
 	postprocessing_traceback = models.TextField(null=True, blank=True)
+	parent = models.ForeignKey("ModelRun", null=True, blank=True, on_delete=models.CASCADE, related_name="children")
 
 
 	# Support pushing code instead of model template for one-off runs
