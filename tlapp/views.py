@@ -325,6 +325,7 @@ def create_savio_job(request, job_data):
     job = models.ModelRun(
         status=models.ModelRun.status_choices["created"],
         inputs=job_data.get("inputs", {}),
+        backend="savio",
         base_url=base_url,
         title=title,
         code=code,
