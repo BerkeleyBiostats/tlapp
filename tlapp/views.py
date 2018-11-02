@@ -6,7 +6,6 @@ import yaml
 import re
 
 from django.db import transaction
-from django.core.cache import cache
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
@@ -251,66 +250,6 @@ def job_download_url_token(request, job_id):
         return unauthorized_reponse()
 
 
-def create_ghap_job(request, job_data):
-    ghap_username = None
-    ghap_password = None
-    ghap_ip = None
-
-    if "ghap_credentials" in job_data:
-        ghap_credentials = job_data["ghap_credentials"]
-        ghap_username = ghap_credentials["username"]
-        ghap_password = ghap_credentials["password"]
-        ghap_ip = ghap_credentials["ip"]
-
-    if "r_packages" in job_data:
-        job_data["provision"] = build_provision_code(job_data["r_packages"])
-
-    if "model_template" in job_data:
-        template = models.AnalysisTemplate.objects.get(pk=job_data["model_template"])
-        code = template.code
-        provision = template.provision
-    else:
-        code = job_data.get("code")
-        provision = job_data.get("provision")
-
-    # Override provision with anything in the code header
-    # (Consider removing the ability to specify `required_packages` in
-    # inputs.json)
-    header = get_yaml_header(code)
-    provision_header = header.get("required_packages")
-    if provision_header:
-        provision = build_provision_code(provision_header)
-
-    title = header.get("title")
-
-    if job_data.get("skip_provision"):
-        provision = 'echo "skipping provisioning"'
-
-    job = models.ModelRun(
-        dataset_id=job_data.get("dataset", None),
-        status=models.ModelRun.status_choices["submitted"],
-        inputs=job_data["inputs"],
-        backend=job_data["backend"],
-        ghap_username=ghap_username,
-        ghap_ip=ghap_ip,
-        base_url=job_data.get("base_url"),
-        title=title,
-        code=code,
-        provision=provision,
-        created_by=request.user,
-    )
-    job.save()
-
-    if ghap_password:
-        # expire saved password after a day to reduce impact of the
-        # application being compromised
-        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60 * 60 * 24)
-
-    ret = job.as_dict()
-    ret["results_url"] = request.build_absolute_uri(ret["results_url"])
-
-    return ret
-
 def _submit_job(request):
     job_data = json.loads(request.body.decode("utf-8"))
 
@@ -322,7 +261,7 @@ def _submit_job(request):
             job_data["savio_credentials"]["password"]
         )
     else:
-        jobs = create_ghap_jobs(request, job_data)
+        jobs = cluster.ghap.create_jobs(request.user, job_data)
 
     response = []
     for job in jobs:

@@ -1,1 +1,1 @@
-submit-job --backend=ghap --username=$GHAP_USERNAME --password=$GHAP_PASSWORD --ip=$GHAP_IP --baseurl="http://localhost:8888/" $@
+submit-job --backend=ghap --username=$GHAP_USERNAME --password=$GHAP_PASSWORD --ip=$GHAP_IP --baseurl=https://longbowdev.ngrok.io/ $@

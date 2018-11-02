@@ -41,19 +41,18 @@
 </nav>
 </div>
 
-<div class="row wrapper border-bottom white-bg page-heading p-sm">
+<!-- <div class="row wrapper border-bottom white-bg page-heading p-sm">
     <div class="col-md-6">
-        <a class="btn btn-default btn-rounded" href="/">Analysis</a>
+         <a class="btn btn-default btn-rounded" href="/">Analysis</a>
         <a class="btn btn-default btn-rounded" href="/jobs/">
             Jobs
             {% if user.running_job_count > 0 %}
                 <span class="label label-primary">{{ user.running_job_count }}</span>
             {% endif %}
         </a>
-        <a class="btn btn-default btn-rounded disabled" href="#">Results</a>
     </div>
 </div>
-
+ -->
 <div class="wrapper wrapper-content">
   {% block body %}{% endblock %}
 </div>

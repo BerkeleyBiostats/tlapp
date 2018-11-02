@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic.base import RedirectView
 from tlapp import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', views.index, name='index'),
+    url(r'^$', RedirectView.as_view(url='/jobs/', permanent=False)),
     url(r'^jobs/(?P<job_id>[0-9]+)/download/$', views.job_output_download, name='job_output_download'),
     url(r'^jobs/(?P<job_id>[0-9]+)/download_url_token/$', views.job_download_url_token, name='job_download_url_token'),
     url(r'^jobs/(?P<job_id>[0-9]+)/output/$', views.job_output, name='job_output'),

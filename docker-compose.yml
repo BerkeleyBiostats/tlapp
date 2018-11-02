@@ -55,11 +55,6 @@ services:
       dockerfile: Dockerfile.cluster
     volumes:
       - ~/.ssh:/root/.ssh
-  jumper:
-    image: longbow_web
-    volumes:
-      - ~/.ssh:/root/.ssh
-    command: ssh -nN -R 8888:webapp:5721 ${GHAP_USERNAME}@${GHAP_IP}
   ngrok:
     depends_on:
       - webapp
