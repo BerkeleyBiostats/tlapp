@@ -330,7 +330,7 @@ def finish_job(request, job_id):
 
 def _restart_job(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
-    job.status = models.ModelRun.status_choices["submitted"]
+    job.status = models.ModelRun.status_choices["queued"]
     job.save()
     return JsonResponse({"status": "success"}, safe=False)
 

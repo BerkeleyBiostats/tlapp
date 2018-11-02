@@ -52,7 +52,7 @@ def create_jobs(created_by, job_data):
 
     job = models.ModelRun(
         dataset_id=job_data.get("dataset", None),
-        status=models.ModelRun.status_choices["submitted"],
+        status=models.ModelRun.status_choices["queued"],
         inputs=job_data["inputs"],
         backend=job_data["backend"],
         ghap_username=ghap_username,

@@ -47,6 +47,7 @@ class ModelRun(models.Model):
 
 	status_choices = {
 		'created': 'created',
+		'queued': 'queued',
 		'submitted': 'submitted',
 		'running': 'running',
 		'executed': 'executed',

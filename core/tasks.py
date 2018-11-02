@@ -327,7 +327,7 @@ class StreamingStringIO(io.StringIO):
 def handle_jobs():
     # Pick off a random ModelRun job
     job = models.ModelRun.objects.filter(
-        status=models.ModelRun.status_choices['submitted'],
+        status=models.ModelRun.status_choices['queued']
     ).order_by('?').first()
 
     if job is None:
