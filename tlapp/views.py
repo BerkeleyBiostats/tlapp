@@ -337,12 +337,17 @@ def create_savio_job(request, job_data):
     ret["results_url"] = request.build_absolute_uri(ret["results_url"])
     ret["job_id"] = job.id
 
+    # Savio jobs are pushed to the cluster immediately
+    creds = job_data["savio_credentials"]
+    cluster.savio.submit_job(job, creds["username"], creds["password"])
+
     return ret
 
 def create_ghap_job(request, job_data):
     ghap_username = None
     ghap_password = None
     ghap_ip = None
+
     if "ghap_credentials" in job_data:
         ghap_credentials = job_data["ghap_credentials"]
         ghap_username = ghap_credentials["username"]
@@ -396,13 +401,13 @@ def create_ghap_job(request, job_data):
     ret = job.as_dict()
     ret["results_url"] = request.build_absolute_uri(ret["results_url"])
 
+    return ret
+
 def _submit_job(request):
     job_data = json.loads(request.body.decode("utf-8"))
 
     if job_data["backend"] == "savio":
         response = create_savio_job(request, job_data)
-        creds = job_data["savio_credentials"]
-        cluster.savio.submit_job(job, creds["username"], creds["password"])
     else:
         response = create_ghap_job(request, job_data)
     

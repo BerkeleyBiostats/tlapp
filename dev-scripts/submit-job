@@ -5,58 +5,113 @@ import os
 import sys
 import requests
 import click
+import pyotp
 
-def post_job(job_script_filename, inputs_filename, username, password, ip, baseurl, longbowurl, token):
-	with open(job_script_filename) as f:
-		job_code = f.read()
 
-	job_data = {
-		"backend": "ghap"
-	}
+def post_job(
+    backend,
+    job_script_filename,
+    inputs_filename,
+    username,
+    password,
+    ip,
+    baseurl,
+    longbowurl,
+    token,
+):
+    with open(job_script_filename) as f:
+        job_code = f.read()
 
-	with open(inputs_filename) as f:
-		job_data["inputs"] = json.loads(f.read())
+    job_data = {"backend": backend}
 
-	job_data["code"] = job_code
+    with open(inputs_filename) as f:
+        job_data["inputs"] = json.loads(f.read())
 
-	job_data["ghap_credentials"] = {
-		"username": username,
-		"password": password,
-		"ip": ip,
-	}
+    job_data["code"] = job_code
 
-	if baseurl:
-		job_data["base_url"] = baseurl
+    if backend == "ghap":
+        job_data["ghap_credentials"] = {
+            "username": username,
+            "password": password,
+            "ip": ip,
+        }
+    if backend == "savio":
+        job_data["savio_credentials"] = {
+            "username": username,
+            "password": password,
+        }
 
-	endpoint = os.path.join(longbowurl, "submit_job_token/")
-	response = requests.post(endpoint, data=json.dumps(job_data), headers = {
-		"Authorization": token
-	})
+    if baseurl:
+        job_data["base_url"] = baseurl
 
-	print(response)
-	print(response.text)
+    endpoint = os.path.join(longbowurl, "submit_job_token/")
+    response = requests.post(
+        endpoint, data=json.dumps(job_data), headers={"Authorization": token}
+    )
+
+    print(response)
+    print(response.text)
 
 
 @click.command()
 @click.argument("job_directory")
 @click.option("--username")
 @click.option("--password")
+@click.option("--pin")
+@click.option("--secret")
 @click.option("--ip")
 @click.option("--baseurl")
 @click.option("--longbowurl", default="http://localhost:5721/")
 @click.option("--token", default="admintoken")
-def cli(job_directory, username, password, ip, baseurl, longbowurl, token):
-	inputs_directory = os.path.join(job_directory, "inputs")
-	inputs_filename = os.path.join(job_directory, "inputs.json")
-	job_script_filename = os.path.join(job_directory, "code.Rmd")
-	if os.path.exists(inputs_directory):
-		for root, dirs, files in os.walk(inputs_directory):
-			for filename in files:
-				inputs_filename = os.path.join(root, filename)
-				post_job(job_script_filename, inputs_filename, username, password, ip, baseurl, longbowurl, token)
-	else:
-		post_job(job_script_filename, inputs_filename, username, password, ip, baseurl, longbowurl, token)
+@click.option("--backend", default="ghap")
+def cli(
+    job_directory,
+    username,
+    password,
+    pin,
+    secret,
+    ip,
+    baseurl,
+    longbowurl,
+    token,
+    backend,
+):
+    inputs_directory = os.path.join(job_directory, "inputs")
+    inputs_filename = os.path.join(job_directory, "inputs.json")
+    job_script_filename = os.path.join(job_directory, "code.Rmd")
+
+    if pin and secret:
+        totp = pyotp.TOTP(secret)
+        password = pin + totp.now()
+
+    if os.path.exists(inputs_directory):
+        for root, dirs, files in os.walk(inputs_directory):
+            for filename in files:
+                inputs_filename = os.path.join(root, filename)
+                post_job(
+                    backend,
+                    job_script_filename,
+                    inputs_filename,
+                    username,
+                    password,
+                    ip,
+                    baseurl,
+                    longbowurl,
+                    token,
+                )
+    else:
+        post_job(
+            backend,
+            job_script_filename,
+            inputs_filename,
+            username,
+            password,
+            ip,
+            baseurl,
+            longbowurl,
+            token,
+        )
 
 
 if __name__ == "__main__":
-	cli()
+    cli()

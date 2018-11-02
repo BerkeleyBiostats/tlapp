@@ -36,7 +36,5 @@ urlpatterns = [
     url(r'^token/', views.token, name='token'),
     url(r'^submit_job/', views.submit_job, name='submit_job'),
     url(r'^submit_job_token/', views.submit_job_token, name='submit_job_token'),
-    url(r'^create_analysis_token/', views.create_analysis_token, name='create_analysis_token'),
-    url(r'^run_analysis_token/(?P<analysis_id>[0-9]+)/$', views.run_analysis_token, name='run_analysis_token'),
     url(r'^accounts/', include('django.contrib.auth.urls')),
 ]

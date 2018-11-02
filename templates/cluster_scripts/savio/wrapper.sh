@@ -2,15 +2,26 @@ export TLAPP_TOKEN={{ token }}
 export TLAPP_LOGS_URL={{ logs_url }}
 export R_LIBS_USER=$HOME/rlibs
 
-echo "Making sure longbowtools package is available for runner"
-
 curl \
 	--request POST \
 	-H "Authorization: $TLAPP_TOKEN" \
 	-d '{"status": "running"}' \
 	"{{ job_url | safe }}"
 
+echo "Making sure longbowtools package is available for runner"
+
+mkdir -p ~/rlibs
 R -e "if (!require('devtools')) install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+
+if [ ! -f ~/bin/pandoc ]; then
+	echo "Installing pandoc"
+	mkdir -p ~/downloads
+	wget -O ~/downloads/pandoc-2.3.1-linux.tar.gz https://github.com/jgm/pandoc/releases/download/2.3.1/pandoc-2.3.1-linux.tar.gz
+	tar xvzf ~/downloads/pandoc-2.3.1-linux.tar.gz -C ~/downloads
+	cp ~/downloads/pandoc-2.3.1/bin/pandoc ~/bin
+fi
+
+
 
 echo "Running provision script"
 
