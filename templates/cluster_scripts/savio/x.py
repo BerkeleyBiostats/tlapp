@@ -14,7 +14,7 @@ last_post = datetime.utcnow()
 five_seconds = timedelta(seconds=5)
 log_lines = b""
 
-for line in iter(process.stdout.readline, ""):
+for line in iter(process.stdout.readline, b""):
 
     log_lines += line
 
