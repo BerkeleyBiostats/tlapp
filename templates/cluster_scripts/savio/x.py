@@ -5,13 +5,8 @@ import subprocess
 import requests
 from datetime import datetime, timedelta
 
-token = os.getenv("TLAPP_TOKEN")
-if token is None:
-    sys.exit("Expecting TLAPP_TOKEN")
-
-logs_url = os.getenv("TLAPP_LOGS_URL")
-if logs_url is None:
-    sys.exit("Expecting TLAPP_LOGS_URL")
+token = "{{ token }}"
+logs_url = "{{ logs_url }}"
 
 process = subprocess.Popen(["sh", "wrapper.sh"], stdout=subprocess.PIPE)
 

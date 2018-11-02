@@ -45,15 +45,6 @@ def extract_fields(code):
     return inputs
 
 
-def get_yaml_header(code):
-    pattern = r"---([\s\S]+)---"
-    matches = re.search(pattern, code)
-    if matches is None:
-        return None
-    header = yaml.load(matches.group(1))
-    return header
-
-
 def extract_roles(code):
     header = get_yaml_header(code)
     try:
@@ -260,90 +251,6 @@ def job_download_url_token(request, job_id):
         return unauthorized_reponse()
 
 
-def expand_r_package_definition(package_definition):
-    if package_definition.startswith("github://"):
-        full_package_name = package_definition[len("github://") :]
-        package_name = full_package_name.split("/")[-1]
-        output = "R -e \"devtools::install_github('%s')\"" % (full_package_name)
-    elif "@" in package_definition:
-        package_name, version = package_definition.split("@")
-        output = (
-            "R -e \"if (!require('%s')) devtools::install_version('%s', version='%s', repos = 'http://cran.rstudio.com/')\""
-            % (package_name, package_name, version)
-        )
-    else:
-        package_name = package_definition
-        output = (
-            "R -e \"if (!require('%s')) install.packages('%s', repos = 'http://cran.rstudio.com/')\""
-            % (package_name, package_name)
-        )
-
-    return output
-
-
-def build_provision_code(r_packages_section, backend=None):
-
-    preamble = ""
-
-    if backend == "ghap":
-        preamble = """
-
-mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.2/"
-mkdir -p "/data/R/x86_64-redhat-linux-gnu-library/3.4/"
-
-"""
-    elif backend == "bluevelvet":
-        preamble = """
-
-module load pandoc-2.1.2
-module load gcc-4.9.4
-module load python-3.5.2
-
-"""
-
-    return preamble + "\n".join(
-        [expand_r_package_definition(pd) for pd in r_packages_section]
-    )
-
-
-def create_savio_job(request, job_data):
-    code = job_data.get("code")
-
-    # Grab provision information from the code
-    header = get_yaml_header(code)
-    provision_header = header.get("required_packages")
-    if provision_header:
-        provision = build_provision_code(provision_header)
-
-    if job_data.get("skip_provision"):
-        provision = 'echo "skipping provisioning"'
-
-    title = header.get("title")
-
-    base_url = job_data.get("base_url")
-
-    job = models.ModelRun(
-        status=models.ModelRun.status_choices["created"],
-        inputs=job_data.get("inputs", {}),
-        backend="savio",
-        base_url=base_url,
-        title=title,
-        code=code,
-        provision=provision,
-        created_by=request.user,
-    )
-    job.save()
-
-    ret = job.as_dict()
-    ret["results_url"] = request.build_absolute_uri(ret["results_url"])
-    ret["job_id"] = job.id
-
-    # Savio jobs are pushed to the cluster immediately
-    creds = job_data["savio_credentials"]
-    cluster.savio.submit_job(job, creds["username"], creds["password"])
-
-    return ret
-
 def create_ghap_job(request, job_data):
     ghap_username = None
     ghap_password = None
@@ -408,10 +315,22 @@ def _submit_job(request):
     job_data = json.loads(request.body.decode("utf-8"))
 
     if job_data["backend"] == "savio":
-        response = create_savio_job(request, job_data)
+        jobs = cluster.savio.create_jobs(request.user, job_data)
+        cluster.savio.submit_jobs(
+            jobs, 
+            job_data["savio_credentials"]["username"],
+            job_data["savio_credentials"]["password"]
+        )
     else:
-        response = create_ghap_job(request, job_data)
-    
+        jobs = create_ghap_jobs(request, job_data)
+
+    response = []
+    for job in jobs:
+        resp = job.as_dict()
+        resp["results_url"] = request.build_absolute_uri(resp["results_url"])
+        resp["job_id"] = job.id
+        response.append(resp)
+
     return JsonResponse(response, safe=False)
 
 

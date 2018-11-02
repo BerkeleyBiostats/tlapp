@@ -43,14 +43,18 @@ def generate_s3_urls(remote_output_folder):
         "put": put_url
     }
 
+def ensure_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
-def submit_savio_job(job, username, password):
 
-    # Create the job bundle
-    local_code_folder = tempfile.mkdtemp()
+def create_job_files(bundle_folder, job):
+    local_code_folder = make_temp_dir_name()
+    local_code_folder_full_path = os.path.join(bundle_folder, local_code_folder)
+    ensure_dir(local_code_folder_full_path)
 
     remote_output_folder = make_temp_dir_name()
-    remote_output_folder_full_path = "~/longbow/%s/%s" % (os.path.basename(local_code_folder), remote_output_folder)
+    remote_output_folder_full_path = "~/longbow/%s/%s" % (local_code_folder, remote_output_folder)
 
     def create_file(name=None, content=None, copy_from_path=None, template=None, template_params=None, executable=False):
         if copy_from_path:
@@ -59,11 +63,15 @@ def submit_savio_job(job, username, password):
         if template:
             template = loader.get_template(template)
             content = template.render(template_params)
-        filename = os.path.join(local_code_folder, name)
+        filename = os.path.join(local_code_folder_full_path, name)
         with open(filename, "w") as f:
             f.write(content)
         if executable:
             os.chmod(filename, 0o755)
+
+    def create_directory(name=None):
+        path = os.path.join(local_code_folder_full_path, name)
+        os.mkdir(path)
 
     create_file(
         name="script.Rmd",
@@ -89,12 +97,6 @@ def submit_savio_job(job, username, password):
     )
 
     create_file(
-        name="x.py",
-        template="cluster_scripts/savio/x.py",
-        executable=True
-    )
-
-    create_file(
         name="slurm.sh",
         template="cluster_scripts/savio/slurm.sh",
         template_params={
@@ -102,6 +104,8 @@ def submit_savio_job(job, username, password):
         },
         executable=True
     )
+
+    create_directory(name=remote_output_folder)
 
     # Generate signed PUT url for outputs zip
     s3_urls = generate_s3_urls(remote_output_folder)
@@ -145,14 +149,35 @@ def submit_savio_job(job, username, password):
         }
     )
 
+    create_file(
+        name="x.py",
+        template="cluster_scripts/savio/x.py",
+        template_params={
+            "token": token,
+            "logs_url": logs_url
+        },
+        executable=True
+    )
+
+    return local_code_folder    
+
+
+def submit_savio_jobs(jobs, username, password):
+
+    local_bundle_folder = tempfile.mkdtemp()
+
+    job_dir_names = []
+    for job in jobs:
+        job_dir_names.append(create_job_files(local_bundle_folder, job))
+
     # Tar it
-    with tarfile.open(local_code_folder + ".tar.gz", "w:gz") as tar:
-        tar.add(local_code_folder, arcname=os.path.basename(local_code_folder))
+    with tarfile.open(local_bundle_folder + ".tar.gz", "w:gz") as tar:
+        tar.add(local_bundle_folder, arcname=os.path.basename(local_bundle_folder))
 
     # Upload to S3
-    tar_basename = os.path.basename(local_code_folder)
+    tar_basename = os.path.basename(local_bundle_folder)
     tar_filename = tar_basename + ".tar.gz"
-    tar_fullpath = local_code_folder + ".tar.gz"
+    tar_fullpath = local_bundle_folder + ".tar.gz"
     s3_key = "jobs/%s" % tar_filename    
     s3 = boto3.resource("s3")
     s3.Object("tlapp", s3_key).upload_file(tar_fullpath)
@@ -165,18 +190,19 @@ def submit_savio_job(job, username, password):
 
     # Create string of commands to download, untar, and run
     commands = [
-        "mkdir -p %s" % remote_output_folder_full_path,
+        "mkdir -p ~/longbow",
         "cd ~/longbow",
-        "wget -O %s '%s'" % (tar_filename, get_url),
-        "tar xvzf %s" % tar_filename,
-        "cd %s" % tar_basename,
         "module load python",
         "module load r",
         "pip install requests --user",
-        "export TLAPP_TOKEN=%s" % token,
-        "export TLAPP_LOGS_URL=%s" % logs_url,
-        "sbatch slurm.sh"
+        "wget -O %s '%s'" % (tar_filename, get_url),
+        "tar xvzf %s --strip 1" % tar_filename,
     ]
+
+    for job_dir_name in job_dir_names:
+        commands.append("cd %s" % job_dir_name)
+        commands.append("sbatch slurm.sh")
+        commands.append("cd ..")
 
     command = ";".join(commands)
 
@@ -198,16 +224,18 @@ class StreamingStringIO(io.StringIO):
         self.job.output = self.getvalue()
         self.job.save(update_fields=["output"])
 
-def submit_job(job, username, password):
-    job.status = models.ModelRun.status_choices["submitted"]
-    job.save(update_fields=["status"])
+def submit_jobs(jobs, username, password):
+    for job in jobs:
+        job.status = models.ModelRun.status_choices["submitted"]
+        job.save(update_fields=["status"])
 
     f = StreamingStringIO(job)
     with redirect_stdout(f), redirect_stderr(f):
         try:
-            submit_savio_job(job, username, password)
+            submit_savio_jobs(jobs, username, password)
         except:
-            traceback.print_exc()
-            job.status = models.ModelRun.status_choices["error"]
-            job.save(update_fields=["status"])
+            logger.info(traceback.format_exc())
+            for job in jobs:
+                job.status = models.ModelRun.status_choices["error"]
+                job.save(update_fields=["status"])
 
