@@ -173,7 +173,11 @@ def job_detail(request, job_id):
         return JsonResponse({"job": job.as_dict()})
 
     context = {"job": job, "inputs_formatted": json.dumps(job.inputs, indent=2)}
-    return render(request, "job_detail.html", context)
+
+    if job.has_children():
+        return render(request, "job_detail_parent.html", context)
+    else:
+        return render(request, "job_detail.html", context)
 
 
 @login_required

@@ -1,0 +1,66 @@
+{% extends "app.html" %}
+
+{% load staticfiles %}
+
+{% block body %}
+
+<div id="fullscreen">
+
+    <div id="fullscreentop">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-title">
+{% if job.title %}
+    {{ job.title }}
+{% else %}
+    [untitled] Parent Job
+{% endif %}
+            </div>
+            <div class="ibox-content">
+            <p>Backend: {{ job.backend }}</p>
+            <p>Created at: {{ job.created_at }}</p>
+
+            <div>
+
+            <hr>
+
+            <h3>Child jobs</h3>
+
+            {% for child in job.children.all %}
+                <div>
+                    <a href="{% url 'job_detail' child.id %}">{{ child.created_at }}</a> 
+                    {{ child.status }}
+                </div>
+            {% endfor %}
+            </div>
+
+            </div>
+
+            </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+    <!-- Mainly scripts -->
+    <script src="{% static 'js/jquery-3.1.1.min.js' %} "></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
+    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+    <!-- Custom and plugin javascript -->
+    <script src="{% static 'js/inspinia.js' %}"></script>
+    <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
+
+</script>
+
+
+
+{% endblock %}

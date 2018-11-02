@@ -88,6 +88,12 @@ class ModelRun(models.Model):
 		else:
 			return "One-off %s" % (self.created_at)
 
+	def has_children(self):
+		return self.children.count() > 0
+
+	def child_count(self):
+		return self.children.count()
+
 	def as_dict(self):
 		ret = {
 			'status': self.status,
