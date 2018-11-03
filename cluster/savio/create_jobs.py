@@ -29,6 +29,7 @@ def create_jobs(created_by, job_data, parent=None):
             code=code,
             provision=provision,
             created_by=created_by,
+            is_batch=True
         )
         parent_job.save()
 

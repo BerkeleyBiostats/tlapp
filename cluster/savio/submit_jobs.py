@@ -43,6 +43,7 @@ def generate_s3_urls(remote_output_folder):
         "put": put_url
     }
 
+
 def ensure_dir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)

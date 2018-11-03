@@ -103,7 +103,7 @@ def parse_id_comma_list(raw):
     return [int(x) for x in sp]
 
 
-def _jobs(request):
+def _jobs(request, oneoff=False):
     response_format = request.GET.get("format")
 
     ids = request.GET.get("ids")
@@ -114,7 +114,10 @@ def _jobs(request):
     else:
         jobs = models.ModelRun.objects.filter(created_by=request.user)
 
-    jobs = jobs.filter(parent=None)
+    if oneoff:
+        jobs = jobs.filter(parent=None, is_batch=False)
+    else:
+        jobs = jobs.filter(is_batch=True)
 
     if ids:
         jobs = jobs.filter(id__in=ids)
@@ -144,8 +147,11 @@ def _jobs(request):
     if response_format == "json":
         # TODO: add the rest of pagination
         return JsonResponse({"jobs": [job.as_dict() for job in jobs]})
+    elif oneoff:
+        return render(request, "jobs_oneoff.html", context)
     else:
         return render(request, "jobs.html", context)
+
 
 
 @csrf_exempt
@@ -155,6 +161,12 @@ def jobs(request):
     else:
         return unauthorized_reponse()
 
+@csrf_exempt
+def jobs_oneoff(request):
+    if request.user.is_authenticated or check_token(request):
+        return _jobs(request, oneoff=True)
+    else:
+        return unauthorized_reponse()
 
 def update_job(job, job_data):
     # TODO: validate the status

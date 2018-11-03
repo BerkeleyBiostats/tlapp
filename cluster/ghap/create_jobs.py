@@ -7,15 +7,6 @@ def create_jobs(created_by, job_data):
 
     inputs = job_data.get("inputs", {})
 
-    # Create multiple jobs if `job_data["inputs"]` is a list
-    if isinstance(inputs, list):
-        job_list = []
-        for inputs_dict in inputs:
-            single_job_data = job_data.copy()
-            single_job_data["inputs"] = inputs_dict
-            job_list.extend(create_jobs(created_by, single_job_data))
-        return job_list
-
     ghap_username = None
     ghap_password = None
     ghap_ip = None
@@ -49,6 +40,28 @@ def create_jobs(created_by, job_data):
 
     if job_data.get("skip_provision"):
         provision = 'echo "skipping provisioning"'
+
+    # Create multiple jobs if `job_data["inputs"]` is a list
+    if isinstance(inputs, list):
+
+        parent_job = models.ModelRun(
+            status=models.ModelRun.status_choices["created"],
+            inputs=inputs,
+            backend="ghap",
+            title=title,
+            code=code,
+            provision=provision,
+            created_by=created_by,
+            is_batch=True
+        )
+        parent_job.save()
+
+        job_list = []
+        for inputs_dict in inputs:
+            single_job_data = job_data.copy()
+            single_job_data["inputs"] = inputs_dict
+            job_list.extend(create_jobs(created_by, single_job_data))
+        return job_list
 
     job = models.ModelRun(
         dataset_id=job_data.get("dataset", None),
