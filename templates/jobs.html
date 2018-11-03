@@ -27,8 +27,10 @@
         
         <div class="tabs-container">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="{% url 'jobs' %}">Batch</a></li>
-                <li><a href="{% url 'jobs_oneoff' %}">One-off</a></li>
+                <li class="{% if mode == 'batch' %}active{% endif %}"><a href="{% url 'jobs' %}">Batch</a></li>
+                <li class="{% if mode == 'oneoff' %}active{% endif %}"><a href="?mode=oneoff">One-off</a></li>
+                <li class="{% if mode == 'debug' %}active{% endif %}"><a href="?mode=debug">Debug</a></li>
+
             </ul>
             <div class="tab-content">
                 <div class="panel-body">
@@ -40,15 +42,6 @@
 
         {% for job in jobs %}
                         <tr>
-                            <td class="project-status">
-                                {% if job.has_children %}  
-                                    <small>Child jobs</small>
-                                    <span class="label label-primary">{{ job.child_count }}</span>
-                                {% else %}
-                                <span class="label label-default">{{ job.status }}</span>
-                                {% endif %}
-                                
-                            </td>
                             <td class="project-title">
                                 <a href="{% url 'job_detail' job.id %}">{% if job.title %}
                                     {{ job.title }}
@@ -57,6 +50,15 @@
                                 {% endif %}</a>
                                 <br>
                                 <small>Created {{ job.created_at }}</small>
+                            </td>
+                            <td class="project-status">
+                                {% if job.has_children %}  
+                                    <small>Jobs </small>
+                                    <span class="label label-default">{{ job.child_count }}</span>
+                                {% else %}
+                                <span class="label label-default">{{ job.status }}</span>
+                                {% endif %}
+                                
                             </td>
                             <td class="project-completion">  
                                 <div>{% if superuser %}

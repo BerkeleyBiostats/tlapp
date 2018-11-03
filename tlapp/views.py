@@ -103,8 +103,9 @@ def parse_id_comma_list(raw):
     return [int(x) for x in sp]
 
 
-def _jobs(request, oneoff=False):
+def _jobs(request):
     response_format = request.GET.get("format")
+    mode = request.GET.get("mode", "batch")
 
     ids = request.GET.get("ids")
     ids = parse_id_comma_list(ids)
@@ -114,8 +115,10 @@ def _jobs(request, oneoff=False):
     else:
         jobs = models.ModelRun.objects.filter(created_by=request.user)
 
-    if oneoff:
+    if mode == "oneoff":
         jobs = jobs.filter(parent=None, is_batch=False)
+    elif mode == "debug":
+        jobs = jobs.filter(is_batch=False)
     else:
         jobs = jobs.filter(is_batch=True)
 
@@ -142,13 +145,12 @@ def _jobs(request, oneoff=False):
         "superuser": request.user.is_superuser,
         "status_counts": status_counts,
         "status_filter": status_filter,
+        "mode": mode
     }
 
     if response_format == "json":
         # TODO: add the rest of pagination
         return JsonResponse({"jobs": [job.as_dict() for job in jobs]})
-    elif oneoff:
-        return render(request, "jobs_oneoff.html", context)
     else:
         return render(request, "jobs.html", context)
 
@@ -158,13 +160,6 @@ def _jobs(request, oneoff=False):
 def jobs(request):
     if request.user.is_authenticated or check_token(request):
         return _jobs(request)
-    else:
-        return unauthorized_reponse()
-
-@csrf_exempt
-def jobs_oneoff(request):
-    if request.user.is_authenticated or check_token(request):
-        return _jobs(request, oneoff=True)
     else:
         return unauthorized_reponse()
 

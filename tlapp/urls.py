@@ -33,7 +33,6 @@ urlpatterns = [
     url(r'^jobs/(?P<job_id>[0-9]+)/finish/$', views.finish_job, name='job_finish'),
     url(r'^jobs/(?P<job_id>[0-9]+)/restart/$', views.restart_job, name='job_restart'),
     url(r'^jobs/', views.jobs, name='jobs'),
-    url(r'^jobs_oneoff/', views.jobs_oneoff, name='jobs_oneoff'),
     url(r'^templates/', views.templates, name='templates'),    
     url(r'^token/', views.token, name='token'),
     url(r'^submit_job/', views.submit_job, name='submit_job'),
