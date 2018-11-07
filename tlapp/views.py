@@ -182,6 +182,19 @@ def job_detail(request, job_id):
     context = {"job": job, "inputs_formatted": json.dumps(job.inputs, indent=2)}
 
     if job.has_children():
+        status_counts = {}
+        for choice in models.ModelRun.status_choices.keys():
+            status_counts[choice] = job.status_count(choice)
+        context["status_counts"] = status_counts
+
+        child_jobs = job.children
+        status_filter = request.GET.get("status")
+        if status_filter:
+            child_jobs = child_jobs.filter(status=status_filter)
+        context["child_jobs"] = child_jobs.all()
+        context["status_filter"] = status_filter
+
+    if job.has_children():
         return render(request, "job_detail_parent.html", context)
     else:
         return render(request, "job_detail.html", context)

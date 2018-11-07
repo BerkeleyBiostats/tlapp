@@ -20,19 +20,61 @@
             <div class="ibox-content">
             <p>Backend: {{ job.backend }}</p>
             <p>Created at: {{ job.created_at }}</p>
+            <div class="m-t-lg">
 
-            <div>
 
-            <hr>
+                        <div class="m-t-lg m-b-lg">
+                        {% if status_filter %}
+                                {% for status, count in status_counts.items %}  
+                                {% if status == status_filter %}    
+                                <span class="m-sm">
+                                <span class="label">{{ count }}</span> 
+                                <a href="?status={{ status }}&mode={{ mode }}">{{ status | title }}</a>
+                                </span>
+                                <a href="?mode={{ mode }}">Remove Filter</a>
+                                {% endif %} 
+                                {% endfor %}    
+                        {% else %}
+                                {% for status, count in status_counts.items %}
+                                <span class="m-sm">
+                                <span class="label">{{ count }}</span> 
+                                <a href="?status={{ status }}&mode={{ mode }}">{{ status | title }}</a>
+                                </span>
+                                {% endfor %}
+                        {% endif %}
+                        </div>
 
-            <h3>Child jobs</h3>
 
-            {% for child in job.children.all %}
-                <div>
-                    <a href="{% url 'job_detail' child.id %}">{{ child.created_at }}</a> 
-                    {{ child.status }}
-                </div>
-            {% endfor %}
+
+                <table class="table table-hover">
+                    <tbody>
+                    {% for job in child_jobs %}
+                    <tr>
+                        <td class="project-title">
+                            <a href="{% url 'job_detail' job.id %}">[{{ job.id }}] {{ job.created_at }}</a>
+                        </td>
+                        <td class="project-status">
+                            <span class="label label-default">{{ job.status }}</span>
+                        </td>
+                        <td class="project-completion">  
+                            <div>{% if superuser %}
+                            <p><span class="text-muted">User</span> 
+                                {{ job.created_by.username }} 
+                                {{ job.created_by.email }}
+                            </p>
+                            {% endif %}</div>
+                        </td>
+                        <td>
+                            {% if job.output_url %}
+                            <div>
+                                <a href="{{ job.output_url }}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> Download Outputs</a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             </div>
