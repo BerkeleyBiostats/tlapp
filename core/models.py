@@ -95,6 +95,18 @@ class ModelRun(models.Model):
 	def child_count(self):
 		return self.children.count()
 
+	def status_count(self, status):
+		return self.children.filter(status=self.status_choices[status]).count()
+
+	def created_count(self):
+		return self.status_count(self.status_choices["created"])
+
+	def running_count(self):
+		return self.status_count(self.status_choices["running"])
+
+	def success_count(self):
+		return self.status_count(self.status_choices["success"])
+
 	def as_dict(self):
 		ret = {
 			'status': self.status,

@@ -63,9 +63,20 @@
                                 <small>Created {{ job.created_at }}</small>
                             </td>
                             <td class="project-status">
-                                {% if job.has_children %}  
-                                    <small>Jobs </small>
-                                    <span class="label label-default">{{ job.child_count }}</span>
+                                {% if job.has_children %} 
+                                <div class="m-sm">  
+                                    <span class="label label-default">{{ job.created_count }}</span>
+                                    <small>Created</small>
+                                </div>
+                                <div class="m-sm">  
+                                    <span class="label label-success">{{ job.running_count }}</span>
+                                    <small>Running</small>
+                                </div>
+                                <div class="m-sm">  
+                                    <span class="label label-primary">{{ job.success_count }}</span>
+                                    <small>Success</small>
+                                </div>
+
                                 {% else %}
                                 <span class="label label-default">{{ job.status }}</span>
                                 {% endif %}
