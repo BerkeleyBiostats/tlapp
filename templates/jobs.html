@@ -35,14 +35,26 @@
                 <div class="panel-body">
                     
                     {% if mode == 'oneoff' or mode == 'debug' %}
-                    <div class="m-t-md m-b-md">
-                        {% for status, count in status_counts.items %}
-                        <span class="m-sm">
-                        <span class="label">{{ count }}</span> 
-                        <a href="?status={{ status }}&mode={{ mode }}">{{ status | title }}</a>
-                        </span>
-                        {% endfor %}
-                    </div>
+                        <div class="m-t-md m-b-md">
+                        {% if status_filter %}
+                                {% for status, count in status_counts.items %}  
+                                {% if status == status_filter %}    
+                                <span class="m-sm">
+                                <span class="label">{{ count }}</span> 
+                                <a href="?status={{ status }}&mode={{ mode }}">{{ status | title }}</a>
+                                </span>
+                                <a href="?mode={{ mode }}">Remove Filter</a>
+                                {% endif %} 
+                                {% endfor %}    
+                        {% else %}
+                                {% for status, count in status_counts.items %}
+                                <span class="m-sm">
+                                <span class="label">{{ count }}</span> 
+                                <a href="?status={{ status }}&mode={{ mode }}">{{ status | title }}</a>
+                                </span>
+                                {% endfor %}
+                        {% endif %}
+                        </div>
                     {% endif %}
             
 
