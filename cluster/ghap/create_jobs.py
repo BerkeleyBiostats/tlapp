@@ -56,7 +56,7 @@ def create_jobs(created_by, job_data):
         )
         parent_job.save()
 
-        job_list = []
+        job_list = [parent_job]
         for inputs_dict in inputs:
             single_job_data = job_data.copy()
             single_job_data["inputs"] = inputs_dict
