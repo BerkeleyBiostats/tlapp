@@ -226,6 +226,10 @@ class StreamingStringIO(io.StringIO):
         self.job.save(update_fields=["output"])
 
 def submit_jobs(jobs, username, password):
+
+    if isinstance(jobs, dict):
+        job = jobs["children"]
+
     for job in jobs:
         job.status = models.ModelRun.status_choices["submitted"]
         job.save(update_fields=["status"])

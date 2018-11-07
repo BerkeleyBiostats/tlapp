@@ -38,6 +38,7 @@ def create_jobs(created_by, job_data, parent=None):
             single_job_data = job_data.copy()
             single_job_data["inputs"] = inputs_dict
             job_list.extend(create_jobs(created_by, single_job_data, parent=parent_job))
+
         return {
             "parent": parent_job,
             "children": job_list

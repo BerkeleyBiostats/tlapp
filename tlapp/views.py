@@ -286,7 +286,7 @@ def _submit_job(request):
     if job_data["backend"] == "savio":
         jobs = cluster.savio.create_jobs(request.user, job_data)
         cluster.savio.submit_jobs(
-            jobs["children"], 
+            jobs, 
             job_data["savio_credentials"]["username"],
             job_data["savio_credentials"]["password"]
         )

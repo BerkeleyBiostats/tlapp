@@ -3,7 +3,7 @@ from cluster.parse_notebook import get_yaml_header
 from cluster.provision_code_generator import build_provision_code
 from core import models
 
-def create_jobs(created_by, job_data):
+def create_jobs(created_by, job_data, parent=None):
 
     inputs = job_data.get("inputs", {})
 
@@ -60,7 +60,8 @@ def create_jobs(created_by, job_data):
         for inputs_dict in inputs:
             single_job_data = job_data.copy()
             single_job_data["inputs"] = inputs_dict
-            job_list.extend(create_jobs(created_by, single_job_data))
+            job_list.extend(create_jobs(created_by, single_job_data, parent=parent_job))
+
         return {
             "parent": parent_job,
             "children": job_list
@@ -78,6 +79,7 @@ def create_jobs(created_by, job_data):
         code=code,
         provision=provision,
         created_by=created_by,
+        parent=parent
     )
     job.save()
 
