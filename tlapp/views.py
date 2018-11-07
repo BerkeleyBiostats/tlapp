@@ -172,12 +172,16 @@ def update_job(job, job_data):
 @login_required
 @csrf_exempt
 def job_detail(request, job_id):
+    response_format = request.GET.get("format")
     job = models.ModelRun.objects.get(pk=job_id)
 
     if request.method == "POST":
         job_data = json.loads(request.body.decode("utf-8"))
         update_job(job, job_data)
         return JsonResponse({"job": job.as_dict()})
+
+    if response_format == "json":
+        return JsonResponse(job.as_dict())
 
     context = {"job": job, "inputs_formatted": json.dumps(job.inputs, indent=2)}
 
