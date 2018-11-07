@@ -286,19 +286,21 @@ def _submit_job(request):
     if job_data["backend"] == "savio":
         jobs = cluster.savio.create_jobs(request.user, job_data)
         cluster.savio.submit_jobs(
-            jobs, 
+            jobs["children"], 
             job_data["savio_credentials"]["username"],
             job_data["savio_credentials"]["password"]
         )
     else:
         jobs = cluster.ghap.create_jobs(request.user, job_data)
 
-    response = []
-    for job in jobs:
-        resp = job.as_dict()
-        resp["results_url"] = request.build_absolute_uri(resp["results_url"])
-        resp["job_id"] = job.id
-        response.append(resp)
+    if isinstance(jobs, list):
+        job = jobs[0]
+    else:
+        job = jobs["parent"]
+
+    response = job.as_dict()
+    response["results_url"] = request.build_absolute_uri(response["results_url"])
+    response["job_id"] = job.id
 
     return JsonResponse(response, safe=False)
 

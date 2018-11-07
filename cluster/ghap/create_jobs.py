@@ -56,12 +56,15 @@ def create_jobs(created_by, job_data):
         )
         parent_job.save()
 
-        job_list = [parent_job]
+        job_list = []
         for inputs_dict in inputs:
             single_job_data = job_data.copy()
             single_job_data["inputs"] = inputs_dict
             job_list.extend(create_jobs(created_by, single_job_data))
-        return job_list
+        return {
+            "parent": parent_job,
+            "children": job_list
+        }
 
     job = models.ModelRun(
         dataset_id=job_data.get("dataset", None),
