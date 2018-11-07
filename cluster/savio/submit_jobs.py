@@ -228,7 +228,7 @@ class StreamingStringIO(io.StringIO):
 def submit_jobs(jobs, username, password):
 
     if isinstance(jobs, dict):
-        job = jobs["children"]
+        jobs = jobs["children"]
 
     for job in jobs:
         job.status = models.ModelRun.status_choices["submitted"]
