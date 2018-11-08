@@ -77,8 +77,8 @@
                             <td class="project-status">
                                 {% if job.has_children %} 
                                 <div class="m-sm">  
-                                    <span class="label label-default">{{ job.created_count }}</span>
-                                    <small>Created</small>
+                                    <span class="label label-default">{{ job.child_count }}</span>
+                                    <small>Jobs</small>
                                 </div>
                                 <div class="m-sm">  
                                     <span class="label label-success">{{ job.running_count }}</span>
