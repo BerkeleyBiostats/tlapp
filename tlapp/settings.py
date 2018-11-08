@@ -26,6 +26,8 @@ SECRET_KEY = '7=9qd5g$@9teiv&#r69+*5k%o%wq*s!po)$63da)@pvra1nd8w'
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get('ENVIRONMENT') == 'development':
     DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'core',
 ]
 
@@ -51,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'tlapp.urls'
@@ -159,3 +163,10 @@ APPEND_SLASH = True
 MAX_CONCURRENT_JOBS = int(os.environ.get('MAX_CONCURRENT_JOBS', '1'))
 
 HOSTNAME = os.environ.get("HOSTNAME", "http://localhost:63000/")
+
+INTERNAL_IPS = (
+    '127.0.0.1',
+    '0.0.0.0',
+    '10.0.2.2',
+    '172.22.0.1',
+)

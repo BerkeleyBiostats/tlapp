@@ -135,6 +135,8 @@ def _jobs(request):
     if status_filter:
         jobs = jobs.filter(status=status_filter)
 
+    jobs = jobs.prefetch_related("created_by", "children")
+
     per_page = request.GET.get("per_page", 30)
     paginator = Paginator(jobs, per_page)
     page = request.GET.get("page")
