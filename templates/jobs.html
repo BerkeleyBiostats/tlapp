@@ -10,8 +10,8 @@
         <div class="btn-group pull-right">
             <span class="step-links">
                 {% if jobs.has_previous %}
-                    <a class="btn btn-white" href="?page=1">&laquo; first</a>
-                    <a class="btn btn-white" href="?page={{ jobs.previous_page_number }}">previous</a>
+                    <a class="btn btn-white" href="?page=1&mode={{ mode }}">&laquo; first</a>
+                    <a class="btn btn-white" href="?page={{ jobs.previous_page_number }}&mode={{ mode }}">previous</a>
                 {% endif %}
 
                 <span class="current-page">
@@ -19,8 +19,8 @@
                 </span>
 
                 {% if jobs.has_next %}
-                    <a class="btn btn-white" href="?page={{ jobs.next_page_number }}">next</a>
-                    <a class="btn btn-white" href="?page={{ jobs.paginator.num_pages }}">last &raquo;</a>
+                    <a class="btn btn-white" href="?page={{ jobs.next_page_number }}&mode={{ mode }}">next</a>
+                    <a class="btn btn-white" href="?page={{ jobs.paginator.num_pages }}&mode={{ mode }}">last &raquo;</a>
                 {% endif %}
             </span>
         </div>
