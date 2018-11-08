@@ -55,6 +55,8 @@ def extract_roles(code):
 @login_required
 def index(request):
 
+    return redirect('jobs')
+
     templates = models.AnalysisTemplate.objects.all()
 
     templates_json = [
