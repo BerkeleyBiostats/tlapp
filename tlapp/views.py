@@ -4,6 +4,7 @@ import os
 import json
 import yaml
 import re
+import logging
 
 from django.db import transaction
 from django.urls import reverse
@@ -16,6 +17,7 @@ from django.http import HttpResponse, JsonResponse
 from core import models, tasks
 import cluster
 
+logger = logging.getLogger('django')
 
 @login_required
 def token(request):
@@ -138,6 +140,7 @@ def _jobs(request):
         jobs = jobs.filter(status=status_filter)
 
     jobs = jobs.prefetch_related("created_by", "children")
+    jobs = jobs.defer("inputs", "output", "output_zip", "report_html", "code", "provision")
 
     per_page = request.GET.get("per_page", 30)
     paginator = Paginator(jobs, per_page)

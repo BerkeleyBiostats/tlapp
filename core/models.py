@@ -44,7 +44,6 @@ class AnalysisTemplate(models.Model):
 		return self.name
 
 class ModelRun(models.Model):
-
 	status_choices = {
 		'created': 'created',
 		'queued': 'queued',

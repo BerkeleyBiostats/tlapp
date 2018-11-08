@@ -1,0 +1,8 @@
+pg_restore --verbose \
+           --clean \
+           --no-acl \
+           --no-owner \
+           -h localhost \
+           -U longbow \
+           -d longbow \
+           /app/snapshots/foo.dump

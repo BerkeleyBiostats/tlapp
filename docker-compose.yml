@@ -3,11 +3,13 @@ services:
   redis:
     image: redis:3.2.11-alpine
   db:
-    image: postgres:10.1-alpine
+    image: postgres:9.6.10-alpine
     environment:
       - POSTGRES_DB=longbow
       - POSTGRES_USER=longbow
       - POSTGRES_PASSWORD=longbow
+    volumes:
+      - .:/app
   webapp:
     build:
       context: .
