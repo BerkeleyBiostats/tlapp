@@ -71,6 +71,7 @@ class ModelRun(models.Model):
 	traceback = models.TextField(null=True, blank=True)
 	model_template = models.ForeignKey(AnalysisTemplate, null=True, blank=True, on_delete=models.SET_NULL)
 	dataset = models.ForeignKey(Dataset, null=True, blank=True, on_delete=models.SET_NULL)
+	postprocessing_attempts = models.IntegerField(default=0)
 	postprocessing_attempted_at = models.DateTimeField(blank=True, null=True)
 	postprocessing_traceback = models.TextField(null=True, blank=True)
 	is_batch = models.BooleanField(default=False)

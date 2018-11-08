@@ -1,5 +1,6 @@
 import boto3
 import datetime
+from datetime import timedelta
 import io
 import json
 import logging
@@ -90,9 +91,19 @@ def post_process_outputs(job):
     else:
         logger.info("Didn't find a report")
 
+def pick_stalled_job():
+    five_minutes_ago = datetime.datetime.utcnow() - timedelta(minutes=5)
+    job = (
+        models.ModelRun.objects.filter(
+            status=models.ModelRun.status_choices["postprocessing"],
+            postprocessing_attempted_at__lte=five_minutes_ago
+        )
+        .order_by("?")
+        .first()
+    )
+    return job
 
-def handle_a_job():
-    # Pick off a random job that hasn't been postprocessed
+def pick_random_job():
     job = (
         models.ModelRun.objects.filter(
             status=models.ModelRun.status_choices["executed"]
@@ -102,10 +113,25 @@ def handle_a_job():
     )
 
     if job is None:
+        job = pick_stalled_job()
+
+    return job
+
+def handle_a_job():
+    job = pick_random_job()
+
+    if job is None:
         return 0
+
+    if job.postprocessing_attempts >= 2:
+        job.status = models.ModelRun.status_choices["error"]
+        job.postprocessing_traceback = "Maximum postprocessing attempts reached."
+        job.save()
+        return 1
 
     job.status = models.ModelRun.status_choices["postprocessing"]
     job.postprocessing_attempted_at = datetime.datetime.utcnow()
+    job.postprocessing_attempts = job.postprocessing_attempts + 1
     job.save()
 
     try:
