@@ -176,9 +176,12 @@ def update_job(job, job_data):
     job.save()
 
 
-@login_required
 @csrf_exempt
 def job_detail(request, job_id):
+
+    if not (request.user.is_authenticated or check_token(request)):
+        return unauthorized_reponse()
+
     response_format = request.GET.get("format")
     job = models.ModelRun.objects.get(pk=job_id)
 
