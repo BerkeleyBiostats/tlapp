@@ -357,6 +357,7 @@ def handle_jobs():
         return 0
 
     job.status = models.ModelRun.status_choices['running']
+    job.last_heartbeat = datetime.datetime.utcnow()
     job.save()
 
     f = StreamingStringIO(job)

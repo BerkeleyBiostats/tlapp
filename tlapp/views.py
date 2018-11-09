@@ -174,7 +174,8 @@ def jobs(request):
 def update_job(job, job_data):
     # TODO: validate the status
     job.status = job_data.get("status")
-    job.save()
+    job.last_heartbeat = datetime.utcnow()
+    job.save(update_fields=["status", "last_heartbeat"])
 
 
 @csrf_exempt
