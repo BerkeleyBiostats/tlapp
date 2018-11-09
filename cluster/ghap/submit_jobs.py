@@ -1,9 +1,7 @@
-from contextlib import redirect_stdout, redirect_stderr
 from urllib.parse import urlparse, urlunparse
 import boto3
 import datetime
 from datetime import timedelta
-import io
 import json
 import logging
 import os
@@ -20,6 +18,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.template import loader, Context
 from core import models
+from ..run_job import run_job
 
 logger = logging.getLogger("django")
 
@@ -272,32 +271,9 @@ def run_ghap_job(job):
         output = upload_to_ghap(c, job, username, password)
 
 
-class StreamingStringIO(io.StringIO):
-    def __init__(self, job):
-        self.job = job
-        io.StringIO.__init__(self)
-
-    def write(self, s):
-        io.StringIO.write(self, s)
-        self.job.output = self.getvalue()
-        self.job.save()
-
-
 def submit_job(job):
-    job.status = models.ModelRun.status_choices["running"]
-    job.last_heartbeat = datetime.datetime.utcnow()
-    job.save(update_fields=["status", "last_heartbeat"])
+    run_job(run_ghap_job, job)
 
-    f = StreamingStringIO(job)
-
-    with redirect_stdout(f), redirect_stderr(f):
-        try:
-            run_ghap_job(job)
-        except:
-            logger.info(traceback.format_exc())
-            job.status = models.ModelRun.status_choices["error"]
-
-    job.save()
 
 def submit_jobs(jobs):
     for job in jobs:
