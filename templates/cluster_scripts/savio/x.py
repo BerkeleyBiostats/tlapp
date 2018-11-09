@@ -4,9 +4,24 @@ import sys
 import subprocess
 import requests
 from datetime import datetime, timedelta
+from threading import Thread, Event
 
 token = "{{ token }}"
 logs_url = "{{ logs_url }}"
+heartbeat_url = "{{ heartbeat_url }}"
+
+class HeartbeatThread(Thread):
+    def __init__(self, event):
+        Thread.__init__(self)
+        self.stopped = event
+
+    def run(self):
+        while not self.stopped.wait(1):
+            requests.get(heartbeat_url, headers={"Authorization": token})
+
+stop_flag = Event()
+thread = HeartbeatThread(stop_flag)
+thread.start()
 
 process = subprocess.Popen(["sh", "wrapper.sh"], stdout=subprocess.PIPE)
 
@@ -24,3 +39,4 @@ for line in iter(process.stdout.readline, b""):
         log_lines = b""
 
 requests.post(logs_url, headers={"Authorization": token}, data=log_lines)
+stop_flag.set()

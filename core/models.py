@@ -77,6 +77,7 @@ class ModelRun(models.Model):
 	is_batch = models.BooleanField(default=False)
 	parent = models.ForeignKey("ModelRun", null=True, blank=True, on_delete=models.CASCADE, related_name="children")
 
+	last_heartbeat = models.DateTimeField(null=True, blank=True)
 
 	# Support pushing code instead of model template for one-off runs
 	code = models.TextField(null=True, blank=True)

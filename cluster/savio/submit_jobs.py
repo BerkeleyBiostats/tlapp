@@ -133,6 +133,7 @@ def create_job_files(bundle_folder, job):
 
     # TODO: generate the url using django url and join with urllib
     logs_url = base_url + "jobs/%s/append_log/" % job.id
+    heartbeat_url = base_url + "jobs/%s/heartbeat/" % job.id
     job_url = base_url + "jobs/%s/" % job.id
 
     create_file(
@@ -155,7 +156,8 @@ def create_job_files(bundle_folder, job):
         template="cluster_scripts/savio/x.py",
         template_params={
             "token": token,
-            "logs_url": logs_url
+            "logs_url": logs_url,
+            "heartbeat_url": heartbeat_url,
         },
         executable=True
     )

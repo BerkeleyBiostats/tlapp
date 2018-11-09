@@ -1,6 +1,7 @@
 {% extends "app.html" %}
 
 {% load staticfiles %}
+{% load humanize %}
 
 {% block body %}
 
@@ -21,6 +22,10 @@
             <p>Backend: {{ job.backend }}</p>
             <p>Created at: {{ job.created_at }}</p>
             <p>Status: {{ job.status }}</p>
+
+            {% if job.status == "running" %}
+            <p>Last Heartbeat: {{ job.last_heartbeat | naturaltime }}</p>
+            {% endif %}
 
             <div class="row">
                 

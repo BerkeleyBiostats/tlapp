@@ -193,8 +193,12 @@ def upload_to_ghap(c, job, username, password):
     logger.info(cmd)
 
     # upload x.py
+    heartbeat_url = base_url + "jobs/%s/heartbeat/" % job.id
+
     x_template = loader.get_template('ghap_scripts/x.py')
-    x_script = x_template.render()
+    x_script = x_template.render({
+        "heartbeat_url": heartbeat_url,
+    })
     put_script(c, 
         content=x_script, 
         script_name='x.py',

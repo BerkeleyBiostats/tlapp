@@ -5,6 +5,7 @@ import json
 import yaml
 import re
 import logging
+from datetime import datetime
 
 from django.db import transaction
 from django.urls import reverse
@@ -381,6 +382,19 @@ def _restart_job(request, job_id):
 def restart_job(request, job_id):
     if request.user.is_authenticated or check_token(request):
         return _restart_job(request, job_id)
+    else:
+        return unauthorized_reponse()
+
+def _heartbeat_job(request, job_id):
+    job = models.ModelRun.objects.get(pk=job_id)
+    job.last_heartbeat = datetime.utcnow()
+    job.save(update_fields=['last_heartbeat'])
+    return JsonResponse({"status": "success"})
+
+@csrf_exempt
+def heartbeat_job(request, job_id):
+    if request.user.is_authenticated or check_token(request):
+        return _heartbeat_job(request, job_id)
     else:
         return unauthorized_reponse()
 
