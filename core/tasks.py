@@ -80,7 +80,9 @@ def upload_to_ghap(c, job, username, password):
         repo_name = o.path.split('/')[-1][:-4]
         repo_base_path = '~/datasets'
         repo_path = os.path.join(repo_base_path, repo_name)
-        repo_exists = c.exists(repo_path)
+
+        result = c.run("(ls %s && echo yes) || echo no" % repo_path)
+        repo_exists = "yes" in result.stdout
 
         # Set the uri to the file's path on the local file system
         # (used by tltools)
@@ -96,8 +98,8 @@ def upload_to_ghap(c, job, username, password):
             git_url_with_password = urlunparse(tuple(o))
 
             # Clone it, hiding the command so password doesn't appear in logs
-            with c.cd(repo_base_path), c.hide('running'):
-                c.run('git clone %s' % git_url_with_password)
+            with c.cd(repo_base_path):
+                c.run('git clone %s' % git_url_with_password, hide=True)
 
     # Write script to a file...    
     local_code_folder = tempfile.mkdtemp()
