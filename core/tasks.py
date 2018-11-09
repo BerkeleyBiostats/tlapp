@@ -334,7 +334,7 @@ class StreamingStringIO(io.StringIO):
 def reap_stalled_jobs():
     five_minutes_ago = datetime.datetime.utcnow() - timedelta(minutes=5)
     stalled_jobs = models.ModelRun.objects.filter(
-        Q(last_heartbeat__isnull=True) | Q(last_heartbeat__lte=five_minutes_ago),
+        last_heartbeat__lte=five_minutes_ago,
         status=models.ModelRun.status_choices['running'],
     )
     for job in stalled_jobs.all():

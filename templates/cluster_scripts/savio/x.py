@@ -16,7 +16,7 @@ class HeartbeatThread(Thread):
         self.stopped = event
 
     def run(self):
-        while not self.stopped.wait(1):
+        while not self.stopped.wait(10):
             requests.get(heartbeat_url, headers={"Authorization": token})
 
 stop_flag = Event()
