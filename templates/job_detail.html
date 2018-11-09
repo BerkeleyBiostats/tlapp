@@ -40,6 +40,10 @@
             </div>
             {% endif %}
 
+            {% if job.status == "error" and job.traceback %}
+            <pre>{{ job.traceback }}</pre>
+            {% endif %}
+
             </div>
 
                 </div>

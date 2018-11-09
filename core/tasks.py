@@ -1,6 +1,8 @@
 from contextlib import redirect_stdout, redirect_stderr
 from urllib.parse import urlparse, urlunparse
 import boto3
+import datetime
+from datetime import timedelta
 import io
 import json
 import logging
@@ -15,6 +17,7 @@ import traceback
 import uuid
 from fabric.connection import Connection
 from django.conf import settings
+from django.db.models import Q
 from django.core.cache import cache
 from django.template import loader, Context
 from bs4 import BeautifulSoup
@@ -328,7 +331,20 @@ class StreamingStringIO(io.StringIO):
          self.job.output = self.getvalue()
          self.job.save()
 
+def reap_stalled_jobs():
+    five_minutes_ago = datetime.datetime.utcnow() - timedelta(minutes=5)
+    stalled_jobs = models.ModelRun.objects.filter(
+        Q(last_heartbeat__isnull=True) | Q(last_heartbeat__lte=five_minutes_ago),
+        status=models.ModelRun.status_choices['running'],
+    )
+    for job in stalled_jobs.all():
+        job.status = models.ModelRun.status_choices['error']
+        job.traceback = "Job run stalled (heartbeat check)"
+        job.save(update_fields=["status", "traceback"])
+
 def handle_jobs():
+    reap_stalled_jobs()
+
     # Pick off a random ModelRun job
     job = models.ModelRun.objects.filter(
         status=models.ModelRun.status_choices['queued']
