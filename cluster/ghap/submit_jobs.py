@@ -48,8 +48,10 @@ def make_temp_dir(base_dir):
 
 def upload_to_ghap(c, job, username, password):
     temp_base_dir = "/tmp"
+    remote_code_folder_name = make_temp_dir_name()
+    remote_code_folder = os.path.join(temp_base_dir, remote_code_folder_name)
     remote_output_folder = make_temp_dir_name()
-    remote_output_folder_full_path = os.path.join(temp_base_dir, remote_output_folder)
+    remote_output_folder_full_path = os.path.join(remote_code_folder, remote_output_folder)
     c.run("mkdir -p %s" % remote_output_folder_full_path)
 
     # Check if we need to clone a dataset
@@ -109,7 +111,6 @@ def upload_to_ghap(c, job, username, password):
         else:
             code_file.write(job.model_template.code)
     # ...then upload to cluster
-    remote_code_folder = make_temp_dir(temp_base_dir)
     remote_code_filename = os.path.join(remote_code_folder, script_name)
     c.run("mkdir -p %s" % remote_code_folder)
     c.put(local_code_filename, remote_code_filename)

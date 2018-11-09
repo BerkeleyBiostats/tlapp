@@ -1,4 +1,4 @@
-[{
+{
     "data": {
         "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",
         "type": "web"
@@ -14,38 +14,4 @@
         "threshold": true,
         "sample_size": 100
     }
-},
-{
-    "data": {
-        "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",
-        "type": "web"
-    },
-    "nodes": {
-        "A": [
-            "foo",
-            "bar"
-        ],
-        "W": "baz"
-    },
-    "script_params": {
-        "threshold": true,
-        "sample_size": 200
-    }
-},
-{
-    "data": {
-        "uri": "https://raw.githubusercontent.com/BerkeleyBiostats/tlapp/30821fe37d9fdb2cb645ad2c42f63f1c1644d7c4/cpp.csv",
-        "type": "web"
-    },
-    "nodes": {
-        "A": [
-            "foo",
-            "bar"
-        ],
-        "W": "baz"
-    },
-    "script_params": {
-        "threshold": true,
-        "sample_size": 300
-    }
-}]
+}
