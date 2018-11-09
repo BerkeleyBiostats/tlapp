@@ -117,7 +117,7 @@ def upload_to_ghap(c, job, username, password):
 
     # Write runner script to a file...
     app_root = os.environ.get("APP_ROOT")
-    runner_script_filename = os.path.join(app_root, "runner.R")
+    runner_script_filename = os.path.join(app_root, "templates/cluster_scripts/runner.R")
     remote_runner_script_filename = os.path.join(remote_code_folder, "runner.R")
     c.put(runner_script_filename, remote_runner_script_filename)
 
@@ -202,10 +202,17 @@ def upload_to_ghap(c, job, username, password):
     else:
         base_url = os.environ.get("BASE_URL")
 
+    # TODO: generate the url using django url and join with urllib
+    token = job.created_by.token.token
+    logs_url = base_url + "jobs/%s/append_log/" % job.id
     heartbeat_url = base_url + "jobs/%s/heartbeat/" % job.id
 
-    x_template = loader.get_template("ghap_scripts/x.py")
-    x_script = x_template.render({"heartbeat_url": heartbeat_url})
+    x_template = loader.get_template("cluster_scripts/x.py")
+    x_script = x_template.render({
+        "heartbeat_url": heartbeat_url,
+        "token": token,
+        "logs_url": logs_url,
+    })
     put_script(
         c,
         content=x_script,
@@ -215,12 +222,7 @@ def upload_to_ghap(c, job, username, password):
     )
 
     # Generate wrapper script for screen session
-    wrapper_script_template = loader.get_template("ghap_scripts/wrapper.sh")
-
-    # TODO: generate the url using django url and join with urllib
-    token = job.created_by.token.token
-
-    logs_url = base_url + "jobs/%s/append_log/" % job.id
+    wrapper_script_template = loader.get_template("cluster_scripts/ghap/wrapper.sh")
 
     wrapper_script = wrapper_script_template.render(
         {

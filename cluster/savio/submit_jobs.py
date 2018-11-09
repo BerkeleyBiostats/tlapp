@@ -83,7 +83,7 @@ def create_job_files(bundle_folder, job):
 
     create_file(
         name="runner.R",
-        copy_from_path=os.path.join(os.environ.get("APP_ROOT"), "runner.R"),
+        template="cluster_scripts/runner.R",
         executable=True
     )
     
@@ -155,7 +155,7 @@ def create_job_files(bundle_folder, job):
 
     create_file(
         name="x.py",
-        template="cluster_scripts/savio/x.py",
+        template="cluster_scripts/x.py",
         template_params={
             "token": token,
             "logs_url": logs_url,
