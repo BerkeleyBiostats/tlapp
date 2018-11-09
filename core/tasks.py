@@ -225,6 +225,7 @@ def upload_to_ghap(c, job, username, password):
     logs_url = base_url + "jobs/%s/append_log/" % job.id
 
     wrapper_script = wrapper_script_template.render({
+        "github_token": settings.GITHUB_TOKEN,
         "token": token,
         "logs_url": logs_url,
         "finish_url": base_url + "jobs/%s/finish/" % job.id,

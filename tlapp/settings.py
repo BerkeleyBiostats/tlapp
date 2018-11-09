@@ -171,3 +171,5 @@ INTERNAL_IPS = (
     '10.0.2.2',
     '172.18.0.1',
 )
+
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")

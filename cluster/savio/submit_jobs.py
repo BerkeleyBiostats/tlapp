@@ -11,6 +11,7 @@ import traceback
 import uuid
 from fabric.connection import Connection
 from django.template import loader, Context
+from django.conf import settings
 from core import models
 
 logger = logging.getLogger('django')
@@ -140,6 +141,7 @@ def create_job_files(bundle_folder, job):
         name="wrapper.sh",
         template="cluster_scripts/savio/wrapper.sh",
         template_params={
+            "github_token": settings.GITHUB_TOKEN,
             "token": token,
             "logs_url": logs_url,
             "job_url": job_url,
