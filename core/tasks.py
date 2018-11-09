@@ -196,6 +196,12 @@ def upload_to_ghap(c, job, username, password):
     logger.info(cmd)
 
     # upload x.py
+    base_url = None
+    if job.base_url: 
+        base_url = job.base_url
+    else:
+        base_url = os.environ.get("BASE_URL")
+        
     heartbeat_url = base_url + "jobs/%s/heartbeat/" % job.id
 
     x_template = loader.get_template('ghap_scripts/x.py')
@@ -213,11 +219,6 @@ def upload_to_ghap(c, job, username, password):
 
     # TODO: generate the url using django url and join with urllib
     token = job.created_by.token.token
-
-    if job.base_url: 
-        base_url = job.base_url
-    else:
-        base_url = os.environ.get("BASE_URL")
 
     logs_url = base_url + "jobs/%s/append_log/" % job.id
 
