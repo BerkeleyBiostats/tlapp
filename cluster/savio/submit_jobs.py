@@ -1,5 +1,6 @@
 from contextlib import redirect_stdout, redirect_stderr
 import boto3
+import datetime
 import io
 import json
 import logging
@@ -13,6 +14,7 @@ from fabric.connection import Connection
 from django.template import loader, Context
 from django.conf import settings
 from core import models
+from ..redirect_logs import redirect_logs
 
 logger = logging.getLogger('django')
 
@@ -219,15 +221,6 @@ def submit_savio_jobs(jobs, username, password):
 
     return output
 
-class StreamingStringIO(io.StringIO):
-    def __init__(self, job):
-        self.job = job
-        io.StringIO.__init__(self)
-
-    def write(self, s):
-        io.StringIO.write(self, s)
-        self.job.output = self.getvalue()
-        self.job.save(update_fields=["output"])
 
 def submit_jobs(jobs, username, password):
 
@@ -238,13 +231,8 @@ def submit_jobs(jobs, username, password):
         job.status = models.ModelRun.status_choices["submitted"]
         job.save(update_fields=["status"])
 
-    f = StreamingStringIO(job)
-    with redirect_stdout(f), redirect_stderr(f):
-        try:
-            submit_savio_jobs(jobs, username, password)
-        except:
-            logger.info(traceback.format_exc())
-            for job in jobs:
-                job.status = models.ModelRun.status_choices["error"]
-                job.save(update_fields=["status"])
+    with redirect_logs(job):
+        submit_savio_jobs(jobs, username, password)
+
+
 

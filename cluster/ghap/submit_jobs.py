@@ -18,7 +18,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.template import loader, Context
 from core import models
-from ..run_job import run_job
+from ..redirect_logs import redirect_logs
+
 
 logger = logging.getLogger("django")
 
@@ -272,7 +273,12 @@ def run_ghap_job(job):
 
 
 def submit_job(job):
-    run_job(run_ghap_job, job)
+    job.status = models.ModelRun.status_choices["running"]
+    job.last_heartbeat = datetime.datetime.utcnow()
+    job.save(update_fields=["status", "last_heartbeat"])
+    with redirect_logs(job):
+        run_ghap_job(job)
+    job.save()
 
 
 def submit_jobs(jobs):
