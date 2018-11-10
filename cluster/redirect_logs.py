@@ -5,8 +5,6 @@ import datetime
 import traceback
 from core import models
 
-logger = logging.getLogger("django")
-
 @contextmanager
 def redirect_logs(job):
     f = StreamingStringIO(job)
@@ -14,7 +12,7 @@ def redirect_logs(job):
         try:
             yield
         except:
-            logger.info(traceback.format_exc())
+            print(traceback.format_exc())
             job.status = models.ModelRun.status_choices["error"]
 
 class StreamingStringIO(io.StringIO):

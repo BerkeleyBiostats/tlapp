@@ -1,3 +1,7 @@
 {% extends "cluster_scripts/wrapper.sh" %}
 
-# GHAP has no customizations
+{% block preprovision %}
+
+./ensure_git_dataset.sh
+
+{% endblock %}
