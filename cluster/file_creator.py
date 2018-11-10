@@ -6,10 +6,13 @@ class FileCreator(object):
 
     directory = None
 
-    def initialize(directory):
+    def initialize(self, directory):
         self.directory = directory
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-    def create_file(name=None, content=None, copy_from_path=None, template=None, template_params=None, executable=False):
+
+    def create_file(self, name=None, content=None, copy_from_path=None, template=None, template_params=None, executable=False):
         if copy_from_path:
             with open(copy_from_path) as f:
                 content = f.read()
@@ -22,6 +25,6 @@ class FileCreator(object):
         if executable:
             os.chmod(filename, 0o755)
 
-    def create_directory(name=None):
+    def create_directory(self, name=None):
         path = os.path.join(self.directory, name)
         os.mkdir(path)

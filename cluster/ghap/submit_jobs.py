@@ -22,7 +22,6 @@ from ..redirect_logs import redirect_logs
 from ..generate_s3_urls import generate_s3_urls
 from ..file_creator import FileCreator
 
-logger = logging.getLogger("django")
 
 
 file_creator = FileCreator()
@@ -90,7 +89,10 @@ def upload_to_ghap(c, job, username, password):
     remote_output_folder_full_path = os.path.join(remote_code_folder, remote_output_folder)
     local_code_folder = tempfile.mkdtemp()
 
-    file_creator.initialize(local_code_folder)
+    file_creator.initialize(os.path.join(
+        local_code_folder,
+        remote_code_folder_name
+    ))
 
     ensure_dataset(job, username, password)
 
@@ -122,14 +124,14 @@ def upload_to_ghap(c, job, username, password):
     job.save(update_fields=["output_url"])
 
     cmd = "Rscript --default-packages=methods,stats,utils %s %s %s %s" % (
-        remote_runner_script_filename,
-        remote_code_filename,
-        remote_input_filename,
+        "runner.R",
+        "script.Rmd",
+        "inputs.json",
         remote_output_folder_full_path,
     )
 
-    logger.info("Command to run:")
-    logger.info(cmd)
+    print("Command to run:")
+    print(cmd)
 
     # upload x.py
     base_url = None
@@ -142,6 +144,7 @@ def upload_to_ghap(c, job, username, password):
     token = job.created_by.token.token
     logs_url = base_url + "jobs/%s/append_log/" % job.id
     heartbeat_url = base_url + "jobs/%s/heartbeat/" % job.id
+    job_url = base_url + "jobs/%s/" % job.id
 
     file_creator.create_file(
         name="x.py",
@@ -195,7 +198,7 @@ def upload_to_ghap(c, job, username, password):
         "sleep 1",
     ]
     command = ";".join(commands)
-    logger.info(command)
+    print(command)
     output = c.run(command)
 
     return output
