@@ -72,8 +72,8 @@ def ensure_dataset(job, username, password):
 
     file_creator.create_file(
         name="ensure_git_dataset.sh",
-        template="cluster_scripts/ghap/ensure_git_dataset",
-        template_context={
+        template="cluster_scripts/ghap/ensure_git_dataset.sh",
+        template_params={
             "repo_base_path": repo_base_path,
             "repo_path": repo_path,
             "git_url_with_password": git_url_with_password
