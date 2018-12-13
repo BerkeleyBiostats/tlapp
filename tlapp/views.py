@@ -185,6 +185,7 @@ def job_detail(request, job_id):
 
     response_format = request.GET.get("format")
     job = models.ModelRun.objects.get(pk=job_id)
+    job_listing = models.ModelRunListing.objects.get(pk=job_id)
 
     if request.method == "POST":
         job_data = json.loads(request.body.decode("utf-8"))
@@ -202,7 +203,7 @@ def job_detail(request, job_id):
             status_counts[choice] = job.status_count(choice)
         context["status_counts"] = status_counts
 
-        child_jobs = job.children
+        child_jobs = job_listing.children
         status_filter = request.GET.get("status")
         if status_filter:
             child_jobs = child_jobs.filter(status=status_filter)
