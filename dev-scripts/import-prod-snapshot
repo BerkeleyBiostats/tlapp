@@ -1,3 +1,9 @@
+
+
+# docker exec -it tlapp_db_1 /bin/bash
+# cd /app/dev-scripts
+# ./import-prod-snapshot /app/snapshots/4e48e7f3-8b9c-4275-b3b4-a4f85fd4a3e0
+
 pg_restore --verbose \
            --clean \
            --no-acl \
@@ -5,4 +11,4 @@ pg_restore --verbose \
            -h localhost \
            -U longbow \
            -d longbow \
-           /app/snapshots/foo.dump
+           $1

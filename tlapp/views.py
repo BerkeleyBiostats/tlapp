@@ -116,9 +116,9 @@ def _jobs(request):
     ids = parse_id_comma_list(ids)
 
     if request.user.is_superuser:
-        jobs = models.ModelRun.objects
+        jobs = models.ModelRunListing.objects
     else:
-        jobs = models.ModelRun.objects.filter(created_by=request.user)
+        jobs = models.ModelRunListing.objects.filter(created_by=request.user)
 
     if mode == "oneoff":
         jobs = jobs.filter(parent=None, is_batch=False)
@@ -141,7 +141,6 @@ def _jobs(request):
         jobs = jobs.filter(status=status_filter)
 
     jobs = jobs.prefetch_related("created_by", "children")
-    jobs = jobs.defer("inputs", "output", "output_zip", "report_html", "code", "provision")
 
     per_page = request.GET.get("per_page", 30)
     paginator = Paginator(jobs, per_page)
