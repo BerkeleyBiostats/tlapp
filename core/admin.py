@@ -33,5 +33,3 @@ class ModelRunAdmin(admin.ModelAdmin):
 		"code",
 		"provision",
 	)
-
-# admin.site.register(models.ModelRun)
