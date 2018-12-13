@@ -57,6 +57,7 @@ class ModelRunBase(models.Model):
         'postprocessing': 'postprocessing',
         'error': 'error',
         'success': 'success',
+        'cancelled': 'cancelled',
     }
 
     created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)

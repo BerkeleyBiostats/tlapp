@@ -217,6 +217,23 @@ def job_detail(request, job_id):
 
 
 @login_required
+def job_cancel(request, job_id):
+
+    def cancel(job):
+        if job.status == models.ModelRunListing.status_choices["queued"]:
+            job.status = models.ModelRunListing.status_choices["cancelled"]
+            job.save(update_fields=["status"])
+
+    job = models.ModelRunListing.objects.get(pk=job_id)
+    cancel(job)
+
+    for child in job.children.all():
+        cancel(child)
+
+    return redirect('job_detail', job_id)
+
+
+@login_required
 def job_output(request, job_id):
     job = models.ModelRun.objects.get(pk=job_id)
     context = {"job": job}

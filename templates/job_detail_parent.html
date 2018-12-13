@@ -18,6 +18,11 @@
 {% endif %}
             </div>
             <div class="ibox-content">
+
+            <div>
+                <a class="btn btn-default pull-right" href="{% url 'job_cancel' job.id %}">Cancel Queued</a>
+            </div>
+
             <p>Backend: {{ job.backend }}</p>
             <p>Created at: {{ job.created_at }}</p>
             <div class="m-t-lg">
