@@ -13,6 +13,8 @@ class FileCreator(object):
 
 
     def create_file(self, name=None, content=None, copy_from_path=None, template=None, template_params=None, executable=False):
+        if content is None:
+            content = ""
         if copy_from_path:
             with open(copy_from_path) as f:
                 content = f.read()
