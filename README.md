@@ -65,7 +65,7 @@ Then,
 docker-compose up
 ```
 
-A number of helper scripts are included. See the (dev-scripts)[dev-scripts] folder. 
+A number of helper scripts are included. See the [dev-scripts](dev-scripts) folder. 
 
 Creative Commons Credits
 ---
