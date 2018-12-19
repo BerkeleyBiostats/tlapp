@@ -3,6 +3,13 @@ from cluster.parse_notebook import get_yaml_header
 from cluster.provision_code_generator import build_provision_code
 from core import models
 
+def cache_ghap_password(job, ghap_password):
+    if ghap_password is None:
+        return
+    # expire saved password after a day to reduce impact of the
+    # application being compromised
+    cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60 * 60 * 24)
+
 def create_jobs(created_by, job_data, parent=None):
 
     inputs = job_data.get("inputs", {})
@@ -16,11 +23,6 @@ def create_jobs(created_by, job_data, parent=None):
         ghap_username = ghap_credentials["username"]
         ghap_password = ghap_credentials["password"]
         ghap_ip = ghap_credentials["ip"]
-
-    if ghap_password:
-        # expire saved password after a day to reduce impact of the
-        # application being compromised
-        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60 * 60 * 24)
 
     if "r_packages" in job_data:
         job_data["provision"] = build_provision_code(job_data["r_packages"])
@@ -65,6 +67,8 @@ def create_jobs(created_by, job_data, parent=None):
         )
         parent_job.save()
 
+        cache_ghap_password(parent_job, ghap_password)
+
         job_list = []
         for inputs_dict in inputs:
             single_job_data = job_data.copy()
@@ -93,6 +97,8 @@ def create_jobs(created_by, job_data, parent=None):
         parent=parent
     )
     job.save()
+
+    cache_ghap_password(job, ghap_password)
 
     return [job]
 
