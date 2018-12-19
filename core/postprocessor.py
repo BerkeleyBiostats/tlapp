@@ -5,6 +5,7 @@ import io
 import json
 import logging
 import os
+import pytz
 import subprocess
 import sys
 import tarfile
@@ -130,7 +131,7 @@ def handle_a_job():
         return 1
 
     job.status = models.ModelRun.status_choices["postprocessing"]
-    job.postprocessing_attempted_at = datetime.datetime.utcnow()
+    job.postprocessing_attempted_at = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
     job.postprocessing_attempts = job.postprocessing_attempts + 1
     job.save()
 

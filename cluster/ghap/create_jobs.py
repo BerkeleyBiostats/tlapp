@@ -45,11 +45,15 @@ def create_jobs(created_by, job_data, parent=None):
     if isinstance(inputs, list):
 
         parent_job = models.ModelRun(
-            status=models.ModelRun.status_choices["created"],
+            dataset_id=job_data.get("dataset", None),
+            status=models.ModelRun.status_choices["queued"],
             inputs=inputs,
             backend="ghap",
+            ghap_username=ghap_username,
+            ghap_ip=ghap_ip,
+            base_url=job_data.get("base_url"),
             title=title,
-            code=code,
+            code="This is a parent job only responsible for provisioning",
             provision=provision,
             created_by=created_by,
             is_batch=True

@@ -22,13 +22,18 @@ def reap_stalled_jobs():
 
 
 def push_a_ghap_job():
-    # Pick off a random ModelRun job
-    job = (
-        models.ModelRun.objects.filter(status=models.ModelRun.status_choices["queued"])
-        .order_by("?")
-        .first()
-    )
 
+    # Choose a `queued` job that either has not parent or a `queued` child
+    # job whose parent has succeeded.
+    queued = models.ModelRun.status_choices["queued"]
+    success = models.ModelRun.status_choices["success"]
+    queued_parent_jobs = models.ModelRun.objects.filter(status=queued, parent=None)
+    ready_child_jobs = models.ModelRun.objects.filter(status=queued, parent__status=success)
+
+    all_jobs = queued_parent_jobs.union(ready_child_jobs)
+
+    job = all_jobs.first()
+    
     if job is None:
         return 0
 

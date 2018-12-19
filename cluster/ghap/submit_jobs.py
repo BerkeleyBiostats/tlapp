@@ -5,6 +5,7 @@ from datetime import timedelta
 import json
 import logging
 import os
+import pytz
 import pipes
 import shutil
 import subprocess
@@ -214,8 +215,11 @@ def run_ghap_job(job):
 
 
 def submit_job(job):
+
+    print("submitting ghap job")
+
     job.status = models.ModelRun.status_choices["running"]
-    job.last_heartbeat = datetime.datetime.utcnow()
+    job.last_heartbeat = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
     job.save(update_fields=["status", "last_heartbeat"])
     with redirect_logs(job):
         run_ghap_job(job)

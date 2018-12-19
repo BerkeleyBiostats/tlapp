@@ -25,6 +25,12 @@
 
             <p>Backend: {{ job.backend }}</p>
             <p>Created at: {{ job.created_at }}</p>
+            <p>
+                Provisioning status: {{ job.status }}
+                <a class="m-l-lg" href="{% url 'job_view_logs' job.id %}">
+                    View Logs
+                </a>
+            </p>
             <div class="m-t-lg">
 
 
