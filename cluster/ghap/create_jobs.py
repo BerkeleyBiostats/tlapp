@@ -17,6 +17,11 @@ def create_jobs(created_by, job_data, parent=None):
         ghap_password = ghap_credentials["password"]
         ghap_ip = ghap_credentials["ip"]
 
+    if ghap_password:
+        # expire saved password after a day to reduce impact of the
+        # application being compromised
+        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60 * 60 * 24)
+
     if "r_packages" in job_data:
         job_data["provision"] = build_provision_code(job_data["r_packages"])
 
@@ -88,11 +93,6 @@ def create_jobs(created_by, job_data, parent=None):
         parent=parent
     )
     job.save()
-
-    if ghap_password:
-        # expire saved password after a day to reduce impact of the
-        # application being compromised
-        cache.set("ghap_password_%s" % job.id, ghap_password, timeout=60 * 60 * 24)
 
     return [job]
 
