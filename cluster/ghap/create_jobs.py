@@ -71,6 +71,8 @@ def create_jobs(created_by, job_data, parent=None):
             "children": job_list
         }
 
+    provision = 'echo "skipping provisioning because this is a child job"'
+
     job = models.ModelRun(
         dataset_id=job_data.get("dataset", None),
         status=models.ModelRun.status_choices["queued"],
