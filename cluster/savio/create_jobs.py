@@ -8,6 +8,7 @@ def create_jobs(created_by, job_data, parent=None):
     code = job_data.get("code")
     header = get_yaml_header(code)
     title = header.get("title")
+    base_url = job_data.get("base_url")
 
     # Grab provision information from the code
     provision_header = header.get("required_packages")
@@ -25,8 +26,9 @@ def create_jobs(created_by, job_data, parent=None):
             status=models.ModelRun.status_choices["created"],
             inputs=inputs,
             backend="savio",
+            base_url=base_url,
             title=title,
-            code=code,
+            code="This is a parent job only responsible for provisioning",
             provision=provision,
             created_by=created_by,
             is_batch=True
@@ -44,8 +46,7 @@ def create_jobs(created_by, job_data, parent=None):
             "children": job_list
         }
 
-
-    base_url = job_data.get("base_url")
+    provision = 'echo "skipping provisioning because this is a child job"'
 
     job = models.ModelRun(
         status=models.ModelRun.status_choices["created"],

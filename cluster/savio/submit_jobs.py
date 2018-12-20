@@ -169,11 +169,15 @@ def create_job_files(bundle_folder, job):
     return local_code_folder    
 
 
-def submit_savio_jobs(jobs, username, password):
+def submit_savio_jobs(jobs, username, password, parent=None):
 
     local_bundle_folder = tempfile.mkdtemp()
 
     job_dir_names = []
+
+    if parent:
+        job_dir_names.append(create_job_files(local_bundle_folder, parent))
+
     for job in jobs:
         job_dir_names.append(create_job_files(local_bundle_folder, job))
 
@@ -206,9 +210,20 @@ def submit_savio_jobs(jobs, username, password):
         "tar xvzf %s --strip 1" % tar_filename,
     ]
 
+    # TODO: if there's a parent job, add the dependency flag
+    created_parent_job = False
+
     for job_dir_name in job_dir_names:
         commands.append("cd %s" % job_dir_name)
-        commands.append("sbatch slurm.sh")
+
+        if parent and not created_parent_job:
+            commands.append("parentjobid=$(sbatch slurm.sh | cut -d' ' -f4)")
+            created_parent_job = True
+        elif parent:
+            commands.append("sbatch --dependency=afterok:$parentjobid slurm.sh")
+        else:
+            commands.append("sbatch slurm.sh")
+
         commands.append("cd ..")
 
     command = ";".join(commands)
@@ -224,7 +239,10 @@ def submit_savio_jobs(jobs, username, password):
 
 def submit_jobs(jobs, username, password):
 
+    parent = None
+
     if isinstance(jobs, dict):
+        parent = jobs["parent"]
         jobs = jobs["children"]
 
     for job in jobs:
@@ -232,7 +250,7 @@ def submit_jobs(jobs, username, password):
         job.save(update_fields=["status"])
 
     with redirect_logs(job):
-        submit_savio_jobs(jobs, username, password)
+        submit_savio_jobs(jobs, username, password, parent=parent)
 
 
 
