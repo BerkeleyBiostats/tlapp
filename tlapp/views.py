@@ -157,7 +157,7 @@ def _jobs(request):
 
     if response_format == "json":
         # TODO: add the rest of pagination
-        return JsonResponse({"jobs": [job.as_dict() for job in jobs]})
+        return JsonResponse({"jobs": [job.as_dict() for job in jobs.values_list('id','status')]})
     else:
         return render(request, "jobs.html", context)
 
@@ -313,7 +313,8 @@ def _submit_job(request):
     job_data = json.loads(request.body.decode("utf-8"))
 
     if job_data["backend"] == "savio":
-        jobs = cluster.savio.create_jobs(request.user, job_data)
+        jobs = cluster.savio.create
+        (request.user, job_data)
         cluster.savio.submit_jobs(
             jobs, 
             job_data["savio_credentials"]["username"],
