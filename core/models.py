@@ -113,7 +113,7 @@ class ModelRunBase(models.Model):
         if self.model_template is not None:
             ret['model_template'] = self.model_template.name
         if self.has_children:
-            ret['jobs'] = [job.as_dict() for job in self.children.all()]
+            ret['jobs'] = [job for job in self.children.values("id","status")]
         return ret
 
 # Unmanaged model to skip loading of large fields like `report_html`
