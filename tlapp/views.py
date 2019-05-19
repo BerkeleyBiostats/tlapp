@@ -157,7 +157,7 @@ def _jobs(request):
 
     if response_format == "json":
         # TODO: add the rest of pagination
-        return JsonResponse({"jobs": [job.as_dict() for job in jobs.values_list('id','status')]})
+        return JsonResponse({"jobs": [job for job in jobs.values('id','status')]})
     else:
         return render(request, "jobs.html", context)
 
