@@ -14,6 +14,7 @@ import tarfile
 import tempfile
 import traceback
 import uuid
+import backoff
 from fabric.connection import Connection
 from django.conf import settings
 from django.core.cache import cache
@@ -82,6 +83,10 @@ def ensure_dataset(job, username, password):
         executable=True
     )
 
+@backoff.on_exception(backoff.expo,
+                      Exception,
+                      max_tries=3,
+                      jitter=backoff.full_jitter)
 def upload_to_ghap(c, job, username, password):
     temp_base_dir = "/tmp"
     remote_code_folder_name = make_temp_dir_name()
