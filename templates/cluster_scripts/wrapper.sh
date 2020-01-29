@@ -23,7 +23,8 @@ echo "Running provision script"
 
 echo "Making sure longbowtools package is available for runner"
 
-module load pandoc-2.1.2
+module load pandoc-2.4
+module load pandoc-1.17
 module load gcc-4.9.4
 module load python-3.5.2
 
