@@ -19,7 +19,7 @@ gunicorn==19.9.0
 idna==2.7
 jmespath==0.9.3
 newrelic==4.4.1.104
-paramiko==2.4.2
+paramiko==2.10.1
 psycopg2==2.7.5
 pyasn1==0.4.4
 pycparser==2.19
